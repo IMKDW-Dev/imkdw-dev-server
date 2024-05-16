@@ -1,2 +1,1 @@
-# Server
-IMKDW DEV 서버
+# IMKDW DEV Server
