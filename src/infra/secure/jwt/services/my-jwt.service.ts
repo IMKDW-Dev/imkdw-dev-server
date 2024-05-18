@@ -21,4 +21,8 @@ export default class MyJwtService implements IMyJwtService {
     const expiresIn = tokenType === 'access' ? this.ACCESS_TOKEN_EXPIRES_IN : this.REFRESH_TOKEN_EXPIRES_IN;
     return this.jwtService.sign({ userId }, { expiresIn });
   }
+
+  verify(token: string): string {
+    return this.jwtService.verify(token).userId;
+  }
 }

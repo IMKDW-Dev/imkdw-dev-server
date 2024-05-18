@@ -7,4 +7,4 @@ export const extendedPrismaClient = prismaClient.$extends({
   query: {},
 });
 
-export type ExtendedPrismaClient = typeof extendedPrismaClient;
+export interface ExtendedPrismaClient extends PrismaClient {}

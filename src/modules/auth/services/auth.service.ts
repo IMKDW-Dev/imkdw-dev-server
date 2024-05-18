@@ -14,7 +14,7 @@ export default class AuthService {
     const accessToken = this.jwtService.generateToken('access', userId);
     const refreshToken = this.jwtService.generateToken('refresh', userId);
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, userId };
   }
 
   async register(email: string, profile: string, oAuthProvider: UserOAuthProvider) {

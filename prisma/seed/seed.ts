@@ -36,7 +36,7 @@ async function main() {
   );
 
   // 카테고리 시딩
-  await createSeed(addCommonFields(categorySeed), (data) => prisma.category.createMany({ data, skipDuplicates: true }));
+  // await createSeed(addCommonFields(categorySeed), (data) => prisma.category.createMany({ data, skipDuplicates: true }));
 }
 
 main()

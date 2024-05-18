@@ -1,4 +1,5 @@
 import { generateCuid } from '../../../../common/utils/cuid';
+import { generateUUID } from '../../../../common/utils/uuid';
 import UserOAuthProvider from './user-oauth-provider.entity';
 import UserRole from './user-role.entity';
 
@@ -55,6 +56,10 @@ export default class User {
 
   isSignupWithOAuthProvider(oAuthProvider: UserOAuthProvider) {
     return this.oAuthProvider.equals(oAuthProvider);
+  }
+
+  generateId() {
+    this.id = generateUUID();
   }
 }
 

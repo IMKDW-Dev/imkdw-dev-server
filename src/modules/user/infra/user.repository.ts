@@ -1,19 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { users, userRoles, userOAuthProviders } from '@prisma/client';
-import { PrismaService } from 'nestjs-prisma';
+import { CustomPrismaService } from 'nestjs-prisma';
+
 import User, { UserBuilder } from '../domain/entities/user.entity';
 import { UserQueryFilter } from '../repository/user/user-query.filter';
 import { IUserRepository } from '../repository/user/user-repo.interface';
 import UserRole from '../domain/entities/user-role.entity';
 import UserOAuthProvider from '../domain/entities/user-oauth-provider.entity';
-import { PRISMA_SERVICE } from '../../../infra/database/prisma';
+import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 
 @Injectable()
 export default class UserRepository implements IUserRepository {
-  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
+  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
 
   async findOne(where: UserQueryFilter): Promise<User | null> {
-    const row = await this.prisma.users.findFirst({
+    const row = await this.prisma.client.users.findFirst({
       where,
       include: { oAuthProvider: true, role: true },
     });
@@ -26,7 +27,7 @@ export default class UserRepository implements IUserRepository {
   }
 
   async save(user: User): Promise<User> {
-    const row = await this.prisma.users.create({
+    const row = await this.prisma.client.users.create({
       include: {
         role: true,
         oAuthProvider: true,

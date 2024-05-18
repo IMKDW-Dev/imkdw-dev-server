@@ -8,8 +8,10 @@ import UserService from './services/user.service';
 import { USER_ROLE_REPOSITORY } from './repository/role/user-role-repo.interface';
 import UserRoleRepository from './infra/user-role.repository';
 import UserOAuthRepository from './infra/user-oauth.repository';
+import UserController from './controllers/user.controller';
 
 @Module({
+  controllers: [UserController],
   providers: [
     UserQueryService,
     UserOAuthQueryService,

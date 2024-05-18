@@ -1,12 +1,17 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CustomPrismaModule } from 'nestjs-prisma';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PRISMA_SERVICE, extendedPrismaClient } from './infra/database/prisma';
 import AuthModule from './modules/auth/auth.module';
 import UserModule from './modules/user/user.module';
+import LoggerMiddleware from './common/middlewares/logger.middleware';
+import JwtCookieMiddleware from './modules/auth/middlewares/jwt-cookie.middleware';
+import JwtGuard from './modules/auth/guards/jwt.guard';
+import TransformInterceptor from './common/interceptors/transform.interceptor';
 
 @Module({
   imports: [
@@ -19,11 +24,31 @@ import UserModule from './modules/user/user.module';
       isGlobal: true,
       useFactory: () => extendedPrismaClient,
     }),
-
     AuthModule,
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+  ],
 })
-export default class AppModule {}
+export default class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer
+      .apply(JwtCookieMiddleware)
+      .exclude({
+        path: '/v1/oauth/google',
+        method: RequestMethod.POST,
+      })
+      .forRoutes('*');
+  }
+}

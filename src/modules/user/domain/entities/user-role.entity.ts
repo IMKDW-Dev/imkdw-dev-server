@@ -10,4 +10,8 @@ export default class UserRole {
   getId(): number {
     return this.id;
   }
+
+  getName(): string {
+    return this.name;
+  }
 }
