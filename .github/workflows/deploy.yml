@@ -31,9 +31,6 @@ jobs:
             exit 0
           fi
 
-      - name: 임시
-        run: echo ${{ secrets.AWS_ECR_URI }}
-
       - name: 코드 가져오기
         uses: actions/checkout@v3
 
@@ -50,8 +47,8 @@ jobs:
 
       - name: 도커 이미지 빌드 및 ECR 이미지 업로드
         run: |
-          docker build . -t ${{ secrets.AWS_ECR_URI }}:latest
-          docker push ${{ secrets.AWS_ECR_URI }}:latest
+          docker build . -t ${{ secrets.AWS_ECR_URI_SERVER }}:latest
+          docker push ${{ secrets.AWS_ECR_URI_SERVER }}:latest
 
       - name: Github Actions IP 확인
         id: ip
@@ -69,7 +66,7 @@ jobs:
           key: ${{ env.EC2_SSH_KEY }}
           script: |
             # ECR 로그인
-            aws ecr get-login-password --profile imkdw --region ap-northeast-2 | sudo docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_URI }}
+            aws ecr get-login-password --profile imkdw --region ap-northeast-2 | sudo docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_URI_SERVER }}
 
             # 기존에 존재하는 컨테이너 종료
             if sudo docker ps | grep "server"; then
@@ -82,15 +79,15 @@ jobs:
             fi
 
             # 기존에 존재하는 이미지 삭제
-            if sudo docker images | grep ${{ secrets.AWS_ECR_URI }}; then
-              sudo docker rmi ${{ secrets.AWS_ECR_URI }}
+            if sudo docker images | grep ${{ secrets.AWS_ECR_URI_SERVER }}; then
+              sudo docker rmi ${{ secrets.AWS_ECR_URI_SERVER }}
             fi
 
             # 도커 이미지 가져오기
-            sudo docker pull ${{ secrets.AWS_ECR_URI }}
+            sudo docker pull ${{ secrets.AWS_ECR_URI_SERVER }}
 
             # 도커 이미지 실행
-            sudo docker run -d --name server --env-file ~/imkdw-dev/.env -p 4000:4000 ${{ secrets.AWS_ECR_URI }}
+            sudo docker run -d --name server --env-file ~/imkdw-dev/.env -p 4000:4000 ${{ secrets.AWS_ECR_URI_SERVER }}
 
             # 기존 ECR에 업로드된 도커 이미지 삭제
             aws ecr batch-delete-image --profile imkdw --repository-name imkdw-dev --image-ids imageTag=latest
@@ -108,4 +105,4 @@ jobs:
           text: ${{ steps.set_text.outputs.text }}
         env:
           SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
-        if: always() # 스크립트 성공, 실패 상관없이 항상 메세지를 발송
+        if: always()
