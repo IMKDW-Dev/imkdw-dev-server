@@ -19,8 +19,6 @@ export default class UserRepository implements IUserRepository {
       include: { oAuthProvider: true, role: true },
     });
 
-    console.log(row);
-
     if (!row) {
       return null;
     }

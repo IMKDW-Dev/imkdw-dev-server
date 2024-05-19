@@ -158,9 +158,11 @@ model articleTag {
 }
 
 model category {
-  id   Int    @id @default(autoincrement())
-  name String @unique @db.Char(20)
-  sort Int
+  id    Int     @id @default(autoincrement())
+  name  String  @unique @db.Char(20)
+  image String? @db.VarChar(255)
+  desc  String  @db.VarChar(255)
+  sort  Int
 
   createAt   DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")

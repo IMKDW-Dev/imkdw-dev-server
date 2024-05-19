@@ -1,20 +1,51 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  ParseIntPipe,
+  Post,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 import * as Swagger from '../docs/category.swagger';
 import AdminGuard from '../../auth/guards/admin.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import UserRoles from '../../user/enums/user-role.enum';
 import CategoryService from '../services/category.service';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
+import { Public } from '../../auth/decorators/public.decorator';
+import ResponseGetCategoriesDto from '../dto/response/get-categories.dto';
 
 @Controller({ path: 'categories', version: '1' })
 export default class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
+  // TODO: 이미지 검증 파이프 추가하기
   @Swagger.createCategory('카테고리 생성')
   @Post()
+  @UseInterceptors(FileInterceptor('image'))
   @UseGuards(AdminGuard)
   @Roles(UserRoles.ADMIN)
-  async createCategory(@Body() body: RequestCreateCategoryDto): Promise<void> {
-    await this.categoryService.createCategory(body.name);
+  async createCategory(
+    @Body() body: RequestCreateCategoryDto,
+    @UploadedFile() image: Express.Multer.File,
+  ): Promise<void> {
+    await this.categoryService.createCategory({
+      name: body.name,
+      desc: body.desc,
+      image,
+    });
+  }
+
+  @Swagger.getCategories('카테고리 목록 조회')
+  @Public()
+  @Get()
+  async getCategories(@Query('limit', ParseIntPipe) limit: number = 5): Promise<ResponseGetCategoriesDto> {
+    const categories = await this.categoryService.getCategories(limit);
+    return { items: categories };
   }
 }
