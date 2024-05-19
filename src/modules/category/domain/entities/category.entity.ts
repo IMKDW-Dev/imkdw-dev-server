@@ -1,3 +1,5 @@
+import CategoryDto from '../../dto/category.dto';
+
 export default class Category {
   constructor(builder: CategoryBuilder) {
     this.id = builder.id;
@@ -12,6 +14,9 @@ export default class Category {
   private sort: number;
   private image: string;
   private desc: string;
+
+  // TODO: 게시글 개수 하드코딩 제거
+  private articleCount: number = 0;
 
   getId(): number {
     return this.id;
@@ -32,6 +37,14 @@ export default class Category {
   getDesc(): string {
     return this.desc;
   }
+
+  getArticleCount(): number {
+    return this.articleCount;
+  }
+
+  toDto(): CategoryDto {
+    return new CategoryDto(this.id, this.name, this.sort, this.desc, this.image, this.articleCount);
+  }
 }
 
 export class CategoryBuilder {
@@ -40,6 +53,7 @@ export class CategoryBuilder {
   sort: number;
   image: string;
   desc: string;
+  articleCount: number;
 
   public setId(id: number): CategoryBuilder {
     this.id = id;

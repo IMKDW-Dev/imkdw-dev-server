@@ -47,6 +47,7 @@ export default class CategoryRepository implements ICategoryRepository {
         ...(filter?.name && { name: filter.name }),
       },
       ...(filter?.limit && { take: filter.limit }),
+      orderBy: { sort: 'desc' },
     });
 
     return rows.map((row) => this.toEntity(row));
@@ -60,7 +61,13 @@ export default class CategoryRepository implements ICategoryRepository {
   }
 
   private toEntity(_category: PrismaCategory) {
-    const category = new CategoryBuilder().setId(_category.id).setName(_category.name).setSort(_category.sort).build();
+    const category = new CategoryBuilder()
+      .setId(_category.id)
+      .setName(_category.name)
+      .setSort(_category.sort)
+      .setImage(_category.image)
+      .setDesc(_category.desc)
+      .build();
 
     return category;
   }

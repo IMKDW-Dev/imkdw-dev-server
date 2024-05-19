@@ -2,9 +2,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CATEGORY_REPOSITORY, ICategoryRepository } from '../repository/category-repo.interface';
 import Category, { CategoryBuilder } from '../domain/entities/category.entity';
 import { DuplicateCategoryNameException } from '../../../common/exceptions/409';
-import { GetCategoriesItem } from '../dto/response/get-categories.dto';
 import { CreateCategoryDto } from '../dto/internal/create-category.dto';
 import CategoryImageService from './category-image.service';
+import { CategoryNotFoundException } from '../../../common/exceptions/404';
+import CategoryDto from '../dto/category.dto';
 
 @Injectable()
 export default class CategoryService {
@@ -35,8 +36,17 @@ export default class CategoryService {
     return category;
   }
 
-  async getCategories(limit: number): Promise<GetCategoriesItem[]> {
+  async getCategories(limit: number): Promise<CategoryDto[]> {
     const categories = await this.categoryRepository.findMany({ limit });
-    return categories.map((category) => GetCategoriesItem.toDto(category));
+    return categories.map((category) => category.toDto());
+  }
+
+  async getCategoryDetail(name: string): Promise<CategoryDto> {
+    const category = await this.categoryRepository.findOne({ name });
+    if (!category) {
+      throw new CategoryNotFoundException({ name });
+    }
+
+    return category.toDto();
   }
 }

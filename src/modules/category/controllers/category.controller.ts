@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
+  Param,
   ParseIntPipe,
   Post,
   Query,
@@ -19,6 +21,7 @@ import CategoryService from '../services/category.service';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
 import { Public } from '../../auth/decorators/public.decorator';
 import ResponseGetCategoriesDto from '../dto/response/get-categories.dto';
+import CategoryDto from '../dto/category.dto';
 
 @Controller({ path: 'categories', version: '1' })
 export default class CategoryController {
@@ -44,8 +47,17 @@ export default class CategoryController {
   @Swagger.getCategories('카테고리 목록 조회')
   @Public()
   @Get()
-  async getCategories(@Query('limit', ParseIntPipe) limit: number = 5): Promise<ResponseGetCategoriesDto> {
+  async getCategories(
+    @Query('limit', new DefaultValuePipe(999), ParseIntPipe) limit?: number,
+  ): Promise<ResponseGetCategoriesDto> {
     const categories = await this.categoryService.getCategories(limit);
     return { items: categories };
+  }
+
+  @Swagger.getCategoryDetail('카테고리 상세 조회')
+  @Public()
+  @Get(':name')
+  async getCategoryDetail(@Param('name') name: string): Promise<Ca  tegoryDto> {
+    return this.categoryService.getCategoryDetail(name);
   }
 }

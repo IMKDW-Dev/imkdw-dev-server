@@ -1,6 +1,3 @@
-export interface UpdateCategoryDto {
-  name?: string;
-  sort?: number;
-  image?: string;
-  description?: string;
-}
+import CategoryDto from '../category.dto';
+
+export interface UpdateCategoryDto extends Partial<Pick<CategoryDto, 'name' | 'sort' | 'image' | 'desc'>> {}

@@ -1,6 +1,8 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
+import ResponseGetCategoriesDto from '../dto/response/get-categories.dto';
+import CategoryDto from '../dto/category.dto';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createCategory = (summary: string) =>
@@ -11,4 +13,12 @@ export const createCategory = (summary: string) =>
     ApiCreatedResponse({ description: '카테고리 생성 성공' }),
   );
 
-export const getCategories = (summary: string) => applyDecorators(ApiOperation({ summary }));
+export const getCategories = (summary: string) =>
+  applyDecorators(
+    ApiOperation({ summary }),
+    ApiQuery({ name: 'limit', description: '조회할 카테고리의 수' }),
+    ApiOkResponse({ type: ResponseGetCategoriesDto }),
+  );
+
+export const getCategoryDetail = (summary: string) =>
+  applyDecorators(ApiOperation({ summary }), ApiOkResponse({ type: CategoryDto }));
