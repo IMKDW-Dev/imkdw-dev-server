@@ -1,10 +1,10 @@
-import { Inject, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CustomPrismaModule } from 'nestjs-prisma';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import AppController from './app.controller';
+import AppService from './app.service';
 import { PRISMA_SERVICE, extendedPrismaClient } from './infra/database/prisma';
 import AuthModule from './modules/auth/auth.module';
 import UserModule from './modules/user/user.module';

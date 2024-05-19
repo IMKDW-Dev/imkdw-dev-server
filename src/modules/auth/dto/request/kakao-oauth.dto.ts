@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
-export class ReqeustKakaoOAuthDto {
+export default class ReqeustKakaoOAuthDto {
   @ApiProperty({ description: '발급받은 code' })
   @IsString()
   readonly code: string;

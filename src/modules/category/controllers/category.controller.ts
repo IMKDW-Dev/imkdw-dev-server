@@ -57,7 +57,7 @@ export default class CategoryController {
   @Swagger.getCategoryDetail('카테고리 상세 조회')
   @Public()
   @Get(':name')
-  async getCategoryDetail(@Param('name') name: string): Promise<Ca  tegoryDto> {
+  async getCategoryDetail(@Param('name') name: string): Promise<CategoryDto> {
     return this.categoryService.getCategoryDetail(name);
   }
 }

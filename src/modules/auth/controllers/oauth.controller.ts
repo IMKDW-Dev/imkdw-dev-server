@@ -5,13 +5,13 @@ import { Response } from 'express';
 import OAuthService from '../services/oauth.service';
 import * as Swagger from '../docs/oauth.swagger';
 import Authorization from '../../../common/decorators/authorization.decorator';
-import { ReqeustKakaoOAuthDto } from '../dto/request/kakao-oauth.dto';
-import { ReqeustGithubOAuthDto } from '../dto/request/github-oauth.dto';
 import { COOKIE_SERVICE, ICookieService } from '../../../infra/secure/cookie/interfaces/cookie.interface';
 import { ACCESS_TOKEN_KEY } from '../constants/token.constant';
 import { CookieMaxage } from '../../../infra/secure/cookie/enums/cookie.enum';
 import ResponseAuthResultDto from '../dto/response/auth-result.dto';
 import { Public } from '../decorators/public.decorator';
+import ReqeustKakaoOAuthDto from '../dto/request/kakao-oauth.dto';
+import ReqeustGithubOAuthDto from '../dto/request/github-oauth.dto';
 
 @ApiTags('[인증] 소셜로그인')
 @Controller({ path: 'oauth', version: '1' })

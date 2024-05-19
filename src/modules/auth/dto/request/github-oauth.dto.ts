@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
-export class ReqeustGithubOAuthDto {
+export default class ReqeustGithubOAuthDto {
   @ApiProperty({ description: '발급받은 code' })
   @IsString()
   readonly code: string;

@@ -1,6 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export default class CategoryQueryService {
-  constructor() {}
-}
+export default class CategoryQueryService {}
