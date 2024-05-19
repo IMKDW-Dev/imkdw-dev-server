@@ -3,7 +3,6 @@ import { Logger } from '@nestjs/common';
 
 import userRoleSeed from './user/user-role.seed';
 import oAuthProviderSeed from './auth/oauth-provider.seed';
-import categorySeed from './category/category.seed';
 
 const prisma = new PrismaClient();
 
@@ -34,9 +33,6 @@ async function main() {
   await createSeed(addCommonFields(oAuthProviderSeed), (data) =>
     prisma.userOAuthProviders.createMany({ data, skipDuplicates: true }),
   );
-
-  // 카테고리 시딩
-  // await createSeed(addCommonFields(categorySeed), (data) => prisma.category.createMany({ data, skipDuplicates: true }));
 }
 
 main()
