@@ -12,7 +12,6 @@ export default class UserRoleRepository implements IUserRoleRepository {
 
   async findOne(where: UserRoleQueryFilter): Promise<UserRole | null> {
     const row = await this.prisma.client.userRoles.findFirst({ where });
-
     return row ? new UserRole(row.id, row.name) : null;
   }
 }

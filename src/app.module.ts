@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
+import { Inject, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CustomPrismaModule } from 'nestjs-prisma';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -12,6 +12,9 @@ import LoggerMiddleware from './common/middlewares/logger.middleware';
 import JwtCookieMiddleware from './modules/auth/middlewares/jwt-cookie.middleware';
 import JwtGuard from './modules/auth/guards/jwt.guard';
 import TransformInterceptor from './common/interceptors/transform.interceptor';
+import LocalStorageModule from './infra/local-storage/local-storage.module';
+import { ILocalStorageService, LOCAL_STORAGE_SERVICE } from './infra/local-storage/interfaces/local-storage.interface';
+import CategoryModule from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -20,12 +23,16 @@ import TransformInterceptor from './common/interceptors/transform.interceptor';
       isGlobal: true,
     }),
     CustomPrismaModule.forRootAsync({
+      imports: [LocalStorageModule],
       name: PRISMA_SERVICE,
       isGlobal: true,
-      useFactory: () => extendedPrismaClient,
+      inject: [LOCAL_STORAGE_SERVICE],
+      useFactory: (localStorageService: ILocalStorageService) => extendedPrismaClient(localStorageService),
     }),
     AuthModule,
     UserModule,
+    CategoryModule,
+    LocalStorageModule,
   ],
   controllers: [AppController],
   providers: [

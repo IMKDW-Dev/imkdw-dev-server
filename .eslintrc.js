@@ -29,5 +29,6 @@ module.exports = {
     'max-classes-per-file': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     '@typescript-eslint/lines-between-class-members': 'off',
+    'no-underscore-dangle': 'off',
   },
 };

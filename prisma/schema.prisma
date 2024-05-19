@@ -82,9 +82,8 @@ model articles {
   deleteAt   DateTime? @map("delete_at")
   deleteUser String?   @map("delete_user")
 
-  ArticleTag      articleTag[]
-  ArticleCategory articleCategory[]
-  ArticleComment  articleComment[]
+  ArticleTag     articleTag[]
+  ArticleComment articleComment[]
 
   user        users         @relation(fields: [userId], references: [id])
   articleLike articleLike[]
@@ -159,26 +158,9 @@ model articleTag {
 }
 
 model category {
-  id       Int    @id @default(autoincrement())
-  parentId Int?   @map("parent_id")
-  name     String @unique @db.Char(20)
-  param    String @unique @db.Char(50)
-  sort     Int
-
-  createAt        DateTime          @default(now()) @map("create_at")
-  createUser      String            @default("_system") @map("create_user")
-  updateAt        DateTime          @updatedAt @map("update_at")
-  updateUser      String            @default("_system") @map("update_user")
-  deleteAt        DateTime?         @map("delete_at")
-  deleteUser      String?           @map("delete_user")
-  ArticleCategory articleCategory[]
-
-  @@map("Categories")
-}
-
-model articleCategory {
-  articleId  String @map("article_id") @db.VarChar(255)
-  categoryId Int    @map("category_id")
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.Char(20)
+  sort Int
 
   createAt   DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
@@ -187,11 +169,7 @@ model articleCategory {
   deleteAt   DateTime? @map("delete_at")
   deleteUser String?   @map("delete_user")
 
-  article  articles @relation(fields: [articleId], references: [id])
-  category category @relation(fields: [categoryId], references: [id])
-
-  @@id([articleId, categoryId])
-  @@map("ArticleCategories")
+  @@map("Categories")
 }
 
 model articleComment {

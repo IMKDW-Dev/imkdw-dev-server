@@ -5,6 +5,7 @@ import { IUserRoleRepository, USER_ROLE_REPOSITORY } from '../repository/role/us
 import { IUserRepository, USER_REPOSITORY } from '../repository/user/user-repo.interface';
 import UserRoles from '../enums/user-role.enum';
 import ResponseGetUserInfoDto from '../dto/response/user-info.dto';
+import UserRole from '../domain/entities/user-role.entity';
 
 @Injectable()
 export default class UserService {
@@ -15,6 +16,7 @@ export default class UserService {
 
   async createUser(email: string, profile: string, oAuthProvider: UserOAuthProvider) {
     const userRole = await this.userRoleRepository.findOne({ name: UserRoles.NORMAL });
+    userRole;
     const newUser = new UserBuilder().setEmail(email).setOAuthProvider(oAuthProvider).setRole(userRole).build();
     newUser.generateId();
     newUser.setDefaultProfile();
