@@ -11,4 +11,5 @@ export interface ICategoryRepository {
   save(category: Category): Promise<Category>;
   findMany(filter: CategoryQueryFilter): Promise<Category[]>;
   update(id: number, data: UpdateCategoryDto): Promise<void>;
+  updateSort(id: number, newSort: number): Promise<void>;
 }

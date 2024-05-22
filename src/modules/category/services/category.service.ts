@@ -6,6 +6,7 @@ import { CreateCategoryDto } from '../dto/internal/create-category.dto';
 import CategoryImageService from './category-image.service';
 import { CategoryNotFoundException } from '../../../common/exceptions/404';
 import CategoryDto from '../dto/category.dto';
+import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
 
 @Injectable()
 export default class CategoryService {
@@ -48,5 +49,17 @@ export default class CategoryService {
     }
 
     return category.toDto();
+  }
+
+  async updateCategory(categoryId: number, dto: UpdateCategoryDto) {
+    const category = await this.categoryRepository.findOne({id: categoryId})
+    if (!category) {
+      throw new CategoryNotFoundException();
+    }
+
+
+    if (dto?.sort) {
+      await this.categoryRepository.
+    }
   }
 }

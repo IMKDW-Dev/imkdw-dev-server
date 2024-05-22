@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UploadedFile,
@@ -60,4 +61,10 @@ export default class CategoryController {
   async getCategoryDetail(@Param('name') name: string): Promise<CategoryDto> {
     return this.categoryService.getCategoryDetail(name);
   }
+
+  @Swagger.updateCategory('카테고리 수정')
+  @UseGuards(AdminGuard)
+  @Roles(UserRoles.ADMIN)
+  @Patch(":categoryId")
+  async updateCategory(@Param("categoryId", ParseIntPipe) categoryId: number): Promise<void> {}
 }

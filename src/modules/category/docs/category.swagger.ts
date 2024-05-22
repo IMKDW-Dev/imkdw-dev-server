@@ -1,5 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
 import ResponseGetCategoriesDto from '../dto/response/get-categories.dto';
 import CategoryDto from '../dto/category.dto';
@@ -21,4 +21,9 @@ export const getCategories = (summary: string) =>
   );
 
 export const getCategoryDetail = (summary: string) =>
-  applyDecorators(ApiOperation({ summary }), ApiOkResponse({ type: CategoryDto }));
+  applyDecorators(ApiOperation({ summary }), ApiParam({name: "name", description: "카테고리 이름"}),ApiOkResponse({ type: CategoryDto }));
+
+
+export const updateCategory = (summary: string) => applyDecorators(
+  ApiOperation({summary})
+)
