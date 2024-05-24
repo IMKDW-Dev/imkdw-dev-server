@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CATEGORY_REPOSITORY, ICategoryRepository } from '../repository/category-repo.interface';
-import Category, { CategoryBuilder } from '../domain/entities/category.entity';
+import { CategoryBuilder } from '../domain/entities/category.entity';
 import { DuplicateCategoryNameException } from '../../../common/exceptions/409';
 import { CreateCategoryDto } from '../dto/internal/create-category.dto';
 import CategoryImageService from './category-image.service';
@@ -15,7 +15,7 @@ export default class CategoryService {
     private readonly categoryImageService: CategoryImageService,
   ) {}
 
-  async createCategory(dto: CreateCategoryDto): Promise<Category> {
+  async createCategory(dto: CreateCategoryDto): Promise<CategoryDto> {
     const categoryByName = await this.categoryRepository.findOne({ name: dto.name });
 
     if (categoryByName) {
@@ -32,9 +32,9 @@ export default class CategoryService {
 
     const category = await this.categoryRepository.save(newCategory);
     const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
-    await this.categoryRepository.update(category.getId(), { image: thumbnail });
+    const updatedCategory = await this.categoryRepository.update(category.getId(), { image: thumbnail });
 
-    return category;
+    return updatedCategory.toDto();
   }
 
   async getCategories(limit: number): Promise<CategoryDto[]> {
@@ -52,14 +52,16 @@ export default class CategoryService {
   }
 
   async updateCategory(categoryId: number, dto: UpdateCategoryDto) {
-    const category = await this.categoryRepository.findOne({id: categoryId})
+    const category = await this.categoryRepository.findOne({ id: categoryId });
     if (!category) {
       throw new CategoryNotFoundException();
     }
 
-
     if (dto?.sort) {
-      await this.categoryRepository.
+      await this.categoryRepository.updateSort(categoryId, dto.sort);
     }
+
+    // const { sort, ...withoutSort } = { ...dto, sort: undefined };
+    // await this.categoryRepository.update(categoryId, withoutSort);
   }
 }

@@ -10,6 +10,6 @@ export interface ICategoryRepository {
   findNextSort(): Promise<number>;
   save(category: Category): Promise<Category>;
   findMany(filter: CategoryQueryFilter): Promise<Category[]>;
-  update(id: number, data: UpdateCategoryDto): Promise<void>;
+  update(id: number, data: UpdateCategoryDto): Promise<Category>;
   updateSort(id: number, newSort: number): Promise<void>;
 }

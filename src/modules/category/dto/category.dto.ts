@@ -12,6 +12,7 @@ export default class CategoryDto {
   readonly name: string;
 
   @ApiProperty({ description: '카테고리 정렬 순서', example: 1 })
+  @IsNumber()
   readonly sort: number;
 
   @ApiProperty({ description: '카테고리 설명', maxLength: 255 })
