@@ -51,17 +51,25 @@ export default class CategoryService {
     return category.toDto();
   }
 
-  async updateCategory(categoryId: number, dto: UpdateCategoryDto) {
+  async updateCategory(categoryId: number, dto: UpdateCategoryDto, file: Express.Multer.File): Promise<CategoryDto> {
     const category = await this.categoryRepository.findOne({ id: categoryId });
     if (!category) {
       throw new CategoryNotFoundException();
+    }
+
+    const updateData = { ...dto };
+
+    if (file) {
+      const thumbnail = await this.categoryImageService.getThumbnail(category, file);
+      updateData.image = thumbnail;
     }
 
     if (dto?.sort) {
       await this.categoryRepository.updateSort(categoryId, dto.sort);
     }
 
-    // const { sort, ...withoutSort } = { ...dto, sort: undefined };
-    // await this.categoryRepository.update(categoryId, withoutSort);
+    const { sort, ...withoutSort } = updateData;
+    const updatedCategory = await this.categoryRepository.update(categoryId, withoutSort);
+    return updatedCategory.toDto();
   }
 }

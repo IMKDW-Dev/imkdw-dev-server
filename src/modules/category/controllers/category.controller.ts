@@ -24,6 +24,8 @@ import { Public } from '../../auth/decorators/public.decorator';
 import ResponseGetCategoriesDto from '../dto/response/get-categories.dto';
 import CategoryDto from '../dto/category.dto';
 import ResponseCreateCategoryDto from '../dto/response/create-category.dto';
+import RequestUpdateCategoryDto from '../dto/request/update-category.dto';
+import ResponseUpdateCategoryDto from '../dto/response/update-category.dto';
 
 @Controller({ path: 'categories', version: '1' })
 export default class CategoryController {
@@ -37,9 +39,9 @@ export default class CategoryController {
   @Roles(UserRoles.ADMIN)
   async createCategory(
     @Body() body: RequestCreateCategoryDto,
-    @UploadedFile() image: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<ResponseCreateCategoryDto> {
-    return this.categoryService.createCategory({ name: body.name, desc: body.desc, image });
+    return this.categoryService.createCategory({ name: body.name, desc: body.desc, image: file });
   }
 
   @Swagger.getCategories('카테고리 목록 조회')
@@ -62,6 +64,13 @@ export default class CategoryController {
   @Swagger.updateCategory('카테고리 수정')
   @UseGuards(AdminGuard)
   @Roles(UserRoles.ADMIN)
+  @UseInterceptors(FileInterceptor('image'))
   @Patch(':categoryId')
-  async updateCategory(@Param('categoryId', ParseIntPipe) categoryId: number): Promise<void> {}
+  async updateCategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Body() dto: RequestUpdateCategoryDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<ResponseUpdateCategoryDto> {
+    return this.categoryService.updateCategory(categoryId, dto, file);
+  }
 }
