@@ -97,4 +97,8 @@ export default class CategoryRepository implements ICategoryRepository {
       data: { sort: newSort },
     });
   }
+
+  async delete(category: Category): Promise<void> {
+    await this.prisma.client.category.delete({ where: { id: category.getId() } });
+  }
 }

@@ -1,8 +1,18 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
 import ResponseGetCategoriesDto from '../dto/response/get-categories.dto';
-import CategoryDto from '../dto/category.dto';
+import RequestUpdateCategoryDto from '../dto/request/update-category.dto';
+import ResponseCreateCategoryDto from '../dto/response/create-category.dto';
+import ResponseUpdateCategoryDto from '../dto/response/update-category.dto';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createCategory = (summary: string) =>
@@ -21,9 +31,18 @@ export const getCategories = (summary: string) =>
   );
 
 export const getCategoryDetail = (summary: string) =>
-  applyDecorators(ApiOperation({ summary }), ApiParam({name: "name", description: "카테고리 이름"}),ApiOkResponse({ type: CategoryDto }));
+  applyDecorators(
+    ApiOperation({ summary }),
+    ApiParam({ name: 'name', description: '카테고리 이름' }),
+    ApiOkResponse({ type: ResponseCreateCategoryDto }),
+  );
 
+export const updateCategory = (summary: string) =>
+  applyDecorators(
+    ApiOperation({ summary }),
+    ApiBody({ type: RequestUpdateCategoryDto }),
+    ApiCreatedResponse({ type: ResponseUpdateCategoryDto }),
+  );
 
-export const updateCategory = (summary: string) => applyDecorators(
-  ApiOperation({summary})
-)
+export const deleteCategory = (summary: string) =>
+  applyDecorators(ApiOperation({ summary }), ApiParam({ name: 'categoryId', description: '삭제할 카테고리의 ID' }));

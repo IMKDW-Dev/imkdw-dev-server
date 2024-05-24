@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CATEGORY_REPOSITORY, ICategoryRepository } from '../repository/category-repo.interface';
-import { CategoryBuilder } from '../domain/entities/category.entity';
+import Category, { CategoryBuilder } from '../domain/entities/category.entity';
 import { DuplicateCategoryNameException } from '../../../common/exceptions/409';
 import { CreateCategoryDto } from '../dto/internal/create-category.dto';
 import CategoryImageService from './category-image.service';
@@ -17,7 +17,6 @@ export default class CategoryService {
 
   async createCategory(dto: CreateCategoryDto): Promise<CategoryDto> {
     const categoryByName = await this.categoryRepository.findOne({ name: dto.name });
-
     if (categoryByName) {
       throw new DuplicateCategoryNameException(dto.name);
     }
@@ -52,10 +51,7 @@ export default class CategoryService {
   }
 
   async updateCategory(categoryId: number, dto: UpdateCategoryDto, file: Express.Multer.File): Promise<CategoryDto> {
-    const category = await this.categoryRepository.findOne({ id: categoryId });
-    if (!category) {
-      throw new CategoryNotFoundException();
-    }
+    const category = await this.checkCategoryAndReturn(categoryId);
 
     const updateData = { ...dto };
 
@@ -71,5 +67,20 @@ export default class CategoryService {
     const { sort, ...withoutSort } = updateData;
     const updatedCategory = await this.categoryRepository.update(categoryId, withoutSort);
     return updatedCategory.toDto();
+  }
+
+  async deleteCategory(categoryId: number) {
+    const category = await this.checkCategoryAndReturn(categoryId);
+
+    await this.categoryRepository.delete(category);
+  }
+
+  async checkCategoryAndReturn(categoryId: number): Promise<Category> {
+    const category = await this.categoryRepository.findOne({ id: categoryId });
+    if (!category) {
+      throw new CategoryNotFoundException();
+    }
+
+    return category;
   }
 }

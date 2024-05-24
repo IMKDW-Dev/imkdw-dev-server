@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -61,6 +62,7 @@ export default class CategoryController {
     return this.categoryService.getCategoryDetail(name);
   }
 
+  // TODO: 이미지 검증 파이프 추가하기
   @Swagger.updateCategory('카테고리 수정')
   @UseGuards(AdminGuard)
   @Roles(UserRoles.ADMIN)
@@ -72,5 +74,13 @@ export default class CategoryController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ResponseUpdateCategoryDto> {
     return this.categoryService.updateCategory(categoryId, dto, file);
+  }
+
+  @Swagger.deleteCategory('카테고리 삭제')
+  @UseGuards(AdminGuard)
+  @Roles(UserRoles.ADMIN)
+  @Delete(':categoryId')
+  async deleteCategory(@Param('categoryId', ParseIntPipe) categoryId: number): Promise<void> {
+    await this.categoryService.deleteCategory(categoryId);
   }
 }
