@@ -91,7 +91,7 @@ model articles {
   @@map("Articles")
 }
 
-model ArticleViewTrend {
+model articleViewTrend {
   id        Int @id @default(autoincrement())
   viewCount Int
 
