@@ -67,12 +67,10 @@ model userOAuthProviders {
 model articles {
   id           String @id @db.VarChar(255)
   title        String @db.VarChar(255)
-  userId       String @map("user_id")
-  summary      String @db.VarChar(255)
+  userId       String @map("user_id") @db.VarChar(255)
   content      String @db.Text
   thumbnail    String @db.VarChar(255)
   viewCount    Int    @default(0) @map("view_cnt")
-  likeCount    Int    @default(0) @map("like_cnt")
   commentCount Int    @default(0) @map("comment_cnt")
 
   createAt   DateTime  @default(now()) @map("create_at")
@@ -85,8 +83,7 @@ model articles {
   ArticleTag     articleTag[]
   ArticleComment articleComment[]
 
-  user        users         @relation(fields: [userId], references: [id])
-  articleLike articleLike[]
+  user users @relation(fields: [userId], references: [id])
 
   @@map("Articles")
 }
@@ -103,23 +100,6 @@ model articleViewTrend {
   deleteUser String?   @map("delete_user")
 
   @@map("ArticleViewTrend")
-}
-
-model articleLike {
-  id        Int    @id @default(autoincrement())
-  articleId String @map("article_id") @db.VarChar(255)
-  userId    String @map("user_id")
-
-  createAt   DateTime  @default(now()) @map("create_at")
-  createUser String    @default("_system") @map("create_user")
-  updateAt   DateTime  @updatedAt @map("update_at")
-  updateUser String    @default("_system") @map("update_user")
-  deleteAt   DateTime? @map("delete_at")
-  deleteUser String?   @map("delete_user")
-
-  article articles @relation(fields: [articleId], references: [id])
-
-  @@map("ArticleLike")
 }
 
 model tags {
