@@ -7,8 +7,13 @@ export const CATEGORY_REPOSITORY: InjectionToken = Symbol('CATEGORY_REPOSITORY')
 
 export interface ICategoryRepository {
   findOne(filter: CategoryQueryFilter): Promise<Category | null>;
-  findNextSort(): Promise<number>;
-  save(category: Category): Promise<Category>;
   findMany(filter: CategoryQueryFilter): Promise<Category[]>;
-  update(id: number, data: UpdateCategoryDto): Promise<void>;
+  findNextSort(): Promise<number>;
+
+  save(category: Category): Promise<Category>;
+
+  update(id: number, data: UpdateCategoryDto): Promise<Category>;
+  updateSort(id: number, newSort: number): Promise<void>;
+
+  delete(category: Category): Promise<void>;
 }

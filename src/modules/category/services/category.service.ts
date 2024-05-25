@@ -6,6 +6,7 @@ import { CreateCategoryDto } from '../dto/internal/create-category.dto';
 import CategoryImageService from './category-image.service';
 import { CategoryNotFoundException } from '../../../common/exceptions/404';
 import CategoryDto from '../dto/category.dto';
+import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
 
 @Injectable()
 export default class CategoryService {
@@ -14,9 +15,8 @@ export default class CategoryService {
     private readonly categoryImageService: CategoryImageService,
   ) {}
 
-  async createCategory(dto: CreateCategoryDto): Promise<Category> {
+  async createCategory(dto: CreateCategoryDto): Promise<CategoryDto> {
     const categoryByName = await this.categoryRepository.findOne({ name: dto.name });
-
     if (categoryByName) {
       throw new DuplicateCategoryNameException(dto.name);
     }
@@ -31,9 +31,9 @@ export default class CategoryService {
 
     const category = await this.categoryRepository.save(newCategory);
     const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
-    await this.categoryRepository.update(category.getId(), { image: thumbnail });
+    const updatedCategory = await this.categoryRepository.update(category.getId(), { image: thumbnail });
 
-    return category;
+    return updatedCategory.toDto();
   }
 
   async getCategories(limit: number): Promise<CategoryDto[]> {
@@ -48,5 +48,39 @@ export default class CategoryService {
     }
 
     return category.toDto();
+  }
+
+  async updateCategory(categoryId: number, dto: UpdateCategoryDto, file: Express.Multer.File): Promise<CategoryDto> {
+    const category = await this.checkCategoryAndReturn(categoryId);
+
+    const updateData = { ...dto };
+
+    if (file) {
+      const thumbnail = await this.categoryImageService.getThumbnail(category, file);
+      updateData.image = thumbnail;
+    }
+
+    if (dto?.sort) {
+      await this.categoryRepository.updateSort(categoryId, dto.sort);
+    }
+
+    const { sort, ...withoutSort } = updateData;
+    const updatedCategory = await this.categoryRepository.update(categoryId, withoutSort);
+    return updatedCategory.toDto();
+  }
+
+  async deleteCategory(categoryId: number) {
+    const category = await this.checkCategoryAndReturn(categoryId);
+
+    await this.categoryRepository.delete(category);
+  }
+
+  async checkCategoryAndReturn(categoryId: number): Promise<Category> {
+    const category = await this.categoryRepository.findOne({ id: categoryId });
+    if (!category) {
+      throw new CategoryNotFoundException();
+    }
+
+    return category;
   }
 }

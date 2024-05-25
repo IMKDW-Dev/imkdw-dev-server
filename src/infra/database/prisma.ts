@@ -19,6 +19,12 @@ export const extendedPrismaClient = (localStorageService: ILocalStorageService) 
             Object.assign(tempArgs, { ...args, data: { ...args.data, updateUser: userId } });
           }
 
+          // if (operation === 'delete' || operation === 'deleteMany') {
+          //   // eslint-disable-next-line no-param-reassign
+          //   Object.assign(tempArgs, { ...args, data: { deleteAt: new Date() } });
+          //   return query(tempArgs);
+          // }
+
           return query(tempArgs);
         },
       },

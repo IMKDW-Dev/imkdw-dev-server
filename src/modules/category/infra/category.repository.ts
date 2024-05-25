@@ -53,11 +53,13 @@ export default class CategoryRepository implements ICategoryRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
-  async update(id: number, data: UpdateCategoryDto): Promise<void> {
-    await this.prisma.client.category.update({
+  async update(id: number, data: UpdateCategoryDto): Promise<Category> {
+    const updatedCategory = await this.prisma.client.category.update({
       where: { id },
       data,
     });
+
+    return this.toEntity(updatedCategory);
   }
 
   private toEntity(_category: PrismaCategory) {
@@ -70,5 +72,33 @@ export default class CategoryRepository implements ICategoryRepository {
       .build();
 
     return category;
+  }
+
+  async updateSort(categoryId: number, newSort: number) {
+    const category = await this.prisma.client.category.findFirst({ where: { id: categoryId } });
+    const oldSort = category.sort;
+
+    if (newSort < oldSort) {
+      await this.prisma.client.category.updateMany({
+        where: { sort: { gte: newSort, lt: oldSort } },
+        data: {
+          sort: { increment: 1 },
+        },
+      });
+    } else {
+      await this.prisma.client.category.updateMany({
+        where: { sort: { gt: oldSort, lte: newSort } },
+        data: { sort: { decrement: 1 } },
+      });
+    }
+
+    await this.prisma.client.category.update({
+      where: { id: categoryId },
+      data: { sort: newSort },
+    });
+  }
+
+  async delete(category: Category): Promise<void> {
+    await this.prisma.client.category.delete({ where: { id: category.getId() } });
   }
 }
