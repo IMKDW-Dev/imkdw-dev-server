@@ -5,13 +5,16 @@ import { DuplicateCategoryNameException } from '../../../common/exceptions/409';
 import { CreateCategoryDto } from '../dto/internal/create-category.dto';
 import CategoryImageService from './category-image.service';
 import { CategoryNotFoundException } from '../../../common/exceptions/404';
-import CategoryDto from '../dto/category.dto';
 import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
+import { CATEGORY_DETAIL_REPOSITORY, ICategoryDetailRepository } from '../repository/category-detail-repo.interface';
+import CategoryDto from '../dto/category.dto';
+import CategoryDetailDto from '../dto/category-detail.dto';
 
 @Injectable()
 export default class CategoryService {
   constructor(
     @Inject(CATEGORY_REPOSITORY) private readonly categoryRepository: ICategoryRepository,
+    @Inject(CATEGORY_DETAIL_REPOSITORY) private readonly categoryDetailRepository: ICategoryDetailRepository,
     private readonly categoryImageService: CategoryImageService,
   ) {}
 
@@ -41,13 +44,13 @@ export default class CategoryService {
     return categories.map((category) => category.toDto());
   }
 
-  async getCategoryDetail(name: string): Promise<CategoryDto> {
-    const category = await this.categoryRepository.findOne({ name });
-    if (!category) {
+  async getCategoryDetail(name: string): Promise<CategoryDetailDto> {
+    const categoryDetail = await this.categoryDetailRepository.findOne({ name });
+    if (!categoryDetail) {
       throw new CategoryNotFoundException({ name });
     }
 
-    return category.toDto();
+    return categoryDetail;
   }
 
   async updateCategory(categoryId: number, dto: UpdateCategoryDto, file: Express.Multer.File): Promise<CategoryDto> {

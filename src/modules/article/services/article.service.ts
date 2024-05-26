@@ -8,13 +8,17 @@ import Article, { ArticleBuilder } from '../domain/entities/article.entity';
 import CategoryQueryService from '../../category/services/category-query.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../common/exceptions/404';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
+import { GetArticlesDto } from '../dto/internal/get-article.dto';
+import { GetArticleFilter } from '../enums/article.enum';
 import ArticleDetailDto from '../dto/article-detail.dto';
+import { ARTICLE_DETAIL_REPOSITORY, IArticleDetailRepository } from '../repository/article-detail-repo.interface';
 
 @Injectable()
 export default class ArticleService {
   constructor(
     /** 영속성 레이어 */
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
+    @Inject(ARTICLE_DETAIL_REPOSITORY) private readonly articleDetailRepository: IArticleDetailRepository,
 
     /** 게시글 서비스 */
     private readonly articleImageService: ArticleImageService,
@@ -41,7 +45,7 @@ export default class ArticleService {
       .setTitle(dto.title)
       .setContent(dto.content)
       .setThumbnail(thumbnail)
-      .setCategory(category)
+      .setCategoryId(category.getId())
       .setVisible(dto.visible)
       .build();
     newArticle.addHashOnId();
@@ -54,16 +58,32 @@ export default class ArticleService {
   }
 
   async getArticleDetail(articleId: string): Promise<ArticleDetailDto> {
-    const articleDetail = await this.articleRepository.findArticleDetail({ id: articleId });
+    const articleDetail = await this.articleDetailRepository.findOne({ id: articleId });
     if (!articleDetail) {
       throw new ArticleNotFoundException(articleId);
     }
 
-    return articleDetail.toDto();
+    return articleDetail;
   }
 
   async addCommentCount(article: Article): Promise<void> {
     article.addCommentCount();
     await this.articleRepository.update(article, { viewCount: article.getCommentCount() });
+  }
+
+  async getArticles(dto: GetArticlesDto): Promise<ArticleDto[]> {
+    let articles: Article[] = [];
+
+    switch (dto.filter) {
+      case GetArticleFilter.LATEST:
+        articles = await this.articleRepository.findLatestArticles(dto.limit);
+        break;
+      case GetArticleFilter.POPULAR:
+        articles = await this.articleRepository.findArticlesOrderByViewCount(dto.limit);
+        break;
+      default:
+        break;
+    }
+    return articles.map((article) => article.toDto());
   }
 }
