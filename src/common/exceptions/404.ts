@@ -11,7 +11,7 @@ class NotFoundException extends HttpException {
 }
 
 export class CategoryNotFoundException extends NotFoundException {
-  constructor(email?: unknown) {
-    super(NOT_FOUND_EXCEPTIONS.CATEGORY_NOT_FOUND, `Find by ${email}, but not found`);
+  constructor(category?: unknown) {
+    super(NOT_FOUND_EXCEPTIONS.CATEGORY_NOT_FOUND, `Find by ${category}, but not found`);
   }
 }

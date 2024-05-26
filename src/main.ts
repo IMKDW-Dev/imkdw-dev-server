@@ -8,12 +8,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: ['http://localhost:3000', "https://imkdw.dev"],
+    origin: ['http://localhost:3000', 'https://imkdw.dev'],
     credentials: true,
   });
 
   app.enableVersioning({ type: VersioningType.URI });
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   const config = new DocumentBuilder().setTitle('IMKDW Dev API').build();
   const document = SwaggerModule.createDocument(app, config);

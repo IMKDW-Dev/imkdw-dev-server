@@ -1,4 +1,4 @@
-import { generateCuid } from '../../../../common/utils/cuid';
+import { generateCUID } from '../../../../common/utils/cuid';
 import { generateUUID } from '../../../../common/utils/uuid';
 import UserOAuthProvider from './user-oauth-provider.entity';
 import UserRole from './user-role.entity';
@@ -51,7 +51,7 @@ export default class User {
   }
 
   setDefaultNickname() {
-    this.nickname = generateCuid();
+    this.nickname = generateCUID();
   }
 
   isSignupWithOAuthProvider(oAuthProvider: UserOAuthProvider) {

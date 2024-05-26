@@ -1,54 +1,128 @@
+import { generateCUID } from '../../../../common/utils/cuid';
 import Category from '../../../category/domain/entities/category.entity';
+import Tag from '../../../tag/domain/entities/tag.entity';
 
 export default class Article {
   constructor(builder: ArticleBuilder) {
     this.id = builder.id;
     this.title = builder.title;
     this.content = builder.content;
-    this.categories = builder.categories;
+    this.category = builder.category;
+    this.viewCount = builder.viewCount;
+    this.thumbnail = builder.thumbnail;
+    this.tags = builder.tags;
+    this.visible = builder.visible;
     this.createdAt = builder.createdAt;
   }
 
   private id: string;
   private title: string;
   private content: string;
-  private categories: Category[];
+  private category: Category;
+  private viewCount: number;
+  private thumbnail: string;
+  private tags: Tag[];
+  private visible: boolean;
   private createdAt: Date;
+
+  getId(): string {
+    return this.id;
+  }
+
+  getTitle(): string {
+    return this.title;
+  }
+
+  getContent(): string {
+    return this.content;
+  }
+
+  getCategory(): Category {
+    return this.category;
+  }
+
+  getViewCount(): number {
+    return this.viewCount;
+  }
+
+  getThumbnail(): string {
+    return this.thumbnail;
+  }
+
+  getTags(): Tag[] {
+    return this.tags;
+  }
+
+  getVisible(): boolean {
+    return this.visible;
+  }
+
+  getCreatedAt(): Date {
+    return this.createdAt;
+  }
+
+  addHashOnId(): void {
+    this.id = `${this.id}-${generateCUID()}`;
+  }
 }
 
 export class ArticleBuilder {
   id: string;
   title: string;
   content: string;
-  categories: Category[];
+  category: Category;
+  viewCount: number;
+  thumbnail: string;
+  tags: Tag[];
+  visible: boolean;
   createdAt: Date;
 
-  public withId(id: string): ArticleBuilder {
+  setId(id: string): ArticleBuilder {
     this.id = id;
     return this;
   }
 
-  public withTitle(title: string): ArticleBuilder {
+  setTitle(title: string): ArticleBuilder {
     this.title = title;
     return this;
   }
 
-  public withContent(content: string): ArticleBuilder {
+  setContent(content: string): ArticleBuilder {
     this.content = content;
     return this;
   }
 
-  public withCategories(categories: Category[]): ArticleBuilder {
-    this.categories = categories;
+  setCategory(category: Category): ArticleBuilder {
+    this.category = category;
     return this;
   }
 
-  public withCreatedAt(createdAt: Date): ArticleBuilder {
+  setViewCount(viewCount: number): ArticleBuilder {
+    this.viewCount = viewCount;
+    return this;
+  }
+
+  setThumbnail(thumbnail: string): ArticleBuilder {
+    this.thumbnail = thumbnail;
+    return this;
+  }
+
+  setCreatedAt(createdAt: Date): ArticleBuilder {
     this.createdAt = createdAt;
     return this;
   }
 
-  public build(): Article {
+  setTags(tags: Tag[]): ArticleBuilder {
+    this.tags = tags;
+    return this;
+  }
+
+  setVisible(visible: boolean): ArticleBuilder {
+    this.visible = visible;
+    return this;
+  }
+
+  build(): Article {
     return new Article(this);
   }
 }

@@ -36,10 +36,18 @@ export const extendedPrismaClient = (localStorageService: ILocalStorageService) 
           });
         },
         async createMany({ model, args }) {
-          return (prismaClient as any)[model].createMany({
-            ...args,
-            data: { ...args.data, createUser: userId, updateUser: userId },
-          });
+          if (Array.isArray(args.data)) {
+            return (prismaClient as any)[model].createMany({
+              ...args,
+              data: args.data.map((data) => ({
+                ...data,
+                createUser: userId,
+                updateUser: userId,
+              })),
+            });
+          }
+
+          return (prismaClient as any)[model].createMany({});
         },
         async update({ model, args }) {
           return (prismaClient as any)[model].update({
