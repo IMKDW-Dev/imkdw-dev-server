@@ -158,6 +158,7 @@ model category {
 
 model articleComment {
   id        Int    @id @default(autoincrement())
+  parentId  Int?   @map("parent_id")
   articleId String @map("article_id") @db.VarChar(255)
   userId    String @map("user_id")
   content   String @db.Text

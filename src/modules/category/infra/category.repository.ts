@@ -53,9 +53,9 @@ export default class CategoryRepository implements ICategoryRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
-  async update(id: number, data: UpdateCategoryDto): Promise<Category> {
+  async update(category: Category, data: UpdateCategoryDto): Promise<Category> {
     const updatedCategory = await this.prisma.client.category.update({
-      where: { id },
+      where: { id: category.getId() },
       data,
     });
 

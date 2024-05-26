@@ -4,7 +4,7 @@ import { CreateArticleDto } from '../dto/internal/create-article.dto';
 import { DuplicateArticleIdException } from '../../../common/exceptions/409';
 import ArticleTagService from '../../articleTag/services/article-tag.service';
 import ArticleImageService from './article-image.service';
-import { ArticleBuilder } from '../domain/entities/article.entity';
+import Article, { ArticleBuilder } from '../domain/entities/article.entity';
 import CategoryQueryService from '../../category/services/category-query.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../common/exceptions/404';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
@@ -60,5 +60,10 @@ export default class ArticleService {
     }
 
     return articleDetail.toDto();
+  }
+
+  async addCommentCount(article: Article): Promise<void> {
+    article.addCommentCount();
+    await this.articleRepository.update(article, { viewCount: article.getCommentCount() });
   }
 }

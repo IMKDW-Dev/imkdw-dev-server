@@ -1,5 +1,6 @@
 import { generateCUID } from '../../../../common/utils/cuid';
 import { generateUUID } from '../../../../common/utils/uuid';
+import UserDto from '../../dto/user.dto';
 import UserOAuthProvider from './user-oauth-provider.entity';
 import UserRole from './user-role.entity';
 
@@ -60,6 +61,10 @@ export default class User {
 
   generateId() {
     this.id = generateUUID();
+  }
+
+  toDto(): UserDto {
+    return new UserDto(this.nickname, this.profile);
   }
 }
 

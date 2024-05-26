@@ -16,6 +16,7 @@ import LocalStorageModule from './infra/local-storage/local-storage.module';
 import { ILocalStorageService, LOCAL_STORAGE_SERVICE } from './infra/local-storage/interfaces/local-storage.interface';
 import CategoryModule from './modules/category/category.module';
 import ArticleModule from './modules/article/article.module';
+import ArticleCommentModule from './modules/article-comment/article-comment.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import ArticleModule from './modules/article/article.module';
     UserModule,
     CategoryModule,
     ArticleModule,
+    ArticleCommentModule,
     LocalStorageModule,
   ],
   controllers: [AppController],

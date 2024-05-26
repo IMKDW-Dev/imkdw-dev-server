@@ -31,7 +31,7 @@ export default class CategoryService {
 
     const category = await this.categoryRepository.save(newCategory);
     const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
-    const updatedCategory = await this.categoryRepository.update(category.getId(), { image: thumbnail });
+    const updatedCategory = await this.categoryRepository.update(category, { image: thumbnail });
 
     return updatedCategory.toDto();
   }
@@ -65,7 +65,7 @@ export default class CategoryService {
     }
 
     const { sort, ...withoutSort } = updateData;
-    const updatedCategory = await this.categoryRepository.update(categoryId, withoutSort);
+    const updatedCategory = await this.categoryRepository.update(category, withoutSort);
     return updatedCategory.toDto();
   }
 

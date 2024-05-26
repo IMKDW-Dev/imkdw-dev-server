@@ -9,6 +9,7 @@ import { ArticleQueryFilter } from '../repository/article-query.filter';
 import { CategoryBuilder } from '../../category/domain/entities/category.entity';
 import ArticleDetail, { ArticleDetailBuilder } from '../domain/entities/article-detail.entity';
 import { TagBuilder } from '../../tag/domain/entities/tag.entity';
+import { UpdateArticleDto } from '../dto/internal/update-article.dto';
 
 type FindOneResult = Prisma.articlesGetPayload<{
   include: {
@@ -77,6 +78,21 @@ export default class ArticleRepository implements IArticleRepository {
     return row ? this.toDetail(row) : null;
   }
 
+  async update(article: Article, data: UpdateArticleDto): Promise<Article> {
+    const row = await this.prisma.client.articles.update({
+      where: { id: article.getId() },
+      data: {
+        title: data.title,
+        content: data.content,
+        thumbnail: data.thumbnail,
+        visible: data.visible,
+      },
+      include: { category: true, articleTag: { include: { tags: true } } },
+    });
+
+    return this.toEntity(row);
+  }
+
   private toEntity(row: FindOneResult): Article {
     const category = new CategoryBuilder()
       .setId(row.category.id)
@@ -92,6 +108,7 @@ export default class ArticleRepository implements IArticleRepository {
       .setContent(row.content)
       .setCategory(category)
       .setViewCount(row.viewCount)
+      .setCommentCount(row.commentCount)
       .setThumbnail(row.thumbnail)
       .setCreatedAt(row.createdAt)
       .build();

@@ -9,6 +9,7 @@ export default class Article {
     this.content = builder.content;
     this.category = builder.category;
     this.viewCount = builder.viewCount;
+    this.commentCount = builder.commentCount;
     this.thumbnail = builder.thumbnail;
     this.tags = builder.tags;
     this.visible = builder.visible;
@@ -20,6 +21,7 @@ export default class Article {
   private content: string;
   private category: Category;
   private viewCount: number;
+  private commentCount: number;
   private thumbnail: string;
   private tags: Tag[];
   private visible: boolean;
@@ -45,6 +47,10 @@ export default class Article {
     return this.viewCount;
   }
 
+  getCommentCount(): number {
+    return this.commentCount;
+  }
+
   getThumbnail(): string {
     return this.thumbnail;
   }
@@ -64,6 +70,10 @@ export default class Article {
   addHashOnId(): void {
     this.id = `${this.id}-${generateCUID()}`;
   }
+
+  addCommentCount(): void {
+    this.viewCount += 1;
+  }
 }
 
 export class ArticleBuilder {
@@ -72,6 +82,7 @@ export class ArticleBuilder {
   content: string;
   category: Category;
   viewCount: number;
+  commentCount: number;
   thumbnail: string;
   tags: Tag[];
   visible: boolean;
@@ -99,6 +110,11 @@ export class ArticleBuilder {
 
   setViewCount(viewCount: number): ArticleBuilder {
     this.viewCount = viewCount;
+    return this;
+  }
+
+  setCommentCount(commentCount: number): ArticleBuilder {
+    this.commentCount = commentCount;
     return this;
   }
 
