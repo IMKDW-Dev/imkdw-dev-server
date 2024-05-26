@@ -9,6 +9,6 @@ export default class RequestCreateCommentDto extends PickType(ArticleCommentDto,
     default: null,
   })
   @IsOptional()
-  @IsNumber()
+  @IsNumber({ allowNaN: true })
   parentId: number = null;
 }

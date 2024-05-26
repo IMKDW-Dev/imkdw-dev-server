@@ -10,6 +10,8 @@ import { CategoryBuilder } from '../../category/domain/entities/category.entity'
 import ArticleDetail, { ArticleDetailBuilder } from '../domain/entities/article-detail.entity';
 import { TagBuilder } from '../../tag/domain/entities/tag.entity';
 import { UpdateArticleDto } from '../dto/internal/update-article.dto';
+import { ArticleCommentDetailBuilder } from '../../article-comment/domain/entities/article-comment-detail.entity';
+import { UserBuilder } from '../../user/domain/entities/user.entity';
 
 type FindOneResult = Prisma.articlesGetPayload<{
   include: {
@@ -29,7 +31,14 @@ type FindDetailResult = Prisma.articlesGetPayload<{
         tags: true;
       };
     };
-    articleComment: true;
+    articleComment: {
+      include: {
+        user: true;
+        replies: {
+          include: { user: true };
+        };
+      };
+    };
   };
 }>;
 
@@ -71,7 +80,16 @@ export default class ArticleRepository implements IArticleRepository {
             tags: true,
           },
         },
-        articleComment: true,
+        articleComment: {
+          include: {
+            user: true,
+            replies: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -117,7 +135,25 @@ export default class ArticleRepository implements IArticleRepository {
   private toDetail(row: FindDetailResult): ArticleDetail {
     const tags = row.articleTag.map((item) => new TagBuilder().setId(item.tags.id).setName(item.tags.name).build());
 
-    const comments: any[] = [];
+    const comments = row.articleComment.map((item) => {
+      const replies = item.replies.map((reply) =>
+        new ArticleCommentDetailBuilder()
+          .setId(reply.id)
+          .setAuthor(new UserBuilder().setNickname(reply.user.nickname).setProfile(reply.user.profile).build())
+          .setContent(reply.content)
+          .setCreatedAt(reply.createdAt)
+          .setReplies([])
+          .build(),
+      );
+
+      return new ArticleCommentDetailBuilder()
+        .setId(item.id)
+        .setAuthor(new UserBuilder().setNickname(item.user.nickname).setProfile(item.user.profile).build())
+        .setContent(item.content)
+        .setCreatedAt(item.createdAt)
+        .setReplies(replies)
+        .build();
+    });
 
     return new ArticleDetailBuilder()
       .setId(row.id)

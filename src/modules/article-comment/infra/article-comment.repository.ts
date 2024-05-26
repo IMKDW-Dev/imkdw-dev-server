@@ -86,7 +86,7 @@ export default class ArticleCommentRepository implements IArticleCommentReposito
       )
       .setContent(comment.content)
       .setCreatedAt(comment.createdAt)
-      .setReplys(replies)
+      .setReplies(replies)
       .build();
   }
 }

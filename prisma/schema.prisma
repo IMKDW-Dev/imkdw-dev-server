@@ -163,6 +163,9 @@ model articleComment {
   userId    String @map("user_id")
   content   String @db.Text
 
+  parent  articleComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies articleComment[] @relation("CommentReplies")
+
   createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
   updateAt   DateTime  @updatedAt @map("update_at")

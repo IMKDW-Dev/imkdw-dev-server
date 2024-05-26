@@ -4,14 +4,14 @@ import ArticleCommentDetailDto from '../../dto/article-comment-detail.dto';
 export default class ArticleCommentDetail {
   constructor(builder: ArticleCommentDetailBuilder) {
     this.id = builder.id;
-    this.replys = builder.replys;
+    this.replies = builder.replies;
     this.author = builder.author;
     this.content = builder.content;
     this.createdAt = builder.createdAt;
   }
 
   private id: number;
-  private replys: ArticleCommentDetail[];
+  private replies: ArticleCommentDetail[];
   private author: User;
   private content: string;
   private createdAt: Date;
@@ -21,7 +21,7 @@ export default class ArticleCommentDetail {
       this.id,
       this.content,
       this.author.toDto(),
-      this.replys.map((reply) => reply.toDto()),
+      this.replies.map((reply) => reply.toDto()),
       this.createdAt,
     );
   }
@@ -29,7 +29,7 @@ export default class ArticleCommentDetail {
 
 export class ArticleCommentDetailBuilder {
   id: number;
-  replys: ArticleCommentDetail[];
+  replies: ArticleCommentDetail[];
   author: User;
   content: string;
   createdAt: Date;
@@ -39,8 +39,8 @@ export class ArticleCommentDetailBuilder {
     return this;
   }
 
-  setReplys(replys: ArticleCommentDetail[]): ArticleCommentDetailBuilder {
-    this.replys = replys;
+  setReplies(replies: ArticleCommentDetail[]): ArticleCommentDetailBuilder {
+    this.replies = replies;
     return this;
   }
 

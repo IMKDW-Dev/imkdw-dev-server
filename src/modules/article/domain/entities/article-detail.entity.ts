@@ -1,3 +1,4 @@
+import ArticleCommentDetail from '../../../article-comment/domain/entities/article-comment-detail.entity';
 import Tag from '../../../tag/domain/entities/tag.entity';
 import ArticleDetailDto from '../../dto/article-detail.dto';
 
@@ -17,7 +18,7 @@ export default class ArticleDetail {
   private content: string;
   private viewCount: number;
   private tags: Tag[];
-  private comments: any[];
+  private comments: ArticleCommentDetail[];
   private createdAt: Date;
   private thumbnail: string;
 
@@ -40,7 +41,7 @@ export class ArticleDetailBuilder {
   content: string;
   viewCount: number;
   tags: Tag[];
-  comments: any[];
+  comments: ArticleCommentDetail[];
   createdAt: Date;
   thumbnail: string;
 
@@ -69,7 +70,7 @@ export class ArticleDetailBuilder {
     return this;
   }
 
-  setComments(comments: any[]): ArticleDetailBuilder {
+  setComments(comments: ArticleCommentDetail[]): ArticleDetailBuilder {
     this.comments = comments;
     return this;
   }
