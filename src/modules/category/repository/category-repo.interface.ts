@@ -12,7 +12,7 @@ export interface ICategoryRepository {
 
   save(category: Category): Promise<Category>;
 
-  update(id: number, data: UpdateCategoryDto): Promise<Category>;
+  update(category: Category, data: UpdateCategoryDto): Promise<Category>;
   updateSort(id: number, newSort: number): Promise<void>;
 
   delete(category: Category): Promise<void>;

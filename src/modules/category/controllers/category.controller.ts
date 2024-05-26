@@ -23,10 +23,10 @@ import CategoryService from '../services/category.service';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
 import { Public } from '../../auth/decorators/public.decorator';
 import ResponseGetCategoriesDto from '../dto/response/get-categories.dto';
-import CategoryDto from '../dto/category.dto';
 import ResponseCreateCategoryDto from '../dto/response/create-category.dto';
 import RequestUpdateCategoryDto from '../dto/request/update-category.dto';
 import ResponseUpdateCategoryDto from '../dto/response/update-category.dto';
+import CategoryDetailDto from '../dto/category-detail.dto';
 
 @Controller({ path: 'categories', version: '1' })
 export default class CategoryController {
@@ -58,7 +58,7 @@ export default class CategoryController {
   @Swagger.getCategoryDetail('카테고리 상세 조회')
   @Public()
   @Get(':name')
-  async getCategoryDetail(@Param('name') name: string): Promise<CategoryDto> {
+  async getCategoryDetail(@Param('name') name: string): Promise<CategoryDetailDto> {
     return this.categoryService.getCategoryDetail(name);
   }
 
