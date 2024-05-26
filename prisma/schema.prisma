@@ -15,7 +15,7 @@ model users {
   oAuthProviderId Int?   @map("oauth_provider_id")
   roleId          Int    @map("role_id")
 
-  createAt   DateTime  @default(now()) @map("create_at")
+  createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
   updateAt   DateTime  @updatedAt @map("update_at")
   updateUser String    @default("_system") @map("update_user")
@@ -35,7 +35,7 @@ model userRoles {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(20)
 
-  createAt   DateTime  @default(now()) @map("create_at")
+  createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
   updateAt   DateTime  @updatedAt @map("update_at")
   updateUser String    @default("_system") @map("update_user")
@@ -51,7 +51,7 @@ model userOAuthProviders {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(255)
 
-  createAt   DateTime  @default(now()) @map("create_at")
+  createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
   updateAt   DateTime  @updatedAt @map("update_at")
   updateUser String    @default("_system") @map("update_user")
@@ -74,7 +74,7 @@ model articles {
   viewCount    Int     @default(0) @map("view_cnt")
   commentCount Int     @default(0) @map("comment_cnt")
 
-  createAt   DateTime  @default(now()) @map("create_at")
+  createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
   updateAt   DateTime  @updatedAt @map("update_at")
   updateUser String    @default("_system") @map("update_user")
@@ -94,7 +94,7 @@ model articleViewTrend {
   id        Int @id @default(autoincrement())
   viewCount Int
 
-  createAt   DateTime  @default(now()) @map("create_at")
+  createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
   updateAt   DateTime  @updatedAt @map("update_at")
   updateUser String    @default("_system") @map("update_user")
@@ -108,7 +108,7 @@ model tags {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(255)
 
-  createAt   DateTime  @default(now()) @map("create_at")
+  createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
   updateAt   DateTime  @updatedAt @map("update_at")
   updateUser String    @default("_system") @map("update_user")
@@ -124,7 +124,7 @@ model articleTag {
   articleId String @map("article_id") @db.VarChar(255)
   tagId     Int    @map("tag_id")
 
-  createAt   DateTime  @default(now()) @map("create_at")
+  createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
   updateAt   DateTime  @updatedAt @map("update_at")
   updateUser String    @default("_system") @map("update_user")
@@ -145,7 +145,7 @@ model category {
   desc  String  @db.VarChar(255)
   sort  Int
 
-  createAt   DateTime   @default(now()) @map("create_at")
+  createdAt  DateTime   @default(now()) @map("create_at")
   createUser String     @default("_system") @map("create_user")
   updateAt   DateTime   @updatedAt @map("update_at")
   updateUser String     @default("_system") @map("update_user")
@@ -162,7 +162,7 @@ model articleComment {
   userId    String @map("user_id")
   content   String @db.Text
 
-  createAt   DateTime  @default(now()) @map("create_at")
+  createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
   updateAt   DateTime  @updatedAt @map("update_at")
   updateUser String    @default("_system") @map("update_user")

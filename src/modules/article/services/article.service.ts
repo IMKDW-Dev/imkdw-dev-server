@@ -6,8 +6,9 @@ import ArticleTagService from '../../articleTag/services/article-tag.service';
 import ArticleImageService from './article-image.service';
 import { ArticleBuilder } from '../domain/entities/article.entity';
 import CategoryQueryService from '../../category/services/category-query.service';
-import { CategoryNotFoundException } from '../../../common/exceptions/404';
+import { ArticleNotFoundException, CategoryNotFoundException } from '../../../common/exceptions/404';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
+import ArticleDetailDto from '../dto/article-detail.dto';
 
 @Injectable()
 export default class ArticleService {
@@ -50,5 +51,14 @@ export default class ArticleService {
     await this.articleTagService.createTags(createdArticle, dto.tags);
 
     return new ResponseCreateArticleDto(createdArticle.getId());
+  }
+
+  async getArticleDetail(articleId: string): Promise<ArticleDetailDto> {
+    const articleDetail = await this.articleRepository.findArticleDetail({ id: articleId });
+    if (!articleDetail) {
+      throw new ArticleNotFoundException(articleId);
+    }
+
+    return articleDetail.toDto();
   }
 }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsNumber, IsString, MaxLength } from 'class-validator';
+import { IsBoolean, IsDate, IsNumber, IsString, MaxLength } from 'class-validator';
 
 export default class ArticleDto {
   @ApiProperty({ description: '게시글 아이디', maxLength: 231 })
@@ -17,11 +17,6 @@ export default class ArticleDto {
   @IsNumber()
   @Transform(({ value }) => parseInt(value, 10))
   categoryId: number;
-
-  @ApiProperty({ description: '게시글 작성자 아이디', maxLength: 255 })
-  @IsString()
-  @MaxLength(255)
-  author: string;
 
   @ApiProperty({ description: '게시글 내용', maxLength: 65000 })
   @IsString()
@@ -44,4 +39,8 @@ export default class ArticleDto {
   @ApiProperty({ description: '게시글 댓글 수' })
   @IsNumber()
   commentCount: number;
+
+  @ApiProperty({ description: '게시글 작성일' })
+  @IsDate()
+  createdAt: Date;
 }

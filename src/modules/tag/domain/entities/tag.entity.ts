@@ -1,3 +1,5 @@
+import TagDto from '../../dto/tag.dto';
+
 export default class Tag {
   constructor(builder: TagBuilder) {
     this.id = builder.id;
@@ -13,6 +15,10 @@ export default class Tag {
 
   getName(): string {
     return this.name;
+  }
+
+  toDto(): TagDto {
+    return new TagDto(this.id, this.name);
   }
 }
 

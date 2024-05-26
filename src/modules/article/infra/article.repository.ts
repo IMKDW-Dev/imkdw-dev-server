@@ -7,6 +7,8 @@ import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/pr
 import Article, { ArticleBuilder } from '../domain/entities/article.entity';
 import { ArticleQueryFilter } from '../repository/article-query.filter';
 import { CategoryBuilder } from '../../category/domain/entities/category.entity';
+import ArticleDetail, { ArticleDetailBuilder } from '../domain/entities/article-detail.entity';
+import { TagBuilder } from '../../tag/domain/entities/tag.entity';
 
 type FindOneResult = Prisma.articlesGetPayload<{
   include: {
@@ -16,6 +18,17 @@ type FindOneResult = Prisma.articlesGetPayload<{
         tags: true;
       };
     };
+  };
+}>;
+
+type FindDetailResult = Prisma.articlesGetPayload<{
+  include: {
+    articleTag: {
+      include: {
+        tags: true;
+      };
+    };
+    articleComment: true;
   };
 }>;
 
@@ -48,6 +61,22 @@ export default class ArticleRepository implements IArticleRepository {
     return this.toEntity(row);
   }
 
+  async findArticleDetail(query: ArticleQueryFilter): Promise<ArticleDetail> {
+    const row: FindDetailResult = await this.prisma.client.articles.findFirst({
+      where: query,
+      include: {
+        articleTag: {
+          include: {
+            tags: true,
+          },
+        },
+        articleComment: true,
+      },
+    });
+
+    return row ? this.toDetail(row) : null;
+  }
+
   private toEntity(row: FindOneResult): Article {
     const category = new CategoryBuilder()
       .setId(row.category.id)
@@ -64,7 +93,24 @@ export default class ArticleRepository implements IArticleRepository {
       .setCategory(category)
       .setViewCount(row.viewCount)
       .setThumbnail(row.thumbnail)
-      .setCreatedAt(row.createAt)
+      .setCreatedAt(row.createdAt)
+      .build();
+  }
+
+  private toDetail(row: FindDetailResult): ArticleDetail {
+    const tags = row.articleTag.map((item) => new TagBuilder().setId(item.tags.id).setName(item.tags.name).build());
+
+    const comments: any[] = [];
+
+    return new ArticleDetailBuilder()
+      .setId(row.id)
+      .setTitle(row.title)
+      .setContent(row.content)
+      .setViewCount(row.viewCount)
+      .setTags(tags)
+      .setComments(comments)
+      .setCreatedAt(row.createdAt)
+      .setThumbnail(row.thumbnail)
       .build();
   }
 }
