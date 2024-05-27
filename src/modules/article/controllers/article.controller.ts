@@ -9,8 +9,8 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 import UserRoles from '../../user/enums/user-role.enum';
 import RequestCreateArticleDto from '../dto/request/create-article.dto';
 import { Public } from '../../auth/decorators/public.decorator';
-import GetArticlesQuery from '../dto/request/get-article.dto';
 import ArticleDetailDto from '../dto/article-detail.dto';
+import GetArticlesQuery from '../dto/request/get-article.dto';
 
 @ApiTags('게시글')
 @Controller({ path: 'articles', version: '1' })

@@ -12,6 +12,8 @@ import { GetArticlesDto } from '../dto/internal/get-article.dto';
 import { GetArticleFilter } from '../enums/article.enum';
 import ArticleDetailDto from '../dto/article-detail.dto';
 import { ARTICLE_DETAIL_REPOSITORY, IArticleDetailRepository } from '../repository/article-detail-repo.interface';
+import ArticleSummaryDto from '../dto/article-summary.dto';
+import { ARTICLE_SUMMARY_REPOSITORY, IArticleSummaryRepository } from '../repository/article-summary-repo.interface';
 
 @Injectable()
 export default class ArticleService {
@@ -19,6 +21,7 @@ export default class ArticleService {
     /** 영속성 레이어 */
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
     @Inject(ARTICLE_DETAIL_REPOSITORY) private readonly articleDetailRepository: IArticleDetailRepository,
+    @Inject(ARTICLE_SUMMARY_REPOSITORY) private readonly articleSummaryRepository: IArticleSummaryRepository,
 
     /** 게시글 서비스 */
     private readonly articleImageService: ArticleImageService,
@@ -71,19 +74,19 @@ export default class ArticleService {
     await this.articleRepository.update(article, { viewCount: article.getCommentCount() });
   }
 
-  async getArticles(dto: GetArticlesDto): Promise<ArticleDto[]> {
-    let articles: Article[] = [];
+  async getArticles(dto: GetArticlesDto): Promise<ArticleSummaryDto[]> {
+    let articles: ArticleSummaryDto[] = [];
 
     switch (dto.filter) {
       case GetArticleFilter.LATEST:
-        articles = await this.articleRepository.findLatestArticles(dto.limit);
+        articles = await this.articleSummaryRepository.findLatestArticles(dto.limit);
         break;
       case GetArticleFilter.POPULAR:
-        articles = await this.articleRepository.findArticlesOrderByViewCount(dto.limit);
+        articles = await this.articleSummaryRepository.findArticlesOrderByViewCount(dto.limit);
         break;
       default:
         break;
     }
-    return articles.map((article) => article.toDto());
+    return articles;
   }
 }

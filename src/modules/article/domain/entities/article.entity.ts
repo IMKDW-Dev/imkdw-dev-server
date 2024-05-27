@@ -62,6 +62,10 @@ export default class Article {
   addHashOnId(): void {
     this.id = `${this.id}-${generateCUID()}`;
   }
+
+  addCommentCount(): void {
+    this.commentCount += 1;
+  }
 }
 
 export class ArticleBuilder {

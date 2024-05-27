@@ -12,6 +12,7 @@ import RequestCreateArticleDto from '../dto/request/create-article.dto';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import ArticleDetailDto from '../dto/article-detail.dto';
 import { GetArticleFilter } from '../enums/article.enum';
+import ArticleSummaryDto from '../dto/article-summary.dto';
 
 export const createArticle = (summary: string) =>
   applyDecorators(
@@ -32,4 +33,5 @@ export const getArticles = (summary: string) =>
   applyDecorators(
     ApiOperation({ summary }),
     ApiQuery({ name: 'filter', description: '게시글 조회 필터', enum: GetArticleFilter }),
+    ApiOkResponse({ type: [ArticleSummaryDto] }),
   );

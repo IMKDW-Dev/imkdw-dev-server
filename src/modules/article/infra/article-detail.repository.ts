@@ -1,13 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
+import { Prisma } from '@prisma/client';
 
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { IArticleDetailRepository } from '../repository/article-detail-repo.interface';
 import ArticleDetailDto, { ArticleDetailDtoBuilder } from '../dto/article-detail.dto';
 import { ArticleQueryFilter } from '../repository/article-query.filter';
-import { Prisma } from '@prisma/client';
+import TagDto from '../../tag/dto/tag.dto';
+import ArticleCommentDto from '../../article-comment/dto/article-comment.dto';
+import ArticleCommentDetailDto, { CommentUserDto } from '../../article-comment/dto/article-comment-detail.dto';
 
-type FindOneResult = Prisma.articlesGetPayload<{
+type QueryResult = Prisma.articlesGetPayload<{
   include: {
     articleTag: {
       include: {
@@ -55,14 +58,17 @@ export default class ArticleDetailRepository implements IArticleDetailRepository
     return row ? this.toDto(row) : null;
   }
 
-  private toDto(row: FindOneResult): ArticleDetailDto {
+  private toDto(row: QueryResult): ArticleDetailDto {
+    const comments: ArticleCommentDetailDto[] = row.articleComment.map((comment): ArticleCommentDetailDto => {
+      const replies = comment.replies.map((reply) => {});
+    });
     return new ArticleDetailDtoBuilder()
       .setId(row.id)
       .setTitle(row.title)
       .setContent(row.content)
       .setViewCount(row.viewCount)
       .setCreatedAt(row.createdAt)
-      .setTags(row.articleTag.map((tag) => tag.tags))
+      .setTags(row.articleTag.map((tag) => new TagDto(tag.tags.id, tag.tags.name)))
       .build();
   }
 }
