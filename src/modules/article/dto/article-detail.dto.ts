@@ -12,6 +12,11 @@ export default class ArticleDetailDto extends PickType(ArticleDto, [
 ]) {
   constructor(builder: ArticleDetailDtoBuilder) {
     super();
+    this.id = builder.id;
+    this.title = builder.title;
+    this.content = builder.content;
+    this.viewCount = builder.viewCount;
+    this.createdAt = builder.createdAt;
     this.tags = builder.tags;
     this.comments = builder.comments;
   }

@@ -6,8 +6,10 @@ import { IArticleCommentRepository } from '../repository/article-comment-repo.in
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import ArticleComment, { ArticleCommentBuilder } from '../domain/entities/article-comment.entity';
 import { ArticleCommentQueryFilter } from '../repository/article-comment-query.filter';
-import ArticleCommentDetail, { ArticleCommentDetailBuilder } from '../domain/entities/article-comment-detail.entity';
-import { UserBuilder } from '../../user/domain/entities/user.entity';
+import ArticleCommentDetailDto, {
+  ArticleCommentDetailDtoBuilder,
+  CommentUserDto,
+} from '../dto/article-comment-detail.dto';
 
 type FindDetailResult = Prisma.articleCommentGetPayload<{
   include: {
@@ -27,7 +29,7 @@ export default class ArticleCommentRepository implements IArticleCommentReposito
     return this.toEntity(row);
   }
 
-  async save(comment: ArticleComment): Promise<ArticleCommentDetail> {
+  async save(comment: ArticleComment): Promise<ArticleCommentDetailDto> {
     const row = await this.prisma.client.articleComment.create({
       data: {
         articleId: comment.getArticleId(),
@@ -57,33 +59,23 @@ export default class ArticleCommentRepository implements IArticleCommentReposito
       .build();
   }
 
-  private toDetail(comment: FindDetailResult, commentReplies: FindDetailResult[]): ArticleCommentDetail {
+  private toDetail(comment: FindDetailResult, commentReplies: FindDetailResult[]): ArticleCommentDetailDto {
+    console.log('comment', comment);
+    console.log('commentReplies', commentReplies);
     const replies = commentReplies.map((reply) =>
-      new ArticleCommentDetailBuilder()
+      new ArticleCommentDetailDtoBuilder()
         .setId(reply.id)
-        .setAuthor(
-          new UserBuilder()
-            .setId(reply.user.id)
-            .setEmail(reply.user.email)
-            .setNickname(reply.user.nickname)
-            .setProfile(reply.user.profile)
-            .build(),
-        )
+        .setParentId(reply.parentId)
+        .setAuthor(new CommentUserDto(reply.user.nickname, reply.user.profile))
         .setContent(reply.content)
         .setCreatedAt(reply.createdAt)
         .build(),
     );
 
-    return new ArticleCommentDetailBuilder()
+    return new ArticleCommentDetailDtoBuilder()
       .setId(comment.id)
-      .setAuthor(
-        new UserBuilder()
-          .setId(comment.user.id)
-          .setEmail(comment.user.email)
-          .setNickname(comment.user.nickname)
-          .setProfile(comment.user.profile)
-          .build(),
-      )
+      .setParentId(comment.parentId)
+      .setAuthor(new CommentUserDto(comment.user.nickname, comment.user.profile))
       .setContent(comment.content)
       .setCreatedAt(comment.createdAt)
       .setReplies(replies)

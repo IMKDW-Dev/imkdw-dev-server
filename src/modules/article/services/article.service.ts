@@ -62,6 +62,7 @@ export default class ArticleService {
 
   async getArticleDetail(articleId: string): Promise<ArticleDetailDto> {
     const articleDetail = await this.articleDetailRepository.findOne({ id: articleId });
+    console.log(articleDetail);
     if (!articleDetail) {
       throw new ArticleNotFoundException(articleId);
     }

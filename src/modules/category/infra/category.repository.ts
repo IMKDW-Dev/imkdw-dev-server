@@ -7,6 +7,7 @@ import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/pr
 import Category, { CategoryBuilder } from '../domain/entities/category.entity';
 import { CategoryQueryFilter } from '../repository/category-query.filter';
 import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
+import { QueryOption } from '../../../common/interfaces/common-query.filter';
 
 @Injectable()
 export default class CategoryRepository implements ICategoryRepository {
@@ -40,13 +41,13 @@ export default class CategoryRepository implements ICategoryRepository {
     return this.toEntity(row);
   }
 
-  async findMany(filter: CategoryQueryFilter): Promise<Category[]> {
+  async findMany(filter: CategoryQueryFilter, option?: QueryOption): Promise<Category[]> {
     const rows = await this.prisma.client.category.findMany({
       where: {
         ...(filter?.id && { id: filter.id }),
         ...(filter?.name && { name: filter.name }),
       },
-      ...(filter?.limit && { take: filter.limit }),
+      ...(option?.limit && { take: option.limit }),
       orderBy: { sort: 'desc' },
     });
 

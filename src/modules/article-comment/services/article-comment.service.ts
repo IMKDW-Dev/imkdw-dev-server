@@ -43,7 +43,8 @@ export default class ArticleCommentService {
 
     // TODO: 트랜잭션 처리
     const createdComment = await this.articleCommentRepository.save(comment);
+    console.log('createdComment', createdComment);
     await this.articleService.addCommentCount(article);
-    return createdComment.toDto();
+    return createdComment;
   }
 }

@@ -39,9 +39,8 @@ export default class CategoryService {
     return updatedCategory.toDto();
   }
 
-  async getCategories(limit: number): Promise<CategoryDto[]> {
-    const categories = await this.categoryRepository.findMany({ limit });
-    return categories.map((category) => category.toDto());
+  async getCategories(limit: number): Promise<CategoryDetailDto[]> {
+    return this.categoryDetailRepository.findMany({}, { limit });
   }
 
   async getCategoryDetail(name: string): Promise<CategoryDetailDto> {

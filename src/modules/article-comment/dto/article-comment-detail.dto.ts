@@ -12,14 +12,18 @@ export class CommentUserDto extends PickType(UserDto, ['nickname', 'profile']) {
 export default class ArticleCommentDetailDto {
   constructor(builder: ArticleCommentDetailDtoBuilder) {
     this.id = builder.id;
+    this.parentId = builder.parentId;
     this.content = builder.content;
-    this.author = new CommentUserDto();
+    this.author = builder.author;
     this.replies = builder.replies;
     this.createdAt = builder.createdAt;
   }
 
   @ApiProperty({ description: '댓글 ID' })
   id: number;
+
+  @ApiProperty({ description: '부모 댓글 ID' })
+  parentId: number;
 
   @ApiProperty({ description: '댓글 내용' })
   content: string;
@@ -36,8 +40,9 @@ export default class ArticleCommentDetailDto {
 
 export class ArticleCommentDetailDtoBuilder {
   id: number;
+  parentId: number;
   content: string;
-  author: string;
+  author: CommentUserDto;
   replies: ArticleCommentDetailDto[];
   createdAt: Date;
 
@@ -46,12 +51,17 @@ export class ArticleCommentDetailDtoBuilder {
     return this;
   }
 
+  setParentId(parentId: number): ArticleCommentDetailDtoBuilder {
+    this.parentId = parentId;
+    return this;
+  }
+
   setContent(content: string): ArticleCommentDetailDtoBuilder {
     this.content = content;
     return this;
   }
 
-  setAuthor(author: string): ArticleCommentDetailDtoBuilder {
+  setAuthor(author: CommentUserDto): ArticleCommentDetailDtoBuilder {
     this.author = author;
     return this;
   }

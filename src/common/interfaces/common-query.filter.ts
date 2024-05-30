@@ -1,4 +1,4 @@
-export interface CommonQueryFilter {
+export interface QueryOption {
   /**
    * 조회할 데이터의 개수
    */
