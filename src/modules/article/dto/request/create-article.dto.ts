@@ -1,8 +1,8 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { ArrayMaxSize, IsArray, IsString } from 'class-validator';
-import ArticleDto from '../article.dto';
+import Article from '../../domain/entities/article.entity';
 
-export default class RequestCreateArticleDto extends PickType(ArticleDto, [
+export default class RequestCreateArticleDto extends PickType(Article, [
   'id',
   'title',
   'categoryId',

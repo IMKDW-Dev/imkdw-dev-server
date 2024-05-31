@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { users, userRoles, userOAuthProviders } from '@prisma/client';
 import { CustomPrismaService } from 'nestjs-prisma';
 
-import User, { UserBuilder } from '../domain/entities/user.entity';
+import User from '../domain/entities/user.entity';
 import { UserQueryFilter } from '../repository/user/user-query.filter';
 import { IUserRepository } from '../repository/user/user-repo.interface';
 import UserRole from '../domain/entities/user-role.entity';
@@ -33,12 +33,12 @@ export default class UserRepository implements IUserRepository {
         oAuthProvider: true,
       },
       data: {
-        id: user.getId(),
-        email: user.getEmail(),
-        nickname: user.getNickname(),
-        profile: user.getProfile(),
-        roleId: user.getRole().getId(),
-        oAuthProviderId: user.getOAuthProvider().getId(),
+        id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        profile: user.profile,
+        roleId: user.role.id,
+        oAuthProviderId: user.oAuthProvider.id,
       },
     });
 
@@ -46,13 +46,16 @@ export default class UserRepository implements IUserRepository {
   }
 
   private toEntity(user: users & { role: userRoles; oAuthProvider: userOAuthProviders }): User {
-    return new UserBuilder()
-      .setId(user.id)
-      .setEmail(user.email)
-      .setNickname(user.nickname)
-      .setProfile(user.profile)
-      .setRole(new UserRole(user.role.id, user.role.name))
-      .setOAuthProvider(new UserOAuthProvider(user.oAuthProvider.id, user.oAuthProvider.name))
-      .build();
+    const role = UserRole.create({ id: user.role.id, name: user.role.name });
+    const oAuthProvider = UserOAuthProvider.create({ id: user.oAuthProvider.id, provider: user.oAuthProvider.name });
+
+    return User.create({
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+      profile: user.profile,
+      role,
+      oAuthProvider,
+    });
   }
 }

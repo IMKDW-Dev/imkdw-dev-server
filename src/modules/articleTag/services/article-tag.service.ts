@@ -3,7 +3,7 @@ import { ARTICE_TAG_REPOSITORY, IArticleTagRepository } from '../repository/arti
 import TagQueryService from '../../tag/services/tag-query.service';
 import TagService from '../../tag/services/tag.service';
 import Article from '../../article/domain/entities/article.entity';
-import { ArticleTagBuilder } from '../domain/entities/article-tag.entity';
+import ArticleTag from '../domain/entities/article-tag.entity';
 
 @Injectable()
 export default class ArticleTagService {
@@ -16,13 +16,11 @@ export default class ArticleTagService {
   async createTags(article: Article, tagNames: string[]) {
     const tagsByName = await this.tagQueryService.findManyByNames(tagNames);
 
-    const existingTagNames = tagsByName.map((tag) => tag.getName());
+    const existingTagNames = tagsByName.map((tag) => tag.name);
     const newTagNames = tagNames.filter((name) => !existingTagNames.includes(name));
 
     const newTags = await this.tagService.createMany(newTagNames);
-    const tags = [...tagsByName, ...newTags].map((tag) =>
-      new ArticleTagBuilder().setArticle(article).setTag(tag).build(),
-    );
+    const tags = [...tagsByName, ...newTags].map((tag) => ArticleTag.create({ article, tag }));
     await this.articleTagRepository.createMany(article, tags);
   }
 }

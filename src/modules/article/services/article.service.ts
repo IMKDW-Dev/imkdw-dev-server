@@ -4,24 +4,18 @@ import { CreateArticleDto } from '../dto/internal/create-article.dto';
 import { DuplicateArticleIdException } from '../../../common/exceptions/409';
 import ArticleTagService from '../../articleTag/services/article-tag.service';
 import ArticleImageService from './article-image.service';
-import Article, { ArticleBuilder } from '../domain/entities/article.entity';
 import CategoryQueryService from '../../category/services/category-query.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../common/exceptions/404';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import { GetArticlesDto } from '../dto/internal/get-article.dto';
 import { GetArticleFilter } from '../enums/article.enum';
-import ArticleDetailDto from '../dto/article-detail.dto';
-import { ARTICLE_DETAIL_REPOSITORY, IArticleDetailRepository } from '../repository/article-detail-repo.interface';
-import ArticleSummaryDto from '../dto/article-summary.dto';
-import { ARTICLE_SUMMARY_REPOSITORY, IArticleSummaryRepository } from '../repository/article-summary-repo.interface';
+import Article from '../domain/entities/article.entity';
 
 @Injectable()
 export default class ArticleService {
   constructor(
     /** 영속성 레이어 */
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
-    @Inject(ARTICLE_DETAIL_REPOSITORY) private readonly articleDetailRepository: IArticleDetailRepository,
-    @Inject(ARTICLE_SUMMARY_REPOSITORY) private readonly articleSummaryRepository: IArticleSummaryRepository,
 
     /** 게시글 서비스 */
     private readonly articleImageService: ArticleImageService,
@@ -39,30 +33,29 @@ export default class ArticleService {
 
     const article = await this.articleRepository.findOne({ id: dto.id });
     if (article) {
-      throw new DuplicateArticleIdException(dto.id);
+      throw new DuplicateArticleIdException(dto.id.toString());
     }
 
-    const thumbnail = await this.articleImageService.getThumbnail(dto.id, file);
-    const newArticle = new ArticleBuilder()
-      .setId(dto.id)
-      .setTitle(dto.title)
-      .setContent(dto.content)
-      .setThumbnail(thumbnail)
-      .setCategoryId(category.getId())
-      .setVisible(dto.visible)
-      .build();
+    const thumbnail = await this.articleImageService.getThumbnail(dto.id.toString(), file);
+    const newArticle = Article.create({
+      id: dto.id,
+      title: dto.title,
+      content: dto.content,
+      thumbnail,
+      category,
+      visible: dto.visible,
+    });
     newArticle.addHashOnId();
 
     // TODO: 트랜잭션 처리
     const createdArticle = await this.articleRepository.save(newArticle);
     await this.articleTagService.createTags(createdArticle, dto.tags);
 
-    return new ResponseCreateArticleDto(createdArticle.getId());
+    return new ResponseCreateArticleDto(createdArticle.id.toString());
   }
 
   async getArticleDetail(articleId: string): Promise<ArticleDetailDto> {
-    const articleDetail = await this.articleDetailRepository.findOne({ id: articleId });
-    console.log(articleDetail);
+    const articleDetail = await this.articleRepository.findOne({ id: articleId });
     if (!articleDetail) {
       throw new ArticleNotFoundException(articleId);
     }
@@ -72,18 +65,18 @@ export default class ArticleService {
 
   async addCommentCount(article: Article): Promise<void> {
     article.addCommentCount();
-    await this.articleRepository.update(article, { viewCount: article.getCommentCount() });
+    await this.articleRepository.update(article, article);
   }
 
-  async getArticles(dto: GetArticlesDto): Promise<ArticleSummaryDto[]> {
-    let articles: ArticleSummaryDto[] = [];
+  async getArticles(dto: GetArticlesDto): Promise<Article[]> {
+    let articles: Article[] = [];
 
     switch (dto.filter) {
       case GetArticleFilter.LATEST:
-        articles = await this.articleSummaryRepository.findLatestArticles(dto.limit);
+        articles = await this.articleRepository.findLatestArticles({ limit: dto.limit });
         break;
       case GetArticleFilter.POPULAR:
-        articles = await this.articleSummaryRepository.findArticlesOrderByViewCount(dto.limit);
+        articles = await this.articleRepository.findManyOrderByViewCount({ limit: dto.limit });
         break;
       default:
         break;

@@ -61,8 +61,6 @@ export default class ArticleDetailRepository implements IArticleDetailRepository
       },
     });
 
-    console.log(row);
-
     return row ? this.toDto(row) : null;
   }
 

@@ -4,7 +4,7 @@ import { category as PrismaCategory } from '@prisma/client';
 
 import { ICategoryRepository } from '../repository/category-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
-import Category, { CategoryBuilder } from '../domain/entities/category.entity';
+import Category from '../domain/entities/category.entity';
 import { CategoryQueryFilter } from '../repository/category-query.filter';
 import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
 import { QueryOption } from '../../../common/interfaces/common-query.filter';
@@ -31,10 +31,10 @@ export default class CategoryRepository implements ICategoryRepository {
   async save(category: Category): Promise<Category> {
     const row = await this.prisma.client.category.create({
       data: {
-        name: category.getName(),
-        sort: category.getSort(),
-        desc: category.getDesc(),
-        image: category.getImage(),
+        name: category.name,
+        sort: category.sort,
+        desc: category.desc,
+        image: category.image,
       },
     });
 
@@ -56,23 +56,11 @@ export default class CategoryRepository implements ICategoryRepository {
 
   async update(category: Category, data: UpdateCategoryDto): Promise<Category> {
     const updatedCategory = await this.prisma.client.category.update({
-      where: { id: category.getId() },
+      where: { id: category.id },
       data,
     });
 
     return this.toEntity(updatedCategory);
-  }
-
-  private toEntity(_category: PrismaCategory) {
-    const category = new CategoryBuilder()
-      .setId(_category.id)
-      .setName(_category.name)
-      .setSort(_category.sort)
-      .setImage(_category.image)
-      .setDesc(_category.desc)
-      .build();
-
-    return category;
   }
 
   async updateSort(categoryId: number, newSort: number) {
@@ -100,6 +88,16 @@ export default class CategoryRepository implements ICategoryRepository {
   }
 
   async delete(category: Category): Promise<void> {
-    await this.prisma.client.category.delete({ where: { id: category.getId() } });
+    await this.prisma.client.category.delete({ where: { id: category.id } });
+  }
+
+  private toEntity(_category: PrismaCategory) {
+    return Category.create({
+      id: _category.id,
+      name: _category.name,
+      image: _category.image,
+      desc: _category.desc,
+      sort: _category.sort,
+    });
   }
 }

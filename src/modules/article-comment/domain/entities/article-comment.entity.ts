@@ -1,76 +1,27 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsNumber, IsString } from 'class-validator';
+import User from '../../../user/domain/entities/user.entity';
+
 export default class ArticleComment {
-  constructor(builder: ArticleCommentBuilder) {
-    this.id = builder.id;
-    this.articleId = builder.articleId;
-    this.parentId = builder.parentId;
-    this.content = builder.content;
-    this.userId = builder.userId;
-  }
-
-  private id: number;
-  private userId: string;
-  private articleId: string;
-  private parentId: number | null;
-  private content: string;
-
-  getId(): number {
-    return this.id;
-  }
-
-  getArticleId(): string {
-    return this.articleId;
-  }
-
-  getParentId(): number | null {
-    return this.parentId;
-  }
-
-  getContent(): string {
-    return this.content;
-  }
-
-  getUserId(): string {
-    return this.userId;
-  }
-
-  isParentComment(): boolean {
-    return this.parentId !== null;
-  }
-}
-
-export class ArticleCommentBuilder {
+  @ApiProperty({ description: '댓글 아이디', example: 1, type: Number })
+  @IsNumber()
+  @Type(() => Number)
   id: number;
-  userId: string;
+
+  @ApiProperty({ description: '댓글 작성자', type: User })
+  @Type(() => User)
+  author: User;
+
+  @ApiProperty({ description: '게시글 아이디', example: 'UUID' })
+  @IsString()
   articleId: string;
-  parentId: number | null;
+
+  @ApiProperty({ description: '부모 댓글', type: ArticleComment, nullable: true })
+  @Type(() => ArticleComment)
+  parent: ArticleComment | null;
+
+  @ApiProperty({ description: '댓글 내용', example: '댓글 내용' })
+  @IsString()
   content: string;
-
-  setId(id: number): ArticleCommentBuilder {
-    this.id = id;
-    return this;
-  }
-
-  setArticleId(articleId: string): ArticleCommentBuilder {
-    this.articleId = articleId;
-    return this;
-  }
-
-  setParentId(parentId: number | null): ArticleCommentBuilder {
-    this.parentId = parentId;
-    return this;
-  }
-
-  setContent(content: string): ArticleCommentBuilder {
-    this.content = content;
-    return this;
-  }
-
-  setUserId(userId: string): ArticleCommentBuilder {
-    this.userId = userId;
-    return this;
-  }
-
-  build(): ArticleComment {
-    return new ArticleComment(this);
-  }
 }

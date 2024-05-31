@@ -10,11 +10,11 @@ import ArticleTag from '../domain/entities/article-tag.entity';
 export default class ArticleTagRepository implements IArticleTagRepository {
   constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
 
-  async createMany(article: Article, tags: ArticleTag[]): Promise<void> {
-    await this.prisma.client.articleTag.createMany({
-      data: tags.map((tag) => ({
-        articleId: article.getId(),
-        tagId: tag.getTag().getId(),
+  async createMany(article: Article, articleTags: ArticleTag[]): Promise<void> {
+    this.prisma.client.articleTag.createMany({
+      data: articleTags.map((articleTag) => ({
+        articleId: article.id.toString(),
+        tagId: articleTag.tag.id,
       })),
     });
   }

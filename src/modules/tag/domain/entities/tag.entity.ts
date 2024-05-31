@@ -1,42 +1,28 @@
-import TagDto from '../../dto/tag.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsNumber } from 'class-validator';
+import IsTagName from '../../decorators/validation/is-tag-name.decorator';
 
-export default class Tag {
-  constructor(builder: TagBuilder) {
-    this.id = builder.id;
-    this.name = builder.name;
-  }
-
-  private id: number;
-  private name: string;
-
-  getId(): number {
-    return this.id;
-  }
-
-  getName(): string {
-    return this.name;
-  }
-
-  toDto(): TagDto {
-    return new TagDto(this.id, this.name);
-  }
+interface Props {
+  id?: number;
+  name?: string;
 }
+export default class Tag {
+  constructor(props: Props) {
+    this.id = props.id;
+    this.name = props.name;
+  }
 
-export class TagBuilder {
+  @ApiProperty({ description: '아이디', example: 1 })
+  @IsNumber()
+  @Type(() => Number)
   id: number;
+
+  @ApiProperty({ description: '태그 이름', minLength: 2, maxLength: 20, example: 'Backend' })
+  @IsTagName()
   name: string;
 
-  setId(id: number): TagBuilder {
-    this.id = id;
-    return this;
-  }
-
-  setName(name: string): TagBuilder {
-    this.name = name;
-    return this;
-  }
-
-  build(): Tag {
-    return new Tag(this);
+  static create(props: Props): Tag {
+    return new Tag(props);
   }
 }

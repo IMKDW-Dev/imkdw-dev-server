@@ -1,130 +1,86 @@
-import { generateCUID } from '../../../../common/utils/cuid';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type, Transform } from 'class-transformer';
+import { IsBoolean, IsNumber, IsUrl } from 'class-validator';
 
-export default class Article {
-  constructor(builder: ArticleBuilder) {
-    this.id = builder.id;
-    this.title = builder.title;
-    this.categoryId = builder.categoryId;
-    this.content = builder.content;
-    this.visible = builder.visible;
-    this.thumbnail = builder.thumbnail;
-    this.viewCount = builder.viewCount;
-    this.commentCount = builder.commentCount;
-    this.createdAt = builder.createdAt;
-  }
+import IsArticleId from '../../decorators/validation/is-article-id.decorator';
+import ArticleId from '../value-objects/article-id.vo';
+import IsArticleTitle from '../../decorators/validation/is-article-title.decorator';
+import Category from '../../../category/domain/entities/category.entity';
+import IsArticleContent from '../../decorators/validation/is-article-content.decorator';
 
-  private id: string;
-  private title: string;
-  private categoryId: number;
-  private content: string;
-  private visible: boolean;
-  private thumbnail: string;
-  private viewCount: number;
-  private commentCount: number;
-  private createdAt: Date;
-
-  getId(): string {
-    return this.id;
-  }
-
-  getTitle(): string {
-    return this.title;
-  }
-
-  getCategoryId(): number {
-    return this.categoryId;
-  }
-
-  getContent(): string {
-    return this.content;
-  }
-
-  getVisible(): boolean {
-    return this.visible;
-  }
-
-  getThumbnail(): string {
-    return this.thumbnail;
-  }
-
-  getViewCount(): number {
-    return this.viewCount;
-  }
-
-  getCommentCount(): number {
-    return this.commentCount;
-  }
-
-  getCreatedAt(): Date {
-    return this.createdAt;
-  }
-
-  addHashOnId(): void {
-    this.id = `${this.id}-${generateCUID()}`;
-  }
-
-  addCommentCount(): void {
-    this.commentCount += 1;
-  }
+interface Props {
+  id?: ArticleId;
+  title?: string;
+  category?: Category;
+  content?: string;
+  visible?: boolean;
+  thumbnail?: string;
+  viewCount?: number;
+  commentCount?: number;
+  createdAt?: Date;
 }
 
-export class ArticleBuilder {
-  id: string;
+export default class Article {
+  constructor(props: Props) {
+    this.id = props.id;
+    this.title = props.title;
+    this.category = props.category;
+    this.content = props.content;
+    this.visible = props.visible;
+    this.thumbnail = props.thumbnail;
+    this.viewCount = props.viewCount;
+    this.commentCount = props.commentCount;
+    this.createdAt = props.createdAt;
+  }
+
+  @ApiProperty({ description: '게시글 아이디', example: 'how-to-use-nestjs', minLength: 1, maxLength: 245 })
+  @IsArticleId()
+  @Type(() => ArticleId)
+  id: ArticleId;
+
+  @ApiProperty({ description: '게시글 제목', example: 'NestJS 사용법', maxLength: 255 })
+  @IsArticleTitle()
   title: string;
-  categoryId: number;
+
+  @ApiProperty({ description: '카테고리', type: Category })
+  category: Category;
+
+  @ApiProperty({ description: '게시글 내용', example: 'NestJS 사용법에 대한 설명', minLength: 1, maxLength: 65000 })
+  @IsArticleContent()
   content: string;
+
+  @ApiProperty({ description: '게시글 노출 여부', example: true, type: Boolean })
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
   visible: boolean;
+
+  @ApiProperty({ description: '게시글 썸네일 URL', example: 'https://example.com/image.jpg' })
+  @IsUrl()
   thumbnail: string;
+
+  @ApiProperty({ description: '게시글 조회수', example: 0, type: Number })
+  @IsNumber()
+  @Type(() => Number)
   viewCount: number;
+
+  @ApiProperty({ description: '게시글 댓글 수', example: 0, type: Number })
+  @IsNumber()
+  @Type(() => Number)
   commentCount: number;
+
+  @ApiProperty({ description: '게시글 작성일', example: '2021-08-01T00:00:00.000Z', type: Date })
+  @Type(() => Date)
   createdAt: Date;
 
-  setId(id: string): ArticleBuilder {
-    this.id = id;
-    return this;
+  addCommentCount() {
+    this.commentCount += 1;
   }
 
-  setTitle(title: string): ArticleBuilder {
-    this.title = title;
-    return this;
+  addHashOnId() {
+    this.id.addHash();
   }
 
-  setCategoryId(categoryId: number): ArticleBuilder {
-    this.categoryId = categoryId;
-    return this;
-  }
-
-  setContent(content: string): ArticleBuilder {
-    this.content = content;
-    return this;
-  }
-
-  setVisible(visible: boolean): ArticleBuilder {
-    this.visible = visible;
-    return this;
-  }
-
-  setThumbnail(thumbnail: string): ArticleBuilder {
-    this.thumbnail = thumbnail;
-    return this;
-  }
-
-  setViewCount(viewCount: number): ArticleBuilder {
-    this.viewCount = viewCount;
-    return this;
-  }
-
-  setCommentCount(commentCount: number): ArticleBuilder {
-    this.commentCount = commentCount;
-    return this;
-  }
-
-  setCreatedAt(createdAt: Date): ArticleBuilder {
-    this.createdAt = createdAt;
-    return this;
-  }
-
-  build(): Article {
-    return new Article(this);
+  static create(props: Props): Article {
+    return new Article(props);
   }
 }

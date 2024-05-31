@@ -1,51 +1,63 @@
-import { generateCUID } from '../../../../common/utils/cuid';
-import { generateUUID } from '../../../../common/utils/uuid';
-import UserDto from '../../dto/user.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsString, IsUrl } from 'class-validator';
+
 import UserOAuthProvider from './user-oauth-provider.entity';
 import UserRole from './user-role.entity';
+import IsNickname from '../../decorators/validation/is-nickname.decorator';
+import { generateCUID } from '../../../../common/utils/cuid';
+import { generateUUID } from '../../../../common/utils/uuid';
+
+interface UserProps {
+  id?: string;
+  email?: string;
+  nickname?: string;
+  profile?: string;
+  oAuthProvider?: UserOAuthProvider;
+  role?: UserRole;
+}
 
 export default class User {
-  private static readonly NICKNAME_MAX_LENGTH = 21;
-
-  private id: string;
-  private email: string;
-  private nickname: string;
-  private profile: string;
-  private oAuthProvider: UserOAuthProvider;
-  private role: UserRole;
-
-  constructor(builder: UserBuilder) {
-    this.id = builder.id;
-    this.email = builder.email;
-    this.nickname = builder.nickname;
-    this.profile = builder.profile;
-    this.oAuthProvider = builder.oAuthProvider;
-    this.role = builder.role;
+  constructor(props: UserProps) {
+    this.id = props.id;
+    this.email = props.email;
+    this.nickname = props.nickname;
+    this.profile = props.profile;
+    this.oAuthProvider = props.oAuthProvider;
+    this.role = props.role;
   }
 
-  getId(): string {
-    return this.id;
-  }
+  @ApiProperty({ description: '유저 아이디', example: 'UUID' })
+  @IsString()
+  id: string;
 
-  getEmail(): string {
-    return this.email;
-  }
+  @ApiProperty({ description: '유저 이메일', example: 'imkdw@kakao.com' })
+  @IsEmail()
+  email: string;
 
-  getNickname(): string {
-    return this.nickname;
-  }
+  @ApiProperty({
+    description: `
+    유저 닉네임
+    1. 특수문자 사용불가
+    2. 공백 사용불가
+    3. 2자 이상, 22자 이하
+    4. 한글, 영문, 숫자 사용가능
+  `,
+    example: 'imkdw',
+    minLength: 2,
+    maxLength: 22,
+  })
+  @IsNickname()
+  nickname: string;
 
-  getProfile(): string {
-    return this.profile;
-  }
+  @ApiProperty({ description: '유저 프로필사진 URL', example: 'https://temp.com/profile.jpg' })
+  @IsUrl()
+  profile: string;
 
-  getOAuthProvider(): UserOAuthProvider {
-    return this.oAuthProvider;
-  }
+  @ApiProperty({ description: 'OAuth 제공사 정보', type: UserOAuthProvider })
+  oAuthProvider: UserOAuthProvider;
 
-  getRole(): UserRole {
-    return this.role;
-  }
+  @ApiProperty({ description: '유저 권한 정보', type: UserRole })
+  role: UserRole;
 
   setDefaultProfile() {
     this.profile = 'https://static.imkdw.dev/images/default_profile.png';
@@ -55,58 +67,15 @@ export default class User {
     this.nickname = generateCUID();
   }
 
-  isSignupWithOAuthProvider(oAuthProvider: UserOAuthProvider) {
-    return this.oAuthProvider.equals(oAuthProvider);
-  }
-
   generateId() {
     this.id = generateUUID();
   }
 
-  toDto(): UserDto {
-    return new UserDto(this.nickname, this.profile);
-  }
-}
-
-export class UserBuilder {
-  id: string;
-  email: string;
-  nickname: string;
-  profile: string;
-  oAuthProvider: UserOAuthProvider;
-  role: UserRole;
-
-  setId(id: string) {
-    this.id = id;
-    return this;
+  isSignupWithOAuth(provider: UserOAuthProvider) {
+    return this.oAuthProvider.equals(provider);
   }
 
-  setEmail(email: string) {
-    this.email = email;
-    return this;
-  }
-
-  setNickname(nickname: string) {
-    this.nickname = nickname;
-    return this;
-  }
-
-  setProfile(profile: string) {
-    this.profile = profile;
-    return this;
-  }
-
-  setOAuthProvider(oAuthProvider: UserOAuthProvider) {
-    this.oAuthProvider = oAuthProvider;
-    return this;
-  }
-
-  setRole(role: UserRole) {
-    this.role = role;
-    return this;
-  }
-
-  build() {
-    return new User(this);
+  static create(props: UserProps) {
+    return new User(props);
   }
 }

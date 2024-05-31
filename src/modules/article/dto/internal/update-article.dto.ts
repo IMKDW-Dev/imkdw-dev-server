@@ -1,4 +1,4 @@
-import ArticleDto from '../article.dto';
+import Article from '../../domain/entities/article.entity';
 
 export interface UpdateArticleDto
-  extends Partial<Pick<ArticleDto, 'title' | 'visible' | 'viewCount' | 'commentCount' | 'content' | 'thumbnail'>> {}
+  extends Pick<Article, 'title' | 'visible' | 'viewCount' | 'commentCount' | 'content' | 'thumbnail'> {}

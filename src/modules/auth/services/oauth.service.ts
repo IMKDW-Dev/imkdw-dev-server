@@ -3,10 +3,10 @@ import GoogleOAuthProvider from '../providers/google-oauth.provider';
 import UserQueryService from '../../user/services/user-query.service';
 import KakaoOAuthProvider from '../providers/kakao-oauth.provider';
 import GithubOAuthProvider from '../providers/github-oauth.provider';
-import OAuthProviders from '../enums/oauth-provider.enum';
 import { DuplicateEmailException } from '../../../common/exceptions/409';
 import AuthService from './auth.service';
 import UserOAuthQueryService from '../../user/services/user-oauth-query.service';
+import { OAuthProviders } from '../../user/domain/entities/user-oauth-provider.entity';
 
 @Injectable()
 export default class OAuthService {
@@ -42,8 +42,8 @@ export default class OAuthService {
     const userByEmail = await this.userQueryService.findOne({ email });
     const userOAuthProvider = await this.userOAuthProviderQueryService.findOne({ name: provider });
 
-    if (userByEmail && userByEmail.isSignupWithOAuthProvider(userOAuthProvider)) {
-      return this.authService.login(userByEmail.getId());
+    if (userByEmail && userByEmail.isSignupWithOAuth(userOAuthProvider)) {
+      return this.authService.login(userByEmail.id);
     }
 
     if (userByEmail) {

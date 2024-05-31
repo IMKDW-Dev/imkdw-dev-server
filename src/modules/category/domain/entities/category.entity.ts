@@ -1,85 +1,56 @@
-import CategoryDto from '../../dto/category.dto';
-import { CategoryDtoBuilder } from '../../dto/category.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsNumber, IsUrl } from 'class-validator';
+import IsCategoryName from '../../decorators/validation/is-category-name.decorator';
+import IsCategoryDesc from '../../decorators/validation/is-category-desc.decorator';
 
-export default class Category {
-  constructor(builder: CategoryBuilder) {
-    this.id = builder.id;
-    this.name = builder.name;
-    this.image = builder.image;
-    this.desc = builder.desc;
-    this.sort = builder.sort;
-  }
-
-  private id: number;
-  private name: string;
-  private image: string | null;
-  private desc: string;
-  private sort: number;
-
-  getId(): number {
-    return this.id;
-  }
-
-  getName(): string {
-    return this.name;
-  }
-
-  getImage(): string | null {
-    return this.image;
-  }
-
-  getDesc(): string {
-    return this.desc;
-  }
-
-  getSort(): number {
-    return this.sort;
-  }
-
-  toDto(): CategoryDto {
-    return new CategoryDtoBuilder()
-      .setId(this.id)
-      .setName(this.name)
-      .setImage(this.image)
-      .setDesc(this.desc)
-      .setSort(this.sort)
-      .build();
-  }
+interface Props {
+  id?: number;
+  name?: string;
+  image?: string;
+  desc?: string;
+  sort?: number;
+  articleCount?: number;
 }
 
-export class CategoryBuilder {
+export default class Category {
+  constructor(props: Props) {
+    this.id = props.id;
+    this.name = props.name;
+    this.image = props.image;
+    this.desc = props.desc;
+    this.sort = props.sort;
+    this.articleCount = props.articleCount;
+  }
+
+  @ApiProperty({ description: '카테고리 아이디', example: 1, type: Number })
+  @IsNumber()
+  @Type(() => Number)
   id: number;
+
+  @ApiProperty({ description: '카테고리 이름', minLength: 2, maxLength: 20, example: '백엔드' })
+  @IsCategoryName()
   name: string;
-  image: string | null;
+
+  @ApiProperty({ description: '카테고리 이미지 URL', example: 'https://example.com/image.jpg' })
+  @IsUrl()
+  image: string;
+
+  @ApiProperty({ description: '카테고리 설명', example: '백엔드 개발자를 위한 카테고리' })
+  @IsCategoryDesc()
   desc: string;
+
+  @ApiProperty({ description: '카테고리 순서', example: 1, type: Number })
+  @IsNumber()
+  @Type(() => Number)
   sort: number;
 
-  setId(id: number): CategoryBuilder {
-    this.id = id;
-    return this;
-  }
+  @ApiProperty({ description: '카테고리에 속한 게시글 개수', example: 10, type: Number })
+  @IsNumber()
+  @Type(() => Number)
+  articleCount: number;
 
-  setName(name: string): CategoryBuilder {
-    this.name = name;
-    return this;
-  }
-
-  setImage(image: string | null): CategoryBuilder {
-    this.image = image;
-    return this;
-  }
-
-  setDesc(desc: string): CategoryBuilder {
-    this.desc = desc;
-    return this;
-  }
-
-  setSort(sort: number): CategoryBuilder {
-    this.sort = sort;
-    return this;
-  }
-
-  build(): Category {
-    return new Category(this);
+  static create(props: Props): Category {
+    return new Category(props);
   }
 }
