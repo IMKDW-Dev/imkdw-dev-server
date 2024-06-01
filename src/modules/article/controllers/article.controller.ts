@@ -10,6 +10,8 @@ import UserRoles from '../../user/enums/user-role.enum';
 import RequestCreateArticleDto from '../dto/request/create-article.dto';
 import { Public } from '../../auth/decorators/public.decorator';
 import GetArticlesQuery from '../dto/request/get-article.dto';
+import ResponseCreateArticleDto from '../dto/response/create-article.dto';
+import ArticleDto from '../dto/article.dto';
 
 @ApiTags('게시글')
 @Controller({ path: 'articles', version: '1' })
@@ -21,14 +23,17 @@ export default class ArticleController {
   @UseGuards(AdminGuard)
   @Roles(UserRoles.ADMIN)
   @Post()
-  async createArticle(@Body() dto: RequestCreateArticleDto, @UploadedFile() file: Express.Multer.File) {
+  async createArticle(
+    @Body() dto: RequestCreateArticleDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<ResponseCreateArticleDto> {
     return this.articleService.createArticle(dto, file);
   }
 
   @Swagger.getArticleDetail('게시글 상세정보 조회')
   @Public()
   @Get(':articleId')
-  async getArticleDetail(@Param('articleId') articleId: string): Promise<ArticleDetailDto> {
+  async getArticleDetail(@Param('articleId') articleId: string): Promise<ArticleDto> {
     return this.articleService.getArticleDetail(articleId);
   }
 

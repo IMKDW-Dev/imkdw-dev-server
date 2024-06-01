@@ -4,23 +4,28 @@ import { CreateCommentDto } from '../dto/internal/create-comment.dto';
 import ArticleQueryService from '../../article/services/article-query.service';
 import { ArticleCommentNotFoundException, ArticleNotFoundException } from '../../../common/exceptions/404';
 import { CannotReplyOnReplyCommentException } from '../../../common/exceptions/403';
-import { ArticleCommentBuilder } from '../domain/entities/article-comment.entity';
-import ArticleCommentDetailDto from '../dto/article-comment-detail.dto';
+import ArticleId from '../../article/domain/value-objects/article-id.vo';
+import ArticleCommentDto from '../dto/article-comment.dto';
+import ArticleComment from '../domain/entities/article-comment.entity';
+import UserQueryService from '../../user/services/user-query.service';
 import ArticleService from '../../article/services/article.service';
 
 @Injectable()
 export default class ArticleCommentService {
   constructor(
     @Inject(ARTICLE_COMMENT_REPOSITORY) private readonly articleCommentRepository: IArticleCommentRepository,
-    private readonly articleQueryService: ArticleQueryService,
     private readonly articleService: ArticleService,
+    private readonly articleQueryService: ArticleQueryService,
+    private readonly userQueryService: UserQueryService,
   ) {}
 
-  async createComment(dto: CreateCommentDto): Promise<ArticleCommentDetailDto> {
-    const article = await this.articleQueryService.findOne({ id: dto.articleId });
+  async createComment(dto: CreateCommentDto): Promise<ArticleCommentDto> {
+    const article = await this.articleQueryService.findOne({ id: new ArticleId(dto.articleId) });
     if (!article) {
       throw new ArticleNotFoundException(dto.articleId);
     }
+
+    const user = await this.userQueryService.findOne({ id: dto.userId });
 
     if (dto.parentId) {
       const parentComment = await this.articleCommentRepository.findOne({ id: dto.parentId });
@@ -34,16 +39,15 @@ export default class ArticleCommentService {
       }
     }
 
-    const comment = new ArticleCommentBuilder()
-      .setArticleId(dto.articleId)
-      .setParentId(dto.parentId)
-      .setContent(dto.content)
-      .setUserId(dto.userId)
-      .build();
+    const comment = ArticleComment.create({
+      articleId: dto.articleId,
+      parentId: dto.parentId,
+      content: dto.content,
+      author: user,
+    });
 
     // TODO: 트랜잭션 처리
     const createdComment = await this.articleCommentRepository.save(comment);
-    console.log('createdComment', createdComment);
     await this.articleService.addCommentCount(article);
     return createdComment;
   }

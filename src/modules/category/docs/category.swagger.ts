@@ -10,7 +10,6 @@ import {
 } from '@nestjs/swagger';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
 import RequestUpdateCategoryDto from '../dto/request/update-category.dto';
-import ResponseCreateCategoryDto from '../dto/response/create-category.dto';
 import CategoryDto from '../dto/category.dto';
 
 // eslint-disable-next-line import/prefer-default-export
@@ -26,14 +25,14 @@ export const getCategories = (summary: string) =>
   applyDecorators(
     ApiOperation({ summary }),
     ApiQuery({ name: 'limit', description: '조회할 카테고리의 수' }),
-    ApiOkResponse({ type: CategoryDto }),
+    ApiOkResponse({ type: [CategoryDto] }),
   );
 
 export const getCategory = (summary: string) =>
   applyDecorators(
     ApiOperation({ summary }),
     ApiParam({ name: 'name', description: '카테고리 이름' }),
-    ApiOkResponse({ type: ResponseCreateCategoryDto }),
+    ApiOkResponse({ type: CategoryDto }),
   );
 
 export const updateCategory = (summary: string) =>

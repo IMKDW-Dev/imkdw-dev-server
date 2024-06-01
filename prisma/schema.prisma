@@ -22,7 +22,7 @@ model users {
   deleteAt   DateTime? @map("delete_at")
   deleteUser String?   @map("delete_user")
 
-  articleComments articleComment[]
+  articleComments articleComments[]
   articles        articles[]
   oAuthProvider   userOAuthProviders? @relation(fields: [oAuthProviderId], references: [id])
   role            userRoles           @relation(fields: [roleId], references: [id])
@@ -81,16 +81,16 @@ model articles {
   deleteAt   DateTime? @map("delete_at")
   deleteUser String?   @map("delete_user")
 
-  articleTag     articleTag[]
-  articleComment articleComment[]
-  category       category         @relation(fields: [categoryId], references: [id])
-  users          users?           @relation(fields: [usersId], references: [id])
+  articleTag     articleTags[]
+  articleComment articleComments[]
+  category       categories        @relation(fields: [categoryId], references: [id])
+  users          users?            @relation(fields: [usersId], references: [id])
   usersId        String?
 
   @@map("Articles")
 }
 
-model articleViewTrend {
+model articleViewTrends {
   id        Int @id @default(autoincrement())
   viewCount Int
 
@@ -101,7 +101,7 @@ model articleViewTrend {
   deleteAt   DateTime? @map("delete_at")
   deleteUser String?   @map("delete_user")
 
-  @@map("ArticleViewTrend")
+  @@map("ArticleViewTrends")
 }
 
 model tags {
@@ -115,12 +115,12 @@ model tags {
   deleteAt   DateTime? @map("delete_at")
   deleteUser String?   @map("delete_user")
 
-  articleTag articleTag[]
+  articleTag articleTags[]
 
   @@map("Tags")
 }
 
-model articleTag {
+model articleTags {
   articleId String @map("article_id") @db.VarChar(255)
   tagId     Int    @map("tag_id")
 
@@ -138,7 +138,7 @@ model articleTag {
   @@map("ArticleTags")
 }
 
-model category {
+model categories {
   id    Int     @id @default(autoincrement())
   name  String  @unique @db.VarChar(20)
   image String? @db.VarChar(255)
@@ -156,15 +156,15 @@ model category {
   @@map("Categories")
 }
 
-model articleComment {
+model articleComments {
   id        Int    @id @default(autoincrement())
   parentId  Int?   @map("parent_id")
   articleId String @map("article_id") @db.VarChar(255)
   userId    String @map("user_id")
   content   String @db.Text
 
-  parent  articleComment?  @relation("CommentReplies", fields: [parentId], references: [id])
-  replies articleComment[] @relation("CommentReplies")
+  parent  articleComments?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies articleComments[] @relation("CommentReplies")
 
   createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")

@@ -6,10 +6,13 @@ import ArticleTagService from '../../articleTag/services/article-tag.service';
 import ArticleImageService from './article-image.service';
 import CategoryQueryService from '../../category/services/category-query.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../common/exceptions/404';
-import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import { GetArticlesDto } from '../dto/internal/get-article.dto';
 import { GetArticleFilter } from '../enums/article.enum';
 import Article from '../domain/entities/article.entity';
+import ArticleId from '../domain/value-objects/article-id.vo';
+import ResponseCreateArticleDto from '../dto/response/create-article.dto';
+import ArticleDto from '../dto/article.dto';
+import * as ArticleMapper from '../mappers/article.mapper';
 
 @Injectable()
 export default class ArticleService {
@@ -51,21 +54,21 @@ export default class ArticleService {
     const createdArticle = await this.articleRepository.save(newArticle);
     await this.articleTagService.createTags(createdArticle, dto.tags);
 
-    return new ResponseCreateArticleDto(createdArticle.id.toString());
+    return ResponseCreateArticleDto.create(createdArticle);
   }
 
-  async getArticleDetail(articleId: string): Promise<ArticleDetailDto> {
-    const articleDetail = await this.articleRepository.findOne({ id: articleId });
+  async getArticleDetail(articleId: string): Promise<ArticleDto> {
+    const articleDetail = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
     if (!articleDetail) {
       throw new ArticleNotFoundException(articleId);
     }
 
-    return articleDetail;
+    return ArticleMapper.toDto(articleDetail);
   }
 
   async addCommentCount(article: Article): Promise<void> {
     article.addCommentCount();
-    await this.articleRepository.update(article, article);
+    await this.articleRepository.update(article.id, article);
   }
 
   async getArticles(dto: GetArticlesDto): Promise<Article[]> {
@@ -73,10 +76,10 @@ export default class ArticleService {
 
     switch (dto.filter) {
       case GetArticleFilter.LATEST:
-        articles = await this.articleRepository.findLatestArticles({ limit: dto.limit });
+        articles = await this.articleRepository.findMany({}, { limit: dto.limit, orderBy: { createdAt: 'desc' } });
         break;
       case GetArticleFilter.POPULAR:
-        articles = await this.articleRepository.findManyOrderByViewCount({ limit: dto.limit });
+        articles = await this.articleRepository.findMany({}, { limit: dto.limit, orderBy: { viewCount: 'desc' } });
         break;
       default:
         break;

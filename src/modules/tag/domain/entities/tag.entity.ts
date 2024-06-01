@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNumber } from 'class-validator';
 import IsTagName from '../../decorators/validation/is-tag-name.decorator';
+import TagDto from '../../dto/tag.dto';
 
 interface Props {
   id?: number;
@@ -21,6 +22,13 @@ export default class Tag {
   @ApiProperty({ description: '태그 이름', minLength: 2, maxLength: 20, example: 'Backend' })
   @IsTagName()
   name: string;
+
+  toDto(): TagDto {
+    return TagDto.create({
+      id: this.id,
+      name: this.name,
+    });
+  }
 
   static create(props: Props): Tag {
     return new Tag(props);

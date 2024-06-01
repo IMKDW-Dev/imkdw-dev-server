@@ -7,25 +7,25 @@ export const CONFLICT_EXCEPTIONS = {
 } as const;
 
 class ConfilctException extends HttpException {
-  constructor(errorCode: string, data?: unknown) {
-    super({ errorCode, data }, HttpStatus.CONFLICT);
+  constructor(message: string, error?: unknown) {
+    super({ message, error }, HttpStatus.CONFLICT);
   }
 }
 
 export class DuplicateEmailException extends ConfilctException {
   constructor(email?: string) {
-    super(CONFLICT_EXCEPTIONS.DUPLICATE_EMAIL, `[DuplicateEmailException] ${email} is already in use`);
+    super(CONFLICT_EXCEPTIONS.DUPLICATE_EMAIL, `${email} is already in use`);
   }
 }
 
 export class DuplicateCategoryNameException extends ConfilctException {
   constructor(name?: string) {
-    super(CONFLICT_EXCEPTIONS.DUPLICATE_CATEGORY_NAME, `[DuplicateCategoryNameException] ${name} is already in use`);
+    super(CONFLICT_EXCEPTIONS.DUPLICATE_CATEGORY_NAME, `${name} is already in use`);
   }
 }
 
 export class DuplicateArticleIdException extends ConfilctException {
   constructor(id?: string) {
-    super(CONFLICT_EXCEPTIONS.DUPLICATE_ARTICLE_ID, `[DuplicateArticleIdException ${id} is already in use`);
+    super(CONFLICT_EXCEPTIONS.DUPLICATE_ARTICLE_ID, `${id} is already in use`);
   }
 }

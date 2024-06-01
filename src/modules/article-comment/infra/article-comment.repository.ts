@@ -1,84 +1,87 @@
 import { CustomPrismaService } from 'nestjs-prisma';
 import { Inject, Injectable } from '@nestjs/common';
-import { Prisma, articleComment } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 import { IArticleCommentRepository } from '../repository/article-comment-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
-import ArticleComment, { ArticleCommentBuilder } from '../domain/entities/article-comment.entity';
 import { ArticleCommentQueryFilter } from '../repository/article-comment-query.filter';
-import ArticleCommentDetailDto, {
-  ArticleCommentDetailDtoBuilder,
-  CommentUserDto,
-} from '../dto/article-comment-detail.dto';
+import ArticleComment from '../domain/entities/article-comment.entity';
+import User from '../../user/domain/entities/user.entity';
 
-type FindDetailResult = Prisma.articleCommentGetPayload<{
+type IArticleComment = Prisma.articleCommentsGetPayload<{
   include: {
     user: true;
+    replies: {
+      include: {
+        user: true;
+      };
+    };
   };
 }>;
+
+const articleCommentInclude = {
+  user: true,
+  replies: {
+    include: {
+      user: true,
+    },
+  },
+};
 
 @Injectable()
 export default class ArticleCommentRepository implements IArticleCommentRepository {
   constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
 
   async findOne(filter: ArticleCommentQueryFilter): Promise<ArticleComment> {
-    const row = await this.prisma.client.articleComment.findFirst({
+    const row: IArticleComment = await this.prisma.client.articleComments.findFirst({
       where: filter,
+      include: articleCommentInclude,
     });
 
     return this.toEntity(row);
   }
 
-  async save(comment: ArticleComment): Promise<ArticleCommentDetailDto> {
-    const row = await this.prisma.client.articleComment.create({
+  async save(comment: ArticleComment): Promise<ArticleComment> {
+    const row = await this.prisma.client.articleComments.create({
       data: {
-        articleId: comment.getArticleId(),
-        parentId: comment.getParentId(),
-        content: comment.getContent(),
-        userId: comment.getUserId(),
+        articleId: comment.articleId,
+        parentId: comment.parentId,
+        content: comment.content,
+        userId: comment.author.id,
       },
-      include: {
-        user: true,
-      },
+      include: articleCommentInclude,
     });
 
-    const replies = await this.prisma.client.articleComment.findMany({
-      where: { parentId: row.id },
-      include: { user: true },
-    });
-
-    return this.toDetail(row, replies);
+    return this.toEntity(row);
   }
 
-  private toEntity(row: articleComment): ArticleComment {
-    return new ArticleCommentBuilder()
-      .setId(row.id)
-      .setArticleId(row.articleId)
-      .setParentId(row.parentId)
-      .setContent(row.content)
-      .build();
-  }
-
-  private toDetail(comment: FindDetailResult, commentReplies: FindDetailResult[]): ArticleCommentDetailDto {
-    console.log('comment', comment);
-    console.log('commentReplies', commentReplies);
-    const replies = commentReplies.map((reply) =>
-      new ArticleCommentDetailDtoBuilder()
-        .setId(reply.id)
-        .setParentId(reply.parentId)
-        .setAuthor(new CommentUserDto(reply.user.nickname, reply.user.profile))
-        .setContent(reply.content)
-        .setCreatedAt(reply.createdAt)
-        .build(),
+  private toEntity(row: IArticleComment): ArticleComment {
+    const replies = row.replies.map((reply) =>
+      ArticleComment.create({
+        id: reply.id,
+        articleId: reply.articleId,
+        author: User.create({
+          nickname: reply.user.nickname,
+          profile: reply.user.profile,
+        }),
+        content: reply.content,
+        parentId: reply.parentId,
+        replies: [],
+        createdAt: reply.createdAt,
+      }),
     );
 
-    return new ArticleCommentDetailDtoBuilder()
-      .setId(comment.id)
-      .setParentId(comment.parentId)
-      .setAuthor(new CommentUserDto(comment.user.nickname, comment.user.profile))
-      .setContent(comment.content)
-      .setCreatedAt(comment.createdAt)
-      .setReplies(replies)
-      .build();
+    return ArticleComment.create({
+      id: row.id,
+      articleId: row.articleId,
+      author: User.create({
+        nickname: row.user.nickname,
+        profile: row.user.profile,
+      }),
+      content: row.content,
+      parentId: row.parentId,
+      replies,
+      createdAt: row.createdAt,
+    });
   }
 }

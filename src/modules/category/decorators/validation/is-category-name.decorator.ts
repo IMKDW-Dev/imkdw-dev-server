@@ -1,4 +1,5 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
+import { BAD_REQUEST_EXCEPTIONS } from '../../../../common/exceptions/400';
 
 export default function IsCategoryName(validationOptions?: ValidationOptions) {
   return (object: unknown, propertyName: string) => {
@@ -7,7 +8,7 @@ export default function IsCategoryName(validationOptions?: ValidationOptions) {
       target: object.constructor,
       propertyName,
       constraints: [],
-      options: validationOptions,
+      options: { ...validationOptions, message: BAD_REQUEST_EXCEPTIONS.INVALID_CATEGORY_NAME },
       validator: {
         validate(name: string) {
           /**

@@ -9,10 +9,6 @@ import ImageModule from '../../infra/image/image.module';
 import StorageModule from '../../infra/storage/storage.module';
 import CategoryModule from '../category/category.module';
 import ArticleQueryService from './services/article-query.service';
-import { ARTICLE_DETAIL_REPOSITORY } from './repository/article-detail-repo.interface';
-import ArticleDetailRepository from './infra/article-detail.repository';
-import { ARTICLE_SUMMARY_REPOSITORY } from './repository/article-summary-repo.interface';
-import ArticleSummaryRepository from './infra/article-summary.repository';
 
 @Module({
   imports: [ArticleTagModule, ImageModule, StorageModule, CategoryModule],
@@ -20,8 +16,6 @@ import ArticleSummaryRepository from './infra/article-summary.repository';
   providers: [
     ArticleService,
     { provide: ARTICLE_REPOSITORY, useClass: ArticleRepository },
-    { provide: ARTICLE_DETAIL_REPOSITORY, useClass: ArticleDetailRepository },
-    { provide: ARTICLE_SUMMARY_REPOSITORY, useClass: ArticleSummaryRepository },
     ArticleImageService,
     ArticleQueryService,
   ],

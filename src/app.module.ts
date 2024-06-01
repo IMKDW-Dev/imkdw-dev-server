@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CustomPrismaModule } from 'nestjs-prisma';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import AppController from './app.controller';
 import AppService from './app.service';
@@ -17,6 +17,7 @@ import { ILocalStorageService, LOCAL_STORAGE_SERVICE } from './infra/local-stora
 import CategoryModule from './modules/category/category.module';
 import ArticleModule from './modules/article/article.module';
 import ArticleCommentModule from './modules/article-comment/article-comment.module';
+import AllExceptionsFilter from './common/exceptions/all-exception.filter';
 
 @Module({
   imports: [
@@ -48,6 +49,10 @@ import ArticleCommentModule from './modules/article-comment/article-comment.modu
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
     },
   ],
 })

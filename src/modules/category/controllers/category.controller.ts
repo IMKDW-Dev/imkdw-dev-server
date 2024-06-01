@@ -14,6 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 
 import * as Swagger from '../docs/category.swagger';
 import AdminGuard from '../../auth/guards/admin.guard';
@@ -22,11 +23,11 @@ import UserRoles from '../../user/enums/user-role.enum';
 import CategoryService from '../services/category.service';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
 import { Public } from '../../auth/decorators/public.decorator';
-import ResponseCreateCategoryDto from '../dto/response/create-category.dto';
 import RequestUpdateCategoryDto from '../dto/request/update-category.dto';
 import CategoryDto from '../dto/category.dto';
 import ResponseGetCategoriesDto from '../dto/response/get-category.dto';
 
+@ApiTags('카테고리')
 @Controller({ path: 'categories', version: '1' })
 export default class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -40,7 +41,7 @@ export default class CategoryController {
   async createCategory(
     @Body() body: RequestCreateCategoryDto,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ResponseCreateCategoryDto> {
+  ): Promise<CategoryDto> {
     return this.categoryService.createCategory({ name: body.name, desc: body.desc, image: file });
   }
 

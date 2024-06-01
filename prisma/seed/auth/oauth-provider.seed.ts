@@ -1,5 +1,5 @@
 import { userOAuthProviders } from '@prisma/client';
-import OAuthProviders from '../../../src/modules/auth/enums/oauth-provider.enum';
+import { OAuthProviders } from '../../../src/modules/user/domain/entities/user-oauth-provider.entity';
 
 const oAuthProviderSeed: Pick<userOAuthProviders, 'name'>[] = [
   {

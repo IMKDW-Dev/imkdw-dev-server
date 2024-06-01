@@ -7,6 +7,8 @@ import ArticleId from '../value-objects/article-id.vo';
 import IsArticleTitle from '../../decorators/validation/is-article-title.decorator';
 import Category from '../../../category/domain/entities/category.entity';
 import IsArticleContent from '../../decorators/validation/is-article-content.decorator';
+import Tag from '../../../tag/domain/entities/tag.entity';
+import ArticleComment from '../../../article-comment/domain/entities/article-comment.entity';
 
 interface Props {
   id?: ArticleId;
@@ -18,6 +20,8 @@ interface Props {
   viewCount?: number;
   commentCount?: number;
   createdAt?: Date;
+  tags?: Tag[];
+  comments?: ArticleComment[];
 }
 
 export default class Article {
@@ -31,6 +35,8 @@ export default class Article {
     this.viewCount = props.viewCount;
     this.commentCount = props.commentCount;
     this.createdAt = props.createdAt;
+    this.tags = props.tags;
+    this.comments = props.comments;
   }
 
   @ApiProperty({ description: '게시글 아이디', example: 'how-to-use-nestjs', minLength: 1, maxLength: 245 })
@@ -71,6 +77,12 @@ export default class Article {
   @ApiProperty({ description: '게시글 작성일', example: '2021-08-01T00:00:00.000Z', type: Date })
   @Type(() => Date)
   createdAt: Date;
+
+  @ApiProperty({ description: '태그 목록', type: [Tag] })
+  tags: Tag[];
+
+  @ApiProperty({ description: '댓글 목록', type: [ArticleComment] })
+  comments: ArticleComment[];
 
   addCommentCount() {
     this.commentCount += 1;

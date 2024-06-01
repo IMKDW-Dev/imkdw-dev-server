@@ -6,9 +6,9 @@ import { CreateCategoryDto } from '../dto/internal/create-category.dto';
 import CategoryImageService from './category-image.service';
 import { CategoryNotFoundException } from '../../../common/exceptions/404';
 import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
-import ResponseCreateCategoryDto from '../dto/response/create-category.dto';
 import CategoryDto from '../dto/category.dto';
-import ResponseGetCategoriesDto from '../dto/response/get-category.dto';
+import { CategoryHaveArticlesException } from '../../../common/exceptions/403';
+import * as CategoryMapper from '../mappers/category.mapper';
 
 @Injectable()
 export default class CategoryService {
@@ -17,7 +17,7 @@ export default class CategoryService {
     private readonly categoryImageService: CategoryImageService,
   ) {}
 
-  async createCategory(dto: CreateCategoryDto): Promise<ResponseCreateCategoryDto> {
+  async createCategory(dto: CreateCategoryDto): Promise<CategoryDto> {
     const categoryByName = await this.categoryRepository.findOne({ name: dto.name });
     if (categoryByName) {
       throw new DuplicateCategoryNameException(dto.name);
@@ -30,7 +30,7 @@ export default class CategoryService {
     const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
     const updatedCategory = await this.categoryRepository.update(category, { image: thumbnail });
 
-    return ResponseCreateCategoryDto.create(updatedCategory);
+    return CategoryMapper.toDto(updatedCategory);
   }
 
   async getCategories(limit: number): Promise<CategoryDto[]> {
@@ -67,6 +67,10 @@ export default class CategoryService {
 
   async deleteCategory(categoryId: number) {
     const category = await this.checkCategoryAndReturn(categoryId);
+
+    if (category.articleCount) {
+      throw new CategoryHaveArticlesException();
+    }
 
     await this.categoryRepository.delete(category);
   }
