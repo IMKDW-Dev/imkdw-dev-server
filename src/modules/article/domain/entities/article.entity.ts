@@ -51,6 +51,10 @@ export default class Article {
     this.id.addHash();
   }
 
+  addViewCount() {
+    this.viewCount += 1;
+  }
+
   static create(props: Props): Article {
     return new Article(props);
   }

@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -42,5 +53,12 @@ export default class ArticleController {
   @Get()
   async getArticles(@Query() query: GetArticlesQuery) {
     return this.articleService.getArticles(query);
+  }
+
+  @Swagger.addViewCount('게시글 조회수 증가')
+  @Public()
+  @Patch(':articleId/view')
+  async addViewCount(@Param('articleId') articleId: string) {
+    return this.articleService.addViewCount(articleId);
   }
 }

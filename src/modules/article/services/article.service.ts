@@ -102,4 +102,14 @@ export default class ArticleService {
 
     return articles.map(ArticleMapper.toDto);
   }
+
+  async addViewCount(articleId: string): Promise<void> {
+    const article = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
+    if (!article) {
+      throw new ArticleNotFoundException(articleId);
+    }
+
+    article.addViewCount();
+    await this.articleRepository.update(article.id, article);
+  }
 }

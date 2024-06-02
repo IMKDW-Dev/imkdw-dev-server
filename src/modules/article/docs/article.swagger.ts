@@ -34,3 +34,6 @@ export const getArticles = (summary: string) =>
     ApiQuery({ name: 'filter', description: '게시글 조회 필터', enum: GetArticleSort }),
     ApiOkResponse({ type: [ArticleDto] }),
   );
+
+export const addViewCount = (summary: string) =>
+  applyDecorators(ApiOperation({ summary }), ApiParam({ name: 'articleId', description: '게시글 아이디' }));
