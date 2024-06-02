@@ -51,6 +51,7 @@ const articleInclude = {
         },
       },
     },
+    where: { parentId: null as number | null },
   },
 } as const;
 
@@ -77,6 +78,7 @@ export default class ArticleRepository implements IArticleRepository {
       where: {
         ...(query?.id && { id: query.id.toString() }),
         ...(query?.category && { categoryId: query.category.id }),
+        ...(option.excludeId && { NOT: { id: option.excludeId } }),
       },
       include: articleInclude,
       orderBy: {
@@ -140,6 +142,7 @@ export default class ArticleRepository implements IArticleRepository {
         content: comment.content,
         parentId: null,
         replies,
+        createdAt: comment.createdAt,
       });
     });
 
@@ -153,12 +156,16 @@ export default class ArticleRepository implements IArticleRepository {
     const category = Category.create({
       id: row.category.id,
       name: row.category.name,
+      image: row.category.image,
+      desc: row.category.desc,
+      sort: row.category.sort,
     });
 
     return Article.create({
       id: new ArticleId(row.id),
       title: row.title,
       content: row.content,
+      createdAt: row.createdAt,
       thumbnail: row.thumbnail,
       viewCount: row.viewCount,
       commentCount: row.commentCount,

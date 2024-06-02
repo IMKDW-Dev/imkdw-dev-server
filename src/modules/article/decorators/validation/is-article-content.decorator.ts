@@ -1,4 +1,5 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
+import { BAD_REQUEST_EXCEPTIONS } from '../../../../common/exceptions/400';
 
 export default function IsArticleContent(validationOptions?: ValidationOptions) {
   return (object: unknown, propertyName: string) => {
@@ -7,7 +8,7 @@ export default function IsArticleContent(validationOptions?: ValidationOptions) 
       target: object.constructor,
       propertyName,
       constraints: [],
-      options: validationOptions,
+      options: { ...validationOptions, message: BAD_REQUEST_EXCEPTIONS.INVALID_ARTICLE_CONTENT },
       validator: {
         validate(content: string) {
           /**
@@ -15,7 +16,7 @@ export default function IsArticleContent(validationOptions?: ValidationOptions) 
            * 1. 2~65000자 까지 작성이 가능하다
            */
           if (!content) return false;
-          const contentRegex = /^.{2,65000}$/;
+          const contentRegex = /^[\s\S]{2,65000}$/;
           return contentRegex.test(content);
         },
       },

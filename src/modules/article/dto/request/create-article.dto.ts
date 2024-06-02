@@ -2,9 +2,10 @@ import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, IsArray, IsNumber, IsString } from 'class-validator';
 
-import Article from '../../domain/entities/article.entity';
+import ArticleDto from '../article.dto';
 
-export default class RequestCreateArticleDto extends PickType(Article, ['id', 'title', 'content', 'visible']) {
+export default class RequestCreateArticleDto extends PickType(ArticleDto, ['id', 'title', 'content', 'visible']) {
+  @ApiProperty({ description: '게시글 아이디', example: 'how-to-use-nestjs', minLength: 2, maxLength: 245 })
   @ApiProperty({ description: '카테고리 아이디', example: 1 })
   @IsNumber()
   @Type(() => Number)

@@ -10,4 +10,6 @@ export interface QueryOption<T = never> {
   orderBy?: {
     [key in keyof Partial<T>]: 'asc' | 'desc';
   };
+
+  excludeId?: string;
 }

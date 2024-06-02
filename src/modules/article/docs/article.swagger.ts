@@ -9,7 +9,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import RequestCreateArticleDto from '../dto/request/create-article.dto';
-import { GetArticleFilter } from '../enums/article.enum';
+import { GetArticleSort } from '../enums/article.enum';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import ArticleDto from '../dto/article.dto';
 
@@ -31,6 +31,6 @@ export const getArticleDetail = (summary: string) =>
 export const getArticles = (summary: string) =>
   applyDecorators(
     ApiOperation({ summary }),
-    ApiQuery({ name: 'filter', description: '게시글 조회 필터', enum: GetArticleFilter }),
+    ApiQuery({ name: 'filter', description: '게시글 조회 필터', enum: GetArticleSort }),
     ApiOkResponse({ type: [ArticleDto] }),
   );

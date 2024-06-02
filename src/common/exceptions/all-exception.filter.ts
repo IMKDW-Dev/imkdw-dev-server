@@ -1,4 +1,4 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { IS_LOCAL } from '../constants/env.constant';
 
@@ -25,7 +25,8 @@ export default class AllExceptionsFilter implements ExceptionFilter {
       : exceptionResponse.message;
 
     if (IS_LOCAL) {
-      Logger.error(exceptionResponse, exception, 'AllExceptionsFilter');
+      // eslint-disable-next-line no-console
+      console.error(exception);
     }
 
     const responseBody = {

@@ -1,6 +1,8 @@
-import { GetArticleFilter } from '../../enums/article.enum';
+import { GetArticleSort } from '../../enums/article.enum';
 
 export interface GetArticlesDto {
-  filter: GetArticleFilter;
+  sort: GetArticleSort;
   limit: number;
+  categoryId: number;
+  excludeId: string;
 }

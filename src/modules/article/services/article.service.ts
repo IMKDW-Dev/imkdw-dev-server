@@ -7,7 +7,7 @@ import ArticleImageService from './article-image.service';
 import CategoryQueryService from '../../category/services/category-query.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../common/exceptions/404';
 import { GetArticlesDto } from '../dto/internal/get-article.dto';
-import { GetArticleFilter } from '../enums/article.enum';
+import { GetArticleSort } from '../enums/article.enum';
 import Article from '../domain/entities/article.entity';
 import ArticleId from '../domain/value-objects/article-id.vo';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
@@ -34,14 +34,15 @@ export default class ArticleService {
       throw new CategoryNotFoundException(dto.categoryId);
     }
 
-    const article = await this.articleRepository.findOne({ id: dto.id });
+    const articleId = new ArticleId(dto.id);
+    const article = await this.articleRepository.findOne({ id: articleId });
     if (article) {
       throw new DuplicateArticleIdException(dto.id.toString());
     }
 
     const thumbnail = await this.articleImageService.getThumbnail(dto.id.toString(), file);
     const newArticle = Article.create({
-      id: dto.id,
+      id: articleId,
       title: dto.title,
       content: dto.content,
       thumbnail,
@@ -71,19 +72,35 @@ export default class ArticleService {
     await this.articleRepository.update(article.id, article);
   }
 
-  async getArticles(dto: GetArticlesDto): Promise<Article[]> {
+  async getArticles(dto: GetArticlesDto): Promise<ArticleDto[]> {
     let articles: Article[] = [];
+    let category = null;
 
-    switch (dto.filter) {
-      case GetArticleFilter.LATEST:
-        articles = await this.articleRepository.findMany({}, { limit: dto.limit, orderBy: { createdAt: 'desc' } });
+    if (dto?.categoryId) {
+      category = await this.categoryQueryService.findOne({ id: dto.categoryId });
+      if (!category) {
+        throw new CategoryNotFoundException(dto.categoryId);
+      }
+    }
+
+    switch (dto.sort) {
+      case GetArticleSort.LATEST:
+        articles = await this.articleRepository.findMany(
+          { category },
+          { limit: dto.limit, orderBy: { createdAt: 'desc' }, excludeId: dto?.excludeId || '' },
+        );
         break;
-      case GetArticleFilter.POPULAR:
-        articles = await this.articleRepository.findMany({}, { limit: dto.limit, orderBy: { viewCount: 'desc' } });
+      case GetArticleSort.POPULAR:
+        articles = await this.articleRepository.findMany(
+          { category },
+          { limit: dto.limit, orderBy: { viewCount: 'desc' }, excludeId: dto?.excludeId || '' },
+        );
         break;
       default:
         break;
     }
-    return articles;
+
+    console.log(articles);
+    return articles.map(ArticleMapper.toDto);
   }
 }

@@ -17,6 +17,7 @@ export default class ArticleCommentDto extends PickType(ArticleComment, ['id', '
     this.id = props.id;
     this.articleId = props.articleId;
     this.content = props.content;
+    this.createdAt = props.createdAt;
     this.author = props.author;
     this.parentId = props.parentId;
     this.replies = props.replies;
