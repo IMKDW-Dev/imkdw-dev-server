@@ -1,20 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CATEGORY_REPOSITORY, ICategoryRepository } from '../repository/category-repo.interface';
-import Category, { CategoryBuilder } from '../domain/entities/category.entity';
+import Category from '../domain/entities/category.entity';
 import { DuplicateCategoryNameException } from '../../../common/exceptions/409';
 import { CreateCategoryDto } from '../dto/internal/create-category.dto';
 import CategoryImageService from './category-image.service';
 import { CategoryNotFoundException } from '../../../common/exceptions/404';
 import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
-import { CATEGORY_DETAIL_REPOSITORY, ICategoryDetailRepository } from '../repository/category-detail-repo.interface';
 import CategoryDto from '../dto/category.dto';
-import CategoryDetailDto from '../dto/category-detail.dto';
+import { CategoryHaveArticlesException } from '../../../common/exceptions/403';
+import * as CategoryMapper from '../mappers/category.mapper';
 
 @Injectable()
 export default class CategoryService {
   constructor(
     @Inject(CATEGORY_REPOSITORY) private readonly categoryRepository: ICategoryRepository,
-    @Inject(CATEGORY_DETAIL_REPOSITORY) private readonly categoryDetailRepository: ICategoryDetailRepository,
     private readonly categoryImageService: CategoryImageService,
   ) {}
 
@@ -25,32 +24,26 @@ export default class CategoryService {
     }
 
     const nextSort = await this.categoryRepository.findNextSort();
-    const newCategory = new CategoryBuilder()
-      .setName(dto.name)
-      .setSort(nextSort)
-      .setImage('')
-      .setDesc(dto.desc)
-      .build();
+    const newCategory = Category.create({ name: dto.name, sort: nextSort, desc: dto.desc });
 
     const category = await this.categoryRepository.save(newCategory);
     const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
     const updatedCategory = await this.categoryRepository.update(category, { image: thumbnail });
 
-    return updatedCategory.toDto();
+    return CategoryMapper.toDto(updatedCategory);
   }
 
   async getCategories(limit: number): Promise<CategoryDto[]> {
-    const categories = await this.categoryRepository.findMany({ limit });
-    return categories.map((category) => category.toDto());
+    return this.categoryRepository.findMany({}, { limit, page: 1 });
   }
 
-  async getCategoryDetail(name: string): Promise<CategoryDetailDto> {
-    const categoryDetail = await this.categoryDetailRepository.findOne({ name });
+  async getCategory(name: string): Promise<CategoryDto> {
+    const categoryDetail = await this.categoryRepository.findOne({ name });
     if (!categoryDetail) {
       throw new CategoryNotFoundException({ name });
     }
 
-    return categoryDetail;
+    return CategoryDto.create(categoryDetail);
   }
 
   async updateCategory(categoryId: number, dto: UpdateCategoryDto, file: Express.Multer.File): Promise<CategoryDto> {
@@ -69,11 +62,15 @@ export default class CategoryService {
 
     const { sort, ...withoutSort } = updateData;
     const updatedCategory = await this.categoryRepository.update(category, withoutSort);
-    return updatedCategory.toDto();
+    return CategoryDto.create(updatedCategory);
   }
 
   async deleteCategory(categoryId: number) {
     const category = await this.checkCategoryAndReturn(categoryId);
+
+    if (category.articleCount) {
+      throw new CategoryHaveArticlesException();
+    }
 
     await this.categoryRepository.delete(category);
   }

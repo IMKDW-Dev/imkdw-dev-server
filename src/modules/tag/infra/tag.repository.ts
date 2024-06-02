@@ -4,7 +4,7 @@ import { CustomPrismaService } from 'nestjs-prisma';
 
 import { ITagRepository } from '../repository/tag-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
-import Tag, { TagBuilder } from '../domain/entities/tag.entity';
+import Tag from '../domain/entities/tag.entity';
 
 @Injectable()
 export default class TagRepository implements ITagRepository {
@@ -19,16 +19,16 @@ export default class TagRepository implements ITagRepository {
   }
 
   async createMany(tags: Tag[]): Promise<Tag[]> {
-    const tagsData = tags.map((tag) => ({ name: tag.getName() }));
+    const tagsData = tags.map((tag) => ({ name: tag.name }));
     await this.prisma.client.tags.createMany({ data: tagsData });
 
     const createdRows = await this.prisma.client.tags.findMany({
-      where: { name: { in: tags.map((tag) => tag.getName()) } },
+      where: { name: { in: tags.map((tag) => tag.name) } },
     });
     return createdRows.map(this.toEntity);
   }
 
   private toEntity(row: prismaTags): Tag {
-    return new TagBuilder().setId(row.id).setName(row.name).build();
+    return Tag.create({ id: row.id, name: row.name });
   }
 }

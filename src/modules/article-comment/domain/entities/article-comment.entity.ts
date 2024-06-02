@@ -1,76 +1,61 @@
-export default class ArticleComment {
-  constructor(builder: ArticleCommentBuilder) {
-    this.id = builder.id;
-    this.articleId = builder.articleId;
-    this.parentId = builder.parentId;
-    this.content = builder.content;
-    this.userId = builder.userId;
-  }
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsNumber, IsString } from 'class-validator';
+import User from '../../../user/domain/entities/user.entity';
+import IsCommentContent from '../../decorators/validation/is-comment-content.decorator';
 
-  private id: number;
-  private userId: string;
-  private articleId: string;
-  private parentId: number | null;
-  private content: string;
-
-  getId(): number {
-    return this.id;
-  }
-
-  getArticleId(): string {
-    return this.articleId;
-  }
-
-  getParentId(): number | null {
-    return this.parentId;
-  }
-
-  getContent(): string {
-    return this.content;
-  }
-
-  getUserId(): string {
-    return this.userId;
-  }
-
-  isParentComment(): boolean {
-    return this.parentId !== null;
-  }
+interface Props {
+  id?: number;
+  author?: User;
+  articleId?: string;
+  parentId?: number | null;
+  content?: string;
+  replies?: ArticleComment[];
+  createdAt?: Date;
 }
 
-export class ArticleCommentBuilder {
+export default class ArticleComment {
+  constructor(props: Props) {
+    this.id = props.id;
+    this.author = props.author;
+    this.articleId = props.articleId;
+    this.parentId = props.parentId;
+    this.content = props.content;
+    this.replies = props.replies ?? [];
+    this.createdAt = props.createdAt;
+  }
+
+  @ApiProperty({ description: '댓글 아이디', example: 1, type: Number })
+  @IsNumber()
+  @Type(() => Number)
   id: number;
-  userId: string;
+
+  @ApiProperty({ description: '댓글 작성자', type: User })
+  author: User;
+
+  @ApiProperty({ description: '게시글 아이디', example: 'UUID' })
+  @IsString()
   articleId: string;
+
+  @ApiProperty({ description: '부모 댓글 아이디', type: Number })
+  @IsNumber()
   parentId: number | null;
+
+  @ApiProperty({ description: '댓글 내용', example: '댓글 내용', minLength: 2, maxLength: 255 })
+  @IsCommentContent()
   content: string;
 
-  setId(id: number): ArticleCommentBuilder {
-    this.id = id;
-    return this;
+  @ApiProperty({ description: '댓글 작성일' })
+  createdAt: Date;
+
+  @ApiProperty({ description: '답글 목록', type: [ArticleComment] })
+  replies: ArticleComment[];
+
+  isParentComment() {
+    return !!this.parentId;
   }
 
-  setArticleId(articleId: string): ArticleCommentBuilder {
-    this.articleId = articleId;
-    return this;
-  }
-
-  setParentId(parentId: number | null): ArticleCommentBuilder {
-    this.parentId = parentId;
-    return this;
-  }
-
-  setContent(content: string): ArticleCommentBuilder {
-    this.content = content;
-    return this;
-  }
-
-  setUserId(userId: string): ArticleCommentBuilder {
-    this.userId = userId;
-    return this;
-  }
-
-  build(): ArticleComment {
-    return new ArticleComment(this);
+  static create(props: Props): ArticleComment {
+    return new ArticleComment(props);
   }
 }

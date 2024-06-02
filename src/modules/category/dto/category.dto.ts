@@ -1,81 +1,26 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsNumber, IsString, MaxLength } from 'class-validator';
+import { PickType } from '@nestjs/swagger';
+import Category from '../domain/entities/category.entity';
 
-const CATEGORY_NAME_MAX_LENGTH = 20;
-const CATEOGRY_DESC_MAX_LENGTH = 255;
-
-export default class CategoryDto {
-  constructor(builder?: CategoryDtoBuilder) {
-    this.id = builder.id;
-    this.name = builder.name;
-    this.image = builder.image;
-    this.desc = builder.desc;
-    this.sort = builder.sort;
-  }
-
-  @ApiProperty({ description: '카테고리 아이디', example: 1 })
-  @IsNumber()
-  @Type(() => Number)
+interface Props {
   id: number;
-
-  @ApiProperty({ description: '카테고리 이름', example: 'backend', maxLength: CATEGORY_NAME_MAX_LENGTH })
-  @IsString()
-  @MaxLength(CATEGORY_NAME_MAX_LENGTH)
   name: string;
-
-  @ApiProperty({ description: '카테고리 이미지 URL', example: 'https://example.com/image.jpg' })
-  @IsString()
-  image: string | null;
-
-  @ApiProperty({
-    description: '카테고리 설명',
-    example: '백엔드 개발자를 위한 카테고리',
-    maxLength: CATEOGRY_DESC_MAX_LENGTH,
-  })
-  @IsString()
-  @MaxLength(CATEOGRY_DESC_MAX_LENGTH)
+  image: string;
   desc: string;
-
-  @ApiProperty({ description: '카테고리 정렬 순서', example: 1 })
-  @IsNumber()
-  @Type(() => Number)
   sort: number;
+  articleCount: number;
 }
-
-export class CategoryDtoBuilder {
-  id: number;
-  name: string;
-  image: string | null;
-  desc: string;
-  sort: number;
-
-  setId(id: number): CategoryDtoBuilder {
-    this.id = id;
-    return this;
+export default class CategoryDto extends PickType(Category, ['id', 'name', 'image', 'desc', 'sort', 'articleCount']) {
+  constructor(props: Props) {
+    super();
+    this.id = props.id;
+    this.name = props.name;
+    this.image = props.image;
+    this.desc = props.desc;
+    this.sort = props.sort;
+    this.articleCount = props.articleCount;
   }
 
-  setName(name: string): CategoryDtoBuilder {
-    this.name = name;
-    return this;
-  }
-
-  setImage(image: string | null): CategoryDtoBuilder {
-    this.image = image;
-    return this;
-  }
-
-  setDesc(desc: string): CategoryDtoBuilder {
-    this.desc = desc;
-    return this;
-  }
-
-  setSort(sort: number): CategoryDtoBuilder {
-    this.sort = sort;
-    return this;
-  }
-
-  build(): CategoryDto {
-    return new CategoryDto(this);
+  static create(props: Props): CategoryDto {
+    return new CategoryDto(props);
   }
 }

@@ -14,6 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 
 import * as Swagger from '../docs/category.swagger';
 import AdminGuard from '../../auth/guards/admin.guard';
@@ -22,12 +23,11 @@ import UserRoles from '../../user/enums/user-role.enum';
 import CategoryService from '../services/category.service';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
 import { Public } from '../../auth/decorators/public.decorator';
-import ResponseGetCategoriesDto from '../dto/response/get-categories.dto';
-import ResponseCreateCategoryDto from '../dto/response/create-category.dto';
 import RequestUpdateCategoryDto from '../dto/request/update-category.dto';
-import ResponseUpdateCategoryDto from '../dto/response/update-category.dto';
-import CategoryDetailDto from '../dto/category-detail.dto';
+import CategoryDto from '../dto/category.dto';
+import ResponseGetCategoriesDto from '../dto/response/get-category.dto';
 
+@ApiTags('카테고리')
 @Controller({ path: 'categories', version: '1' })
 export default class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -41,7 +41,7 @@ export default class CategoryController {
   async createCategory(
     @Body() body: RequestCreateCategoryDto,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ResponseCreateCategoryDto> {
+  ): Promise<CategoryDto> {
     return this.categoryService.createCategory({ name: body.name, desc: body.desc, image: file });
   }
 
@@ -52,14 +52,14 @@ export default class CategoryController {
     @Query('limit', new DefaultValuePipe(999), ParseIntPipe) limit?: number,
   ): Promise<ResponseGetCategoriesDto> {
     const categories = await this.categoryService.getCategories(limit);
-    return { items: categories };
+    return ResponseGetCategoriesDto.create(categories);
   }
 
-  @Swagger.getCategoryDetail('카테고리 상세 조회')
+  @Swagger.getCategory('카테고리 상세 조회')
   @Public()
   @Get(':name')
-  async getCategoryDetail(@Param('name') name: string): Promise<CategoryDetailDto> {
-    return this.categoryService.getCategoryDetail(name);
+  async getCategory(@Param('name') name: string): Promise<CategoryDto> {
+    return this.categoryService.getCategory(name);
   }
 
   // TODO: 이미지 검증 파이프 추가하기
@@ -72,7 +72,7 @@ export default class CategoryController {
     @Param('categoryId', ParseIntPipe) categoryId: number,
     @Body() dto: RequestUpdateCategoryDto,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ResponseUpdateCategoryDto> {
+  ): Promise<CategoryDto> {
     return this.categoryService.updateCategory(categoryId, dto, file);
   }
 

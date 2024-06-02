@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/prefer-default-export
-export enum GetArticleFilter {
+export enum GetArticleSort {
   LATEST = 'latest',
   POPULAR = 'popular',
 }

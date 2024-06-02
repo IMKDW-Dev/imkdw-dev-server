@@ -8,4 +8,6 @@ export interface IUserRepository {
   findOne(filter: UserQueryFilter): Promise<User | null>;
 
   save(user: User): Promise<User>;
+
+  update(userId: string, user: User): Promise<User>;
 }

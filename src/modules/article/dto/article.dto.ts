@@ -1,54 +1,58 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsNumber, IsString, MaxLength } from 'class-validator';
+import { IsBoolean } from 'class-validator';
+import { Transform } from 'class-transformer';
 
-const ARTICLE_ID_MAX_LENGTH = 231;
-const ARTICLE_TITLE_MAX_LENGTH = 255;
-const ARTICLE_CONTENT_MAX_LENGTH = 50000;
+import CategoryDto from '../../category/dto/category.dto';
+import TagDto from '../../tag/dto/tag.dto';
+import ArticleCommentDto from '../../article-comment/dto/article-comment.dto';
+import IsArticleId from '../decorators/validation/is-article-id.decorator';
+import IsArticleTitle from '../decorators/validation/is-article-title.decorator';
+import IsArticleContent from '../decorators/validation/is-article-content.decorator';
+
+interface Props {
+  id: string;
+  title: string;
+  category: CategoryDto;
+  content: string;
+  visible: boolean;
+  thumbnail: string;
+  viewCount: number;
+  commentCount: number;
+  createdAt: Date;
+  tags: TagDto[];
+  comments: ArticleCommentDto[];
+}
 
 export default class ArticleDto {
-  constructor(builder?: ArticleDtoBuilder) {
-    this.id = builder.id;
-    this.title = builder.title;
-    this.categoryId = builder.categoryId;
-    this.content = builder.content;
-    this.visible = builder.visible;
-    this.thumbnail = builder.thumbnail;
-    this.viewCount = builder.viewCount;
-    this.commentCount = builder.commentCount;
-    this.createdAt = builder.createdAt;
+  constructor(props: Props) {
+    this.id = props.id;
+    this.title = props.title;
+    this.content = props.content;
+    this.visible = props.visible;
+    this.thumbnail = props.thumbnail;
+    this.viewCount = props.viewCount;
+    this.commentCount = props.commentCount;
+    this.createdAt = props.createdAt;
+    this.category = props.category;
+    this.tags = props.tags;
+    this.comments = props.comments;
   }
 
   @ApiProperty({
-    description: '게시글 아이디, 생성시 마지막에 24자리의 CUID가 추가됨',
-    example: 'how-to-leave-office-early',
-    maxLength: ARTICLE_ID_MAX_LENGTH,
+    description: '게시글 아이디',
+    example: 'how-to-use-nestjs-ani213ijoasds',
+    minLength: 2,
+    maxLength: 245,
   })
-  @IsString()
-  @MaxLength(ARTICLE_ID_MAX_LENGTH)
+  @IsArticleId()
   id: string;
 
-  @ApiProperty({
-    description: '게시글 제목',
-    example: '퇴근 빨리하는 방법을 공유합니다.',
-    maxLength: ARTICLE_TITLE_MAX_LENGTH,
-  })
-  @IsString()
-  @MaxLength(ARTICLE_TITLE_MAX_LENGTH)
+  @ApiProperty({ description: '제목', example: 'NestJS 사용법', minLength: 2, maxLength: 255 })
+  @IsArticleTitle()
   title: string;
 
-  @ApiProperty({ description: '게시글 카테고리 아이디', example: 1 })
-  @IsNumber()
-  @Type(() => Number)
-  categoryId: number;
-
-  @ApiProperty({
-    description: '게시글 내용',
-    example: '퇴근 빨리하는 방법을 공유합니다.',
-    maxLength: ARTICLE_CONTENT_MAX_LENGTH,
-  })
-  @IsString()
-  @MaxLength(ARTICLE_CONTENT_MAX_LENGTH)
+  @ApiProperty({ description: '내용', minLength: 2, maxLength: 65000 })
+  @IsArticleContent()
   content: string;
 
   @ApiProperty({ description: '게시글 공개 여부', example: true })
@@ -56,82 +60,28 @@ export default class ArticleDto {
   @Transform(({ value }) => value === 'true')
   visible: boolean;
 
-  @ApiProperty({ description: '게시글 썸네일 이미지 URL', example: 'https://example.com/thumbnail.jpg' })
-  @IsString()
+  @ApiProperty({ description: '썸네일', example: 'https://image.com/article.png' })
   thumbnail: string;
 
-  @ApiProperty({ description: '조회수', example: 100 })
-  @IsNumber()
-  @Type(() => Number)
+  @ApiProperty({ description: '조회수', example: 0 })
   viewCount: number;
 
-  @ApiProperty({ description: '댓글 수', example: 10 })
-  @IsNumber()
-  @Type(() => Number)
+  @ApiProperty({ description: '댓글 수', example: 0 })
   commentCount: number;
 
-  @ApiProperty({ description: '게시글 작성일' })
-  @IsDate()
-  createdAt: Date;
-}
-
-export class ArticleDtoBuilder {
-  id: string;
-  title: string;
-  categoryId: number;
-  content: string;
-  visible: boolean;
-  thumbnail: string;
-  viewCount: number;
-  commentCount: number;
+  @ApiProperty({ description: '생성일', example: new Date() })
   createdAt: Date;
 
-  setId(id: string): ArticleDtoBuilder {
-    this.id = id;
-    return this;
-  }
+  @ApiProperty({ description: '카테고리', type: CategoryDto })
+  category: CategoryDto;
 
-  setTitle(title: string): ArticleDtoBuilder {
-    this.title = title;
-    return this;
-  }
+  @ApiProperty({ description: '태그 목록', type: [TagDto] })
+  tags: TagDto[];
 
-  setCategoryId(categoryId: number): ArticleDtoBuilder {
-    this.categoryId = categoryId;
-    return this;
-  }
+  @ApiProperty({ description: '댓글 목록', type: [ArticleCommentDto] })
+  comments: ArticleCommentDto[];
 
-  setContent(content: string): ArticleDtoBuilder {
-    this.content = content;
-    return this;
-  }
-
-  setVisible(visible: boolean): ArticleDtoBuilder {
-    this.visible = visible;
-    return this;
-  }
-
-  setThumbnail(thumbnail: string): ArticleDtoBuilder {
-    this.thumbnail = thumbnail;
-    return this;
-  }
-
-  setViewCount(viewCount: number): ArticleDtoBuilder {
-    this.viewCount = viewCount;
-    return this;
-  }
-
-  setCommentCount(commentCount: number): ArticleDtoBuilder {
-    this.commentCount = commentCount;
-    return this;
-  }
-
-  setCreatedAt(createdAt: Date): ArticleDtoBuilder {
-    this.createdAt = createdAt;
-    return this;
-  }
-
-  build(): ArticleDto {
-    return new ArticleDto(this);
+  static create(props: Props) {
+    return new ArticleDto(props);
   }
 }

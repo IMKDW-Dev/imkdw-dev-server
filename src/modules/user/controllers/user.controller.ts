@@ -1,18 +1,32 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 import UserService from '../services/user.service';
-import Requester from '../../../common/decorators/requester.decorator';
-import { IRequester } from '../../../common/types/common.type';
 import ResponseGetUserInfoDto from '../dto/response/user-info.dto';
+import RequestUpdateUserInfoDto from '../dto/request/update-user-info.dto';
+import UserGuard from '../../auth/guards/user.guard';
+import * as Swagger from '../docs/user.swagger';
 
 @Controller({ path: 'users', version: '1' })
 export default class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Swagger.getUserInfo('유저 정보 조회')
   @Get(':userId')
-  async getUserInfo(
-    @Requester() requester: IRequester,
+  @UseGuards(UserGuard)
+  async getUserInfo(@Param('userId') userId: string): Promise<ResponseGetUserInfoDto> {
+    return this.userService.getUserInfo(userId);
+  }
+
+  @Swagger.updateUserInfo('유저 정보 수정')
+  @Patch(':userId')
+  @UseGuards(UserGuard)
+  @UseInterceptors(FileInterceptor('profileImage'))
+  async updateUserInfo(
     @Param('userId') userId: string,
-  ): Promise<ResponseGetUserInfoDto> {
-    return this.userService.getUserInfo(requester.userId, userId);
+    @Body() dto: RequestUpdateUserInfoDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.userService.updateUserInfo(userId, { ...dto, profileImage: file });
   }
 }

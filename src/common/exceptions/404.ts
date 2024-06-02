@@ -7,8 +7,8 @@ export const NOT_FOUND_EXCEPTIONS = {
 } as const;
 
 class NotFoundException extends HttpException {
-  constructor(errorCode: string, data?: unknown) {
-    super({ errorCode, data }, HttpStatus.NOT_FOUND);
+  constructor(message: string, error?: unknown) {
+    super({ message, error }, HttpStatus.NOT_FOUND);
   }
 }
 

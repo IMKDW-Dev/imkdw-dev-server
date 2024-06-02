@@ -1,126 +1,61 @@
-import { generateCUID } from '../../../../common/utils/cuid';
+import ArticleId from '../value-objects/article-id.vo';
+import Category from '../../../category/domain/entities/category.entity';
+import Tag from '../../../tag/domain/entities/tag.entity';
+import ArticleComment from '../../../article-comment/domain/entities/article-comment.entity';
 
-export default class Article {
-  constructor(builder: ArticleBuilder) {
-    this.id = builder.id;
-    this.title = builder.title;
-    this.categoryId = builder.categoryId;
-    this.content = builder.content;
-    this.visible = builder.visible;
-    this.thumbnail = builder.thumbnail;
-    this.viewCount = builder.viewCount;
-    this.commentCount = builder.commentCount;
-    this.createdAt = builder.createdAt;
-  }
-
-  private id: string;
-  private title: string;
-  private categoryId: number;
-  private content: string;
-  private visible: boolean;
-  private thumbnail: string;
-  private viewCount: number;
-  private commentCount: number;
-  private createdAt: Date;
-
-  getId(): string {
-    return this.id;
-  }
-
-  getTitle(): string {
-    return this.title;
-  }
-
-  getCategoryId(): number {
-    return this.categoryId;
-  }
-
-  getContent(): string {
-    return this.content;
-  }
-
-  getVisible(): boolean {
-    return this.visible;
-  }
-
-  getThumbnail(): string {
-    return this.thumbnail;
-  }
-
-  getViewCount(): number {
-    return this.viewCount;
-  }
-
-  getCommentCount(): number {
-    return this.commentCount;
-  }
-
-  getCreatedAt(): Date {
-    return this.createdAt;
-  }
-
-  addHashOnId(): void {
-    this.id = `${this.id}-${generateCUID()}`;
-  }
+interface Props {
+  id?: ArticleId;
+  title?: string;
+  category?: Category;
+  content?: string;
+  visible?: boolean;
+  thumbnail?: string;
+  viewCount?: number;
+  commentCount?: number;
+  createdAt?: Date;
+  tags?: Tag[];
+  comments?: ArticleComment[];
 }
 
-export class ArticleBuilder {
-  id: string;
+export default class Article {
+  constructor(props: Props) {
+    this.id = props.id;
+    this.title = props.title;
+    this.category = props.category;
+    this.content = props.content;
+    this.visible = props.visible;
+    this.thumbnail = props.thumbnail;
+    this.viewCount = props.viewCount;
+    this.commentCount = props.commentCount;
+    this.createdAt = props.createdAt;
+    this.tags = props.tags;
+    this.comments = props.comments;
+  }
+  id: ArticleId;
   title: string;
-  categoryId: number;
+  category: Category;
   content: string;
   visible: boolean;
   thumbnail: string;
   viewCount: number;
   commentCount: number;
   createdAt: Date;
+  tags: Tag[];
+  comments: ArticleComment[];
 
-  setId(id: string): ArticleBuilder {
-    this.id = id;
-    return this;
+  addCommentCount() {
+    this.commentCount += 1;
   }
 
-  setTitle(title: string): ArticleBuilder {
-    this.title = title;
-    return this;
+  addHashOnId() {
+    this.id.addHash();
   }
 
-  setCategoryId(categoryId: number): ArticleBuilder {
-    this.categoryId = categoryId;
-    return this;
+  addViewCount() {
+    this.viewCount += 1;
   }
 
-  setContent(content: string): ArticleBuilder {
-    this.content = content;
-    return this;
-  }
-
-  setVisible(visible: boolean): ArticleBuilder {
-    this.visible = visible;
-    return this;
-  }
-
-  setThumbnail(thumbnail: string): ArticleBuilder {
-    this.thumbnail = thumbnail;
-    return this;
-  }
-
-  setViewCount(viewCount: number): ArticleBuilder {
-    this.viewCount = viewCount;
-    return this;
-  }
-
-  setCommentCount(commentCount: number): ArticleBuilder {
-    this.commentCount = commentCount;
-    return this;
-  }
-
-  setCreatedAt(createdAt: Date): ArticleBuilder {
-    this.createdAt = createdAt;
-    return this;
-  }
-
-  build(): Article {
-    return new Article(this);
+  static create(props: Props): Article {
+    return new Article(props);
   }
 }

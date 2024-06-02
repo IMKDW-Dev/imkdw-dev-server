@@ -13,7 +13,7 @@ export default class CategoryImageService {
   ) {}
 
   async getThumbnail(category: Category, image: Express.Multer.File): Promise<string> {
-    const BASIC_PATH = `categories/${category.getId()}`;
+    const BASIC_PATH = `categories/${category.id}`;
 
     const originalPath = `${BASIC_PATH}/original.${image.originalname.split('.').pop()}`;
     this.storageService.upload(originalPath, image.buffer, ContentType.IMAGE);

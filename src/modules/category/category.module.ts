@@ -7,8 +7,6 @@ import { CATEGORY_REPOSITORY } from './repository/category-repo.interface';
 import ImageModule from '../../infra/image/image.module';
 import CategoryImageService from './services/category-image.service';
 import StorageModule from '../../infra/storage/storage.module';
-import { CATEGORY_DETAIL_REPOSITORY } from './repository/category-detail-repo.interface';
-import CategoryDetailRepository from './infra/category-detail.repository';
 
 @Module({
   imports: [ImageModule, StorageModule],
@@ -20,10 +18,6 @@ import CategoryDetailRepository from './infra/category-detail.repository';
     {
       provide: CATEGORY_REPOSITORY,
       useClass: CategoryRepository,
-    },
-    {
-      provide: CATEGORY_DETAIL_REPOSITORY,
-      useClass: CategoryDetailRepository,
     },
   ],
   exports: [CategoryQueryService],

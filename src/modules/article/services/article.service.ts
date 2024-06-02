@@ -4,21 +4,23 @@ import { CreateArticleDto } from '../dto/internal/create-article.dto';
 import { DuplicateArticleIdException } from '../../../common/exceptions/409';
 import ArticleTagService from '../../articleTag/services/article-tag.service';
 import ArticleImageService from './article-image.service';
-import Article, { ArticleBuilder } from '../domain/entities/article.entity';
 import CategoryQueryService from '../../category/services/category-query.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../common/exceptions/404';
-import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import { GetArticlesDto } from '../dto/internal/get-article.dto';
-import { GetArticleFilter } from '../enums/article.enum';
-import ArticleDetailDto from '../dto/article-detail.dto';
-import { ARTICLE_DETAIL_REPOSITORY, IArticleDetailRepository } from '../repository/article-detail-repo.interface';
+import { GetArticleSort } from '../enums/article.enum';
+import Article from '../domain/entities/article.entity';
+import ArticleId from '../domain/value-objects/article-id.vo';
+import ResponseCreateArticleDto from '../dto/response/create-article.dto';
+import ArticleDto from '../dto/article.dto';
+import * as ArticleMapper from '../mappers/article.mapper';
+import ResponseGetArticlesDto from '../dto/response/get-article.dto';
+import { getOffsetPagingResult } from '../../../common/functions/offset-paging.function';
 
 @Injectable()
 export default class ArticleService {
   constructor(
     /** 영속성 레이어 */
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
-    @Inject(ARTICLE_DETAIL_REPOSITORY) private readonly articleDetailRepository: IArticleDetailRepository,
 
     /** 게시글 서비스 */
     private readonly articleImageService: ArticleImageService,
@@ -34,56 +36,105 @@ export default class ArticleService {
       throw new CategoryNotFoundException(dto.categoryId);
     }
 
-    const article = await this.articleRepository.findOne({ id: dto.id });
+    const articleId = new ArticleId(dto.id);
+    const article = await this.articleRepository.findOne({ id: articleId });
     if (article) {
-      throw new DuplicateArticleIdException(dto.id);
+      throw new DuplicateArticleIdException(dto.id.toString());
     }
 
-    const thumbnail = await this.articleImageService.getThumbnail(dto.id, file);
-    const newArticle = new ArticleBuilder()
-      .setId(dto.id)
-      .setTitle(dto.title)
-      .setContent(dto.content)
-      .setThumbnail(thumbnail)
-      .setCategoryId(category.getId())
-      .setVisible(dto.visible)
-      .build();
+    const thumbnail = await this.articleImageService.getThumbnail(dto.id.toString(), file);
+    const newArticle = Article.create({
+      id: articleId,
+      title: dto.title,
+      content: dto.content,
+      thumbnail,
+      category,
+      visible: dto.visible,
+    });
     newArticle.addHashOnId();
 
     // TODO: 트랜잭션 처리
     const createdArticle = await this.articleRepository.save(newArticle);
     await this.articleTagService.createTags(createdArticle, dto.tags);
 
-    return new ResponseCreateArticleDto(createdArticle.getId());
+    return ResponseCreateArticleDto.create(createdArticle);
   }
 
-  async getArticleDetail(articleId: string): Promise<ArticleDetailDto> {
-    const articleDetail = await this.articleDetailRepository.findOne({ id: articleId });
+  async getArticleDetail(articleId: string): Promise<ArticleDto> {
+    const articleDetail = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
     if (!articleDetail) {
       throw new ArticleNotFoundException(articleId);
     }
 
-    return articleDetail;
+    return ArticleMapper.toDto(articleDetail);
   }
 
   async addCommentCount(article: Article): Promise<void> {
     article.addCommentCount();
-    await this.articleRepository.update(article, { viewCount: article.getCommentCount() });
+    await this.articleRepository.update(article.id, article);
   }
 
-  async getArticles(dto: GetArticlesDto): Promise<ArticleDto[]> {
+  async getArticles(dto: GetArticlesDto): Promise<ResponseGetArticlesDto> {
     let articles: Article[] = [];
+    let allCounts = 0;
+    let category = null;
 
-    switch (dto.filter) {
-      case GetArticleFilter.LATEST:
-        articles = await this.articleRepository.findLatestArticles(dto.limit);
+    if (dto?.categoryId) {
+      category = await this.categoryQueryService.findOne({ id: dto.categoryId });
+      if (!category) {
+        throw new CategoryNotFoundException(dto.categoryId);
+      }
+    }
+
+    switch (dto.sort) {
+      case GetArticleSort.LATEST:
+        articles = await this.articleRepository.findMany(
+          { category },
+          {
+            limit: dto.limit,
+            orderBy: { createdAt: 'desc' },
+            excludeId: dto?.excludeId,
+            page: dto.page,
+            search: dto?.search,
+          },
+        );
+        allCounts = await this.articleRepository.findCounts({ category });
         break;
-      case GetArticleFilter.POPULAR:
-        articles = await this.articleRepository.findArticlesOrderByViewCount(dto.limit);
+      case GetArticleSort.POPULAR:
+        articles = await this.articleRepository.findMany(
+          { category },
+          {
+            limit: dto.limit,
+            orderBy: { viewCount: 'desc' },
+            excludeId: dto?.excludeId,
+            page: dto.page,
+            search: dto?.search,
+          },
+        );
+        allCounts = await this.articleRepository.findCounts({ category });
         break;
       default:
         break;
     }
-    return articles.map((article) => article.toDto());
+
+    const articleDtos = articles.map(ArticleMapper.toDto);
+    const offsetPagingResult = getOffsetPagingResult({
+      items: articleDtos,
+      totalCount: allCounts,
+      limit: dto.limit,
+      currentPage: dto.page,
+    });
+
+    return ResponseGetArticlesDto.create(offsetPagingResult);
+  }
+
+  async addViewCount(articleId: string): Promise<void> {
+    const article = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
+    if (!article) {
+      throw new ArticleNotFoundException(articleId);
+    }
+
+    article.addViewCount();
+    await this.articleRepository.update(article.id, article);
   }
 }
