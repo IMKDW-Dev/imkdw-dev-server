@@ -100,7 +100,6 @@ export default class ArticleService {
         break;
     }
 
-    console.log(articles);
     return articles.map(ArticleMapper.toDto);
   }
 }

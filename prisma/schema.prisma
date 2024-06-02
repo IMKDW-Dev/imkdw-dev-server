@@ -178,3 +178,20 @@ model articleComments {
 
   @@map("ArticleComments")
 }
+
+model contacts {
+  id      Int    @id @default(autoincrement())
+  name    String @db.VarChar(30)
+  email   String @db.VarChar(255)
+  subject String @db.VarChar(255)
+  message String @db.Text
+
+  createdAt  DateTime  @default(now()) @map("create_at")
+  createUser String    @default("_system") @map("create_user")
+  updateAt   DateTime  @updatedAt @map("update_at")
+  updateUser String    @default("_system") @map("update_user")
+  deleteAt   DateTime? @map("delete_at")
+  deleteUser String?   @map("delete_user")
+
+  @@map("Contacts")
+}

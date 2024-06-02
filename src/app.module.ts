@@ -18,6 +18,7 @@ import CategoryModule from './modules/category/category.module';
 import ArticleModule from './modules/article/article.module';
 import ArticleCommentModule from './modules/article-comment/article-comment.module';
 import AllExceptionsFilter from './common/exceptions/all-exception.filter';
+import ContactModule from './modules/contact/contact.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import AllExceptionsFilter from './common/exceptions/all-exception.filter';
     CategoryModule,
     ArticleModule,
     ArticleCommentModule,
+    ContactModule,
     LocalStorageModule,
   ],
   controllers: [AppController],
