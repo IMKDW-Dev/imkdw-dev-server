@@ -3,8 +3,8 @@ import ArticleCommentDto from '../dto/article-comment.dto';
 import * as UserMapper from '../../user/mappers/user.mapper';
 
 // eslint-disable-next-line import/prefer-default-export
-export const toDto = (articleComment: ArticleComment): ArticleCommentDto => {
-  return ArticleCommentDto.create({
+export const toDto = (articleComment: ArticleComment): ArticleCommentDto =>
+  ArticleCommentDto.create({
     id: articleComment.id,
     articleId: articleComment.articleId,
     content: articleComment.content,
@@ -13,4 +13,3 @@ export const toDto = (articleComment: ArticleComment): ArticleCommentDto => {
     replies: articleComment.replies.map((reply) => toDto(reply)),
     createdAt: articleComment.createdAt,
   });
-};

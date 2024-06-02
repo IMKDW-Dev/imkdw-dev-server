@@ -12,6 +12,7 @@ import RequestCreateArticleDto from '../dto/request/create-article.dto';
 import { GetArticleSort } from '../enums/article.enum';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import ArticleDto from '../dto/article.dto';
+import ResponseGetArticlesDto from '../dto/response/get-article.dto';
 
 export const createArticle = (summary: string) =>
   applyDecorators(
@@ -32,7 +33,7 @@ export const getArticles = (summary: string) =>
   applyDecorators(
     ApiOperation({ summary }),
     ApiQuery({ name: 'filter', description: '게시글 조회 필터', enum: GetArticleSort }),
-    ApiOkResponse({ type: [ArticleDto] }),
+    ApiOkResponse({ type: ResponseGetArticlesDto }),
   );
 
 export const addViewCount = (summary: string) =>

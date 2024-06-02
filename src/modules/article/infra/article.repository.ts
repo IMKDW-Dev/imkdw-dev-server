@@ -8,11 +8,11 @@ import Article from '../domain/entities/article.entity';
 import { ArticleQueryFilter } from '../repository/article-query.filter';
 import { UpdateArticleDto } from '../dto/internal/update-article.dto';
 import ArticleId from '../domain/value-objects/article-id.vo';
-import { QueryOption } from '../../../common/interfaces/common-query.filter';
 import ArticleComment from '../../article-comment/domain/entities/article-comment.entity';
 import User from '../../user/domain/entities/user.entity';
 import Category from '../../category/domain/entities/category.entity';
 import Tag from '../../tag/domain/entities/tag.entity';
+import { ArticleQueryOption } from '../repository/article-query.option';
 
 type IArticle = Prisma.articlesGetPayload<{
   include: {
@@ -70,20 +70,20 @@ export default class ArticleRepository implements IArticleRepository {
     return row ? this.toEntity(row) : null;
   }
 
-  async findMany(
-    query: ArticleQueryFilter,
-    option?: QueryOption<Pick<Article, 'createdAt' | 'viewCount'>>,
-  ): Promise<Article[]> {
+  async findMany(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<Article[]> {
     const rows: IArticle[] = await this.prisma.client.articles.findMany({
       where: {
         ...(query?.id && { id: query.id.toString() }),
         ...(query?.category && { categoryId: query.category.id }),
-        ...(option.excludeId && { NOT: { id: option.excludeId } }),
+        ...(option.excludeId && { NOT: { id: option.excludeId.toString() } }),
+        ...(option?.search && { title: { contains: option.search }, content: { contains: option.search } }),
       },
       include: articleInclude,
       orderBy: {
-        ...(option?.orderBy && option.orderBy),
+        ...option?.orderBy,
       },
+      take: option?.limit,
+      skip: (option.page - 1) * option.limit,
     });
 
     return rows.map((row) => this.toEntity(row));
@@ -120,6 +120,15 @@ export default class ArticleRepository implements IArticleRepository {
     });
 
     return this.toEntity(row);
+  }
+
+  async findCounts(query: ArticleQueryFilter): Promise<number> {
+    return this.prisma.client.articles.count({
+      where: {
+        ...(query?.id && { id: query.id.toString() }),
+        ...(query?.category && { categoryId: query.category.id }),
+      },
+    });
   }
 
   private toEntity(row: IArticle): Article {

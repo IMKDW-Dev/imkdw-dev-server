@@ -87,6 +87,7 @@ model articles {
   users          users?            @relation(fields: [usersId], references: [id])
   usersId        String?
 
+  @@index([categoryId])
   @@map("Articles")
 }
 

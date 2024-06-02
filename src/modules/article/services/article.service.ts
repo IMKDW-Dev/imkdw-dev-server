@@ -13,6 +13,8 @@ import ArticleId from '../domain/value-objects/article-id.vo';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import ArticleDto from '../dto/article.dto';
 import * as ArticleMapper from '../mappers/article.mapper';
+import ResponseGetArticlesDto from '../dto/response/get-article.dto';
+import { getOffsetPagingResult } from '../../../common/functions/offset-paging.function';
 
 @Injectable()
 export default class ArticleService {
@@ -72,8 +74,9 @@ export default class ArticleService {
     await this.articleRepository.update(article.id, article);
   }
 
-  async getArticles(dto: GetArticlesDto): Promise<ArticleDto[]> {
+  async getArticles(dto: GetArticlesDto): Promise<ResponseGetArticlesDto> {
     let articles: Article[] = [];
+    let allCounts = 0;
     let category = null;
 
     if (dto?.categoryId) {
@@ -87,20 +90,42 @@ export default class ArticleService {
       case GetArticleSort.LATEST:
         articles = await this.articleRepository.findMany(
           { category },
-          { limit: dto.limit, orderBy: { createdAt: 'desc' }, excludeId: dto?.excludeId || '' },
+          {
+            limit: dto.limit,
+            orderBy: { createdAt: 'desc' },
+            excludeId: dto?.excludeId,
+            page: dto.page,
+            search: dto?.search,
+          },
         );
+        allCounts = await this.articleRepository.findCounts({ category });
         break;
       case GetArticleSort.POPULAR:
         articles = await this.articleRepository.findMany(
           { category },
-          { limit: dto.limit, orderBy: { viewCount: 'desc' }, excludeId: dto?.excludeId || '' },
+          {
+            limit: dto.limit,
+            orderBy: { viewCount: 'desc' },
+            excludeId: dto?.excludeId,
+            page: dto.page,
+            search: dto?.search,
+          },
         );
+        allCounts = await this.articleRepository.findCounts({ category });
         break;
       default:
         break;
     }
 
-    return articles.map(ArticleMapper.toDto);
+    const articleDtos = articles.map(ArticleMapper.toDto);
+    const offsetPagingResult = getOffsetPagingResult({
+      items: articleDtos,
+      totalCount: allCounts,
+      limit: dto.limit,
+      currentPage: dto.page,
+    });
+
+    return ResponseGetArticlesDto.create(offsetPagingResult);
   }
 
   async addViewCount(articleId: string): Promise<void> {

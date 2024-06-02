@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, IsUrl } from 'class-validator';
 
 import UserOAuthProvider from './user-oauth-provider.entity';
 import UserRole from './user-role.entity';
-import IsNickname from '../../decorators/validation/is-nickname.decorator';
 import { generateCUID } from '../../../../common/utils/cuid';
 import { generateUUID } from '../../../../common/utils/uuid';
 

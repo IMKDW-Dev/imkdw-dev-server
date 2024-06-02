@@ -23,6 +23,7 @@ import { Public } from '../../auth/decorators/public.decorator';
 import GetArticlesQuery from '../dto/request/get-article.dto';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import ArticleDto from '../dto/article.dto';
+import ResponseGetArticlesDto from '../dto/response/get-article.dto';
 
 @ApiTags('게시글')
 @Controller({ path: 'articles', version: '1' })
@@ -51,7 +52,7 @@ export default class ArticleController {
   @Swagger.getArticles('게시글 목록 조회')
   @Public()
   @Get()
-  async getArticles(@Query() query: GetArticlesQuery) {
+  async getArticles(@Query() query: GetArticlesQuery): Promise<ResponseGetArticlesDto> {
     return this.articleService.getArticles(query);
   }
 

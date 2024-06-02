@@ -34,7 +34,7 @@ export default class CategoryService {
   }
 
   async getCategories(limit: number): Promise<CategoryDto[]> {
-    return this.categoryRepository.findMany({}, { limit });
+    return this.categoryRepository.findMany({}, { limit, page: 1 });
   }
 
   async getCategory(name: string): Promise<CategoryDto> {
