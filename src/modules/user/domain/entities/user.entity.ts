@@ -26,31 +26,9 @@ export default class User {
     this.role = props.role;
   }
 
-  @ApiProperty({ description: '유저 아이디', example: 'UUID' })
-  @IsString()
   id: string;
-
-  @ApiProperty({ description: '유저 이메일', example: 'imkdw@kakao.com' })
-  @IsEmail()
   email: string;
-
-  @ApiProperty({
-    description: `
-    유저 닉네임
-    1. 특수문자 사용불가
-    2. 공백 사용불가
-    3. 2자 이상, 22자 이하
-    4. 한글, 영문, 숫자 사용가능
-  `,
-    example: 'imkdw',
-    minLength: 2,
-    maxLength: 22,
-  })
-  @IsNickname()
   nickname: string;
-
-  @ApiProperty({ description: '유저 프로필사진 URL', example: 'https://temp.com/profile.jpg' })
-  @IsUrl()
   profile: string;
 
   @ApiProperty({ description: 'OAuth 제공사 정보', type: UserOAuthProvider })
@@ -73,6 +51,14 @@ export default class User {
 
   isSignupWithOAuth(provider: UserOAuthProvider) {
     return this.oAuthProvider.equals(provider);
+  }
+
+  changeProfile(profile: string) {
+    this.profile = profile;
+  }
+
+  changeNickname(nickname: string) {
+    this.nickname = nickname;
   }
 
   static create(props: UserProps) {

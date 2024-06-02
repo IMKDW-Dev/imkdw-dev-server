@@ -9,13 +9,18 @@ import { USER_ROLE_REPOSITORY } from './repository/role/user-role-repo.interface
 import UserRoleRepository from './infra/user-role.repository';
 import UserOAuthRepository from './infra/user-oauth.repository';
 import UserController from './controllers/user.controller';
+import UserImageService from './services/user-image.service';
+import ImageModule from '../../infra/image/image.module';
+import StorageModule from '../../infra/storage/storage.module';
 
 @Module({
+  imports: [ImageModule, StorageModule],
   controllers: [UserController],
   providers: [
     UserQueryService,
     UserOAuthQueryService,
     UserService,
+    UserImageService,
     {
       provide: USER_REPOSITORY,
       useClass: UserRepository,
