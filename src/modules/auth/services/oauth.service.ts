@@ -21,24 +21,20 @@ export default class OAuthService {
 
   async googleOAuth(accessToken: string) {
     const userInfo = await this.googleOAuthProvider.authenticate(accessToken);
-    return this.handleOAuth(OAuthProviders.GOOGLE, userInfo.email, userInfo.picture);
+    return this.handleOAuth(OAuthProviders.GOOGLE, userInfo.email);
   }
 
   async kakaoOAuth(code: string, redirectUri: string) {
     const userInfo = await this.kakaoOAuthProvider.authenticate(code, redirectUri);
-    return this.handleOAuth(
-      OAuthProviders.KAKAO,
-      userInfo.kakao_account.email,
-      userInfo.kakao_account.profile.profile_image_url,
-    );
+    return this.handleOAuth(OAuthProviders.KAKAO, userInfo.kakao_account.email);
   }
 
   async githubOAuth(code: string, redirectUri: string) {
     const userInfo = await this.githubOAuthProvider.authenticate(code, redirectUri);
-    return this.handleOAuth(OAuthProviders.GITHUB, userInfo.email, userInfo.avatar_url);
+    return this.handleOAuth(OAuthProviders.GITHUB, userInfo.email);
   }
 
-  private async handleOAuth(provider: OAuthProviders, email: string, profile: string) {
+  private async handleOAuth(provider: OAuthProviders, email: string) {
     const userByEmail = await this.userQueryService.findOne({ email });
     const userOAuthProvider = await this.userOAuthProviderQueryService.findOne({ name: provider });
 
@@ -50,6 +46,6 @@ export default class OAuthService {
       throw new DuplicateEmailException();
     }
 
-    return this.authService.register(email, profile, userOAuthProvider);
+    return this.authService.register(email, userOAuthProvider);
   }
 }
