@@ -18,4 +18,10 @@ export default class ArticleTagRepository implements IArticleTagRepository {
       })),
     });
   }
+
+  async deleteByArticleId(articleId: string): Promise<void> {
+    await this.prisma.client.articleTags.deleteMany({
+      where: { articleId },
+    });
+  }
 }

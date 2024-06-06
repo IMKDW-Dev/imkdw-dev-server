@@ -1,7 +1,7 @@
 import ArticleId from '../value-objects/article-id.vo';
 import Category from '../../../category/domain/entities/category.entity';
 import Tag from '../../../tag/domain/entities/tag.entity';
-import ArticleComment from '../../../article-comment/domain/entities/article-comment.entity';
+import ArticleComment from '../article-comment.entity';
 
 interface Props {
   id?: ArticleId;

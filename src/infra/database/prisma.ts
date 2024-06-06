@@ -5,6 +5,7 @@ import { ILocalStorageService } from '../local-storage/interfaces/local-storage.
 
 export const PRISMA_SERVICE = 'PRISMA_SERVICE';
 const prismaClient = new PrismaClient({});
+
 export const extendedPrismaClient = (localStorageService: ILocalStorageService) => {
   const userId = localStorageService.getUserId() ?? '_system';
 

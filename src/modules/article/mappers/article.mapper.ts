@@ -1,6 +1,6 @@
 import Article from '../domain/entities/article.entity';
 import ArticleDto from '../dto/article.dto';
-import * as ArticleCommentMapper from '../../article-comment/mappers/article-comment.mapper';
+import * as ArticleCommentMapper from './article-comment.mapper';
 import * as CategoryMapper from '../../category/mappers/category.mapper';
 
 // eslint-disable-next-line import/prefer-default-export

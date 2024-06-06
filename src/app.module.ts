@@ -2,10 +2,13 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { ConfigModule } from '@nestjs/config';
 import { CustomPrismaModule } from 'nestjs-prisma';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ClsModule } from 'nestjs-cls';
+import { ClsPluginTransactional } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
 import AppController from './app.controller';
 import AppService from './app.service';
-import { PRISMA_SERVICE, extendedPrismaClient } from './infra/database/prisma';
+import { PRISMA_SERVICE } from './infra/database/prisma';
 import AuthModule from './modules/auth/auth.module';
 import UserModule from './modules/user/user.module';
 import LoggerMiddleware from './common/middlewares/logger.middleware';
@@ -13,31 +16,32 @@ import JwtCookieMiddleware from './modules/auth/middlewares/jwt-cookie.middlewar
 import JwtGuard from './modules/auth/guards/jwt.guard';
 import TransformInterceptor from './common/interceptors/transform.interceptor';
 import LocalStorageModule from './infra/local-storage/local-storage.module';
-import { ILocalStorageService, LOCAL_STORAGE_SERVICE } from './infra/local-storage/interfaces/local-storage.interface';
 import CategoryModule from './modules/category/category.module';
 import ArticleModule from './modules/article/article.module';
-import ArticleCommentModule from './modules/article-comment/article-comment.module';
 import AllExceptionsFilter from './common/exceptions/all-exception.filter';
 import ContactModule from './modules/contact/contact.module';
+import { prismaConfig } from './config/prisma.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      cache: true,
-      isGlobal: true,
-    }),
-    CustomPrismaModule.forRootAsync({
-      imports: [LocalStorageModule],
-      name: PRISMA_SERVICE,
-      isGlobal: true,
-      inject: [LOCAL_STORAGE_SERVICE],
-      useFactory: (localStorageService: ILocalStorageService) => extendedPrismaClient(localStorageService),
+    ConfigModule.forRoot({ cache: true, isGlobal: true }),
+    CustomPrismaModule.forRootAsync(prismaConfig),
+    ClsModule.forRoot({
+      global: true,
+      middleware: { mount: true },
+      plugins: [
+        new ClsPluginTransactional({
+          imports: [CustomPrismaModule.forRootAsync(prismaConfig)],
+          adapter: new TransactionalAdapterPrisma({
+            prismaInjectionToken: PRISMA_SERVICE,
+          }),
+        }),
+      ],
     }),
     AuthModule,
     UserModule,
     CategoryModule,
     ArticleModule,
-    ArticleCommentModule,
     ContactModule,
     LocalStorageModule,
   ],

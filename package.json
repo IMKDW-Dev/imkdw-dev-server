@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.588.0",
+    "@nestjs-cls/transactional": "^2.3.1",
+    "@nestjs-cls/transactional-adapter-prisma": "^1.2.1",
     "@nestjs/cli": "^10.3.2",
     "@nestjs/common": "^10.3.8",
     "@nestjs/config": "^3.2.2",
@@ -44,6 +46,7 @@
     "axios": "^1.7.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
+    "nestjs-cls": "^4.3.0",
     "nestjs-prisma": "^0.23.0",
     "prisma": "^5.14.0",
     "reflect-metadata": "^0.1.14",

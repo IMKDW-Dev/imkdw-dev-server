@@ -8,7 +8,7 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
-import RequestCreateArticleDto from '../dto/request/create-article.dto';
+import RequestCreateArticleDto from '../dto/request/article/create-article.dto';
 import { GetArticleSort } from '../enums/article.enum';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import ArticleDto from '../dto/article.dto';
@@ -38,3 +38,5 @@ export const getArticles = (summary: string) =>
 
 export const addViewCount = (summary: string) =>
   applyDecorators(ApiOperation({ summary }), ApiParam({ name: 'articleId', description: '게시글 아이디' }));
+
+export const deleteArticle = (summary: string) => applyDecorators(ApiOperation({ summary }));

@@ -2,17 +2,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
 import { Prisma } from '@prisma/client';
 
-import { IArticleRepository } from '../repository/article-repo.interface';
+import { IArticleRepository } from '../repository/article/article-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import Article from '../domain/entities/article.entity';
-import { ArticleQueryFilter } from '../repository/article-query.filter';
-import { UpdateArticleDto } from '../dto/internal/update-article.dto';
+import { ArticleQueryFilter } from '../repository/article/article-query.filter';
+import { UpdateArticleDto } from '../dto/internal/article/update-article.dto';
 import ArticleId from '../domain/value-objects/article-id.vo';
-import ArticleComment from '../../article-comment/domain/entities/article-comment.entity';
 import User from '../../user/domain/entities/user.entity';
 import Category from '../../category/domain/entities/category.entity';
 import Tag from '../../tag/domain/entities/tag.entity';
-import { ArticleQueryOption } from '../repository/article-query.option';
+import { ArticleQueryOption } from '../repository/article/article-query.option';
+import ArticleComment from '../domain/article-comment.entity';
 
 type IArticle = Prisma.articlesGetPayload<{
   include: {
@@ -128,6 +128,12 @@ export default class ArticleRepository implements IArticleRepository {
         ...(query?.id && { id: query.id.toString() }),
         ...(query?.category && { categoryId: query.category.id }),
       },
+    });
+  }
+
+  async delete(article: Article): Promise<void> {
+    await this.prisma.client.articles.delete({
+      where: { id: article.id.toString() },
     });
   }
 

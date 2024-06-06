@@ -23,4 +23,8 @@ export default class ArticleTagService {
     const tags = [...tagsByName, ...newTags].map((tag) => ArticleTag.create({ article, tag }));
     await this.articleTagRepository.createMany(article, tags);
   }
+
+  async deleteByArticleId(articleId: string): Promise<void> {
+    await this.articleTagRepository.deleteByArticleId(articleId);
+  }
 }

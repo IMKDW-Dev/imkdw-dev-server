@@ -4,7 +4,7 @@ import { Transform } from 'class-transformer';
 
 import CategoryDto from '../../category/dto/category.dto';
 import TagDto from '../../tag/dto/tag.dto';
-import ArticleCommentDto from '../../article-comment/dto/article-comment.dto';
+import ArticleCommentDto from './article-comment.dto';
 import IsArticleId from '../decorators/validation/is-article-id.decorator';
 import IsArticleTitle from '../decorators/validation/is-article-title.decorator';
 import IsArticleContent from '../decorators/validation/is-article-content.decorator';
