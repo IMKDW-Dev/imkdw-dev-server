@@ -17,8 +17,8 @@ export default class AuthService {
     return { accessToken, refreshToken, userId };
   }
 
-  async register(email: string, profile: string, oAuthProvider: UserOAuthProvider) {
-    const registerdUser = await this.userService.createUser(email, profile, oAuthProvider);
+  async register(email: string, oAuthProvider: UserOAuthProvider) {
+    const registerdUser = await this.userService.createUser(email, oAuthProvider);
     return this.login(registerdUser.id);
   }
 }

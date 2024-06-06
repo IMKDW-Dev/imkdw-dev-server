@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -13,14 +14,14 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import ArticleService from '../services/article.service';
+import ArticleService from '../services/article/article.service';
 import * as Swagger from '../docs/article.swagger';
 import AdminGuard from '../../auth/guards/admin.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import UserRoles from '../../user/enums/user-role.enum';
-import RequestCreateArticleDto from '../dto/request/create-article.dto';
+import RequestCreateArticleDto from '../dto/request/article/create-article.dto';
 import { Public } from '../../auth/decorators/public.decorator';
-import GetArticlesQuery from '../dto/request/get-article.dto';
+import GetArticlesQuery from '../dto/request/article/get-article.dto';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import ArticleDto from '../dto/article.dto';
 import ResponseGetArticlesDto from '../dto/response/get-article.dto';
@@ -61,5 +62,13 @@ export default class ArticleController {
   @Patch(':articleId/view')
   async addViewCount(@Param('articleId') articleId: string) {
     return this.articleService.addViewCount(articleId);
+  }
+
+  @Swagger.deleteArticle('게시글 삭제')
+  @UseGuards(AdminGuard)
+  @Roles(UserRoles.ADMIN)
+  @Delete(':articleId')
+  async deleteArticle(@Param('articleId') articleId: string) {
+    return this.articleService.deleteArticle(articleId);
   }
 }

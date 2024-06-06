@@ -18,9 +18,9 @@ export default class UserService {
     private readonly userImageService: UserImageService,
   ) {}
 
-  async createUser(email: string, profile: string, oAuthProvider: UserOAuthProvider) {
+  async createUser(email: string, oAuthProvider: UserOAuthProvider) {
     const userRole = await this.userRoleRepository.findOne({ name: UserRoles.NORMAL });
-    const newUser = User.create({ email, profile, oAuthProvider, role: userRole });
+    const newUser = User.create({ email, oAuthProvider, role: userRole });
     newUser.generateId();
     newUser.setDefaultProfile();
     newUser.setDefaultNickname();

@@ -4,6 +4,7 @@ import TagQueryService from '../../tag/services/tag-query.service';
 import TagService from '../../tag/services/tag.service';
 import Article from '../../article/domain/entities/article.entity';
 import ArticleTag from '../domain/entities/article-tag.entity';
+import { TX } from '../../../@types/prisma/prisma.type';
 
 @Injectable()
 export default class ArticleTagService {
@@ -22,5 +23,9 @@ export default class ArticleTagService {
     const newTags = await this.tagService.createMany(newTagNames);
     const tags = [...tagsByName, ...newTags].map((tag) => ArticleTag.create({ article, tag }));
     await this.articleTagRepository.createMany(article, tags);
+  }
+
+  async deleteByArticleId(articleId: string, tx: TX): Promise<void> {
+    await this.articleTagRepository.deleteByArticleId(articleId, tx);
   }
 }

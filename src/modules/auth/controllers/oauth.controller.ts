@@ -34,6 +34,7 @@ export default class OAuthController {
   }
 
   @Swagger.kakaoOAuth('카카오 소셜로그인')
+  @Public()
   @Post('kakao')
   async kakaoOAuth(
     @Body() body: ReqeustKakaoOAuthDto,
