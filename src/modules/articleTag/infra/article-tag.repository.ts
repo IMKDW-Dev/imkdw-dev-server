@@ -5,6 +5,7 @@ import { IArticleTagRepository } from '../repository/article-tag-repo.inteface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import Article from '../../article/domain/entities/article.entity';
 import ArticleTag from '../domain/entities/article-tag.entity';
+import { TX } from '../../../@types/prisma/prisma.type';
 
 @Injectable()
 export default class ArticleTagRepository implements IArticleTagRepository {
@@ -19,9 +20,7 @@ export default class ArticleTagRepository implements IArticleTagRepository {
     });
   }
 
-  async deleteByArticleId(articleId: string): Promise<void> {
-    await this.prisma.client.articleTags.deleteMany({
-      where: { articleId },
-    });
+  async deleteByArticleId(articleId: string, tx: TX = this.prisma.client): Promise<void> {
+    await tx.articleTags.deleteMany({ where: { articleId } });
   }
 }

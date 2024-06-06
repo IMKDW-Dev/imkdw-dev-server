@@ -7,6 +7,7 @@ import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/pr
 import { ArticleCommentQueryFilter } from '../repository/article-comment/article-comment-query.filter';
 import User from '../../user/domain/entities/user.entity';
 import ArticleComment from '../domain/article-comment.entity';
+import { TX } from '../../../@types/prisma/prisma.type';
 
 type IArticleComment = Prisma.articleCommentsGetPayload<{
   include: {
@@ -55,8 +56,8 @@ export default class ArticleCommentRepository implements IArticleCommentReposito
     return this.toEntity(row);
   }
 
-  async deleteByArticleId(articleId: string): Promise<void> {
-    await this.prisma.client.articleComments.deleteMany({
+  async deleteByArticleId(articleId: string, tx: TX = this.prisma.client): Promise<void> {
+    await tx.articleComments.deleteMany({
       where: { articleId },
     });
   }

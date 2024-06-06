@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { TransactionHost, Transactional } from '@nestjs-cls/transactional';
+import { CustomPrismaService } from 'nestjs-prisma';
 
 import { ARTICLE_REPOSITORY, IArticleRepository } from '../../repository/article/article-repo.interface';
 import { CreateArticleDto } from '../../dto/internal/article/create-article.dto';
@@ -21,19 +21,17 @@ import {
   ARTICLE_COMMENT_REPOSITORY,
   IArticleCommentRepository,
 } from '../../repository/article-comment/article-comment-repo.interface';
+import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../../infra/database/prisma';
+import { Transactional } from '@nestjs-cls/transactional';
 
 @Injectable()
 export default class ArticleService {
   constructor(
-    /** 영속성 레이어 */
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
     @Inject(ARTICLE_COMMENT_REPOSITORY) private readonly articleCommentRepository: IArticleCommentRepository,
-
-    /** 게시글 서비스 */
+    @Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>,
     private readonly articleImageService: ArticleImageService,
     private readonly articleTagService: ArticleTagService,
-
-    /** 카테고리 서비스 */
     private readonly categoryQueryService: CategoryQueryService,
   ) {}
 
@@ -145,22 +143,18 @@ export default class ArticleService {
     await this.articleRepository.update(article.id, article);
   }
 
-  @Transactional()
   async deleteArticle(articleId: string): Promise<void> {
-    console.log('Hello');
     const article = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
     if (!article) {
       throw new ArticleNotFoundException(articleId);
     }
 
-    /**
-     * 삭제 순서
-     * 1. 댓글 삭제
-     * 2. 게시글-태그 조인테이블 삭제
-     * 3. 게시글 삭제
-     */
-    await this.articleCommentRepository.deleteByArticleId(articleId);
-    await this.articleTagService.deleteByArticleId(articleId);
-    await this.articleRepository.delete(article);
+    await this.prisma.client.$transaction(async (tx) => {
+      await Promise.all([
+        this.articleCommentRepository.deleteByArticleId(articleId, tx),
+        this.articleTagService.deleteByArticleId(articleId, tx),
+        this.articleRepository.delete(article, tx),
+      ]);
+    });
   }
 }

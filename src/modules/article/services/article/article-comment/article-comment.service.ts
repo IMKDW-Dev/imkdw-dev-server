@@ -54,8 +54,4 @@ export default class ArticleCommentService {
     await this.articleService.addCommentCount(article);
     return createdComment;
   }
-
-  async deleteByArticleId(articleId: string): Promise<void> {
-    await this.articleCommentRepository.deleteByArticleId(articleId);
-  }
 }

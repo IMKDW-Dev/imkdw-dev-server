@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { PrismaClient } from '@prisma/client';
-import { ILocalStorageService } from '../local-storage/interfaces/local-storage.interface';
+import { ClsService } from 'nestjs-cls';
 
 export const PRISMA_SERVICE = 'PRISMA_SERVICE';
 const prismaClient = new PrismaClient({});
 
-export const extendedPrismaClient = (localStorageService: ILocalStorageService) => {
-  const userId = localStorageService.getUserId() ?? '_system';
-
-  return prismaClient.$extends({
+export const extendedPrismaClient = (cls: ClsService) =>
+  prismaClient.$extends({
     query: {
       $allModels: {
         async findUnique({ model, args }) {
@@ -31,12 +29,14 @@ export const extendedPrismaClient = (localStorageService: ILocalStorageService) 
           });
         },
         async create({ model, args }) {
+          const userId = cls.get('userId');
           return (prismaClient as any)[model].create({
             ...args,
             data: { ...args.data, createUser: userId, updateUser: userId },
           });
         },
         async createMany({ model, args }) {
+          const userId = cls.get('userId');
           if (Array.isArray(args.data)) {
             return (prismaClient as any)[model].createMany({
               ...args,
@@ -51,24 +51,28 @@ export const extendedPrismaClient = (localStorageService: ILocalStorageService) 
           return (prismaClient as any)[model].createMany({});
         },
         async update({ model, args }) {
+          const userId = cls.get('userId');
           return (prismaClient as any)[model].update({
             ...args,
             data: { ...args.data, updateUser: userId },
           });
         },
         async updateMany({ model, args }) {
+          const userId = cls.get('userId');
           return (prismaClient as any)[model].updateMany({
             ...args,
             data: { ...args.data, updateUser: userId },
           });
         },
         async delete({ model, args }) {
+          const userId = cls.get('userId');
           return (prismaClient as any)[model].update({
             ...args,
             data: { deleteAt: new Date(), deleteUser: userId },
           });
         },
         async deleteMany({ model, args }) {
+          const userId = cls.get('userId');
           return (prismaClient as any)[model].updateMany({
             ...args,
             data: { deleteAt: new Date(), deleteUser: userId },
@@ -77,6 +81,4 @@ export const extendedPrismaClient = (localStorageService: ILocalStorageService) 
       },
     },
   });
-};
-
 export interface ExtendedPrismaClient extends PrismaClient {}

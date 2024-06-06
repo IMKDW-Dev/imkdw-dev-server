@@ -13,6 +13,7 @@ import Category from '../../category/domain/entities/category.entity';
 import Tag from '../../tag/domain/entities/tag.entity';
 import { ArticleQueryOption } from '../repository/article/article-query.option';
 import ArticleComment from '../domain/article-comment.entity';
+import { TX } from '../../../@types/prisma/prisma.type';
 
 type IArticle = Prisma.articlesGetPayload<{
   include: {
@@ -131,10 +132,8 @@ export default class ArticleRepository implements IArticleRepository {
     });
   }
 
-  async delete(article: Article): Promise<void> {
-    await this.prisma.client.articles.delete({
-      where: { id: article.id.toString() },
-    });
+  async delete(article: Article, tx: TX = this.prisma.client): Promise<void> {
+    await tx.articles.delete({ where: { id: article.id.toString() } });
   }
 
   private toEntity(row: IArticle): Article {

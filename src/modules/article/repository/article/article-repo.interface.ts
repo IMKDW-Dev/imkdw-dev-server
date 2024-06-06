@@ -1,3 +1,4 @@
+import { TX } from '../../../../@types/prisma/prisma.type';
 import Article from '../../domain/entities/article.entity';
 import ArticleId from '../../domain/value-objects/article-id.vo';
 import { UpdateArticleDto } from '../../dto/internal/article/update-article.dto';
@@ -11,5 +12,5 @@ export interface IArticleRepository {
   findCounts(query: ArticleQueryFilter): Promise<number>;
   save(article: Article): Promise<Article>;
   update(id: ArticleId, data: UpdateArticleDto): Promise<Article>;
-  delete(article: Article): Promise<void>;
+  delete(article: Article, tx: TX): Promise<void>;
 }
