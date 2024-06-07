@@ -11,8 +11,8 @@ import { TX } from '../../../@types/prisma/prisma.type';
 export default class ArticleTagRepository implements IArticleTagRepository {
   constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
 
-  async createMany(article: Article, articleTags: ArticleTag[]): Promise<void> {
-    this.prisma.client.articleTags.createMany({
+  async createMany(article: Article, articleTags: ArticleTag[], tx: TX = this.prisma.client): Promise<void> {
+    await tx.articleTags.createMany({
       data: articleTags.map((articleTag) => ({
         articleId: article.id.toString(),
         tagId: articleTag.tag.id,

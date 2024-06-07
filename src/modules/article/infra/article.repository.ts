@@ -6,7 +6,6 @@ import { IArticleRepository } from '../repository/article/article-repo.interface
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import Article from '../domain/entities/article.entity';
 import { ArticleQueryFilter } from '../repository/article/article-query.filter';
-import { UpdateArticleDto } from '../dto/internal/article/update-article.dto';
 import ArticleId from '../domain/value-objects/article-id.vo';
 import User from '../../user/domain/entities/user.entity';
 import Category from '../../category/domain/entities/category.entity';
@@ -76,8 +75,20 @@ export default class ArticleRepository implements IArticleRepository {
       where: {
         ...(query?.id && { id: query.id.toString() }),
         ...(query?.category && { categoryId: query.category.id }),
-        ...(option.excludeId && { NOT: { id: option.excludeId.toString() } }),
-        ...(option?.search && { title: { contains: option.search }, content: { contains: option.search } }),
+        ...(option?.excludeId && { NOT: { id: option.excludeId.toString() } }),
+        ...(option?.search && {
+          OR: [
+            {
+              title: { contains: option.search },
+            },
+            {
+              content: { contains: option.search },
+            },
+            {
+              id: { contains: option.search },
+            },
+          ],
+        }),
       },
       include: articleInclude,
       orderBy: {
@@ -90,8 +101,8 @@ export default class ArticleRepository implements IArticleRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
-  async save(article: Article): Promise<Article> {
-    const row: IArticle = await this.prisma.client.articles.create({
+  async save(article: Article, tx: TX = this.prisma.client): Promise<Article> {
+    const row: IArticle = await tx.articles.create({
       include: articleInclude,
       data: {
         id: article.id.toString(),
@@ -106,16 +117,16 @@ export default class ArticleRepository implements IArticleRepository {
     return this.toEntity(row);
   }
 
-  async update(id: ArticleId, data: UpdateArticleDto): Promise<Article> {
+  async update(article: Article): Promise<Article> {
     const row: IArticle = await this.prisma.client.articles.update({
-      where: { id: id.toString() },
+      where: { id: article.id.toString() },
       data: {
-        title: data.title,
-        content: data.content,
-        thumbnail: data.thumbnail,
-        visible: data.visible,
-        viewCount: data.viewCount,
-        commentCount: data.commentCount,
+        title: article.title,
+        content: article.content,
+        thumbnail: article.thumbnail,
+        visible: article.visible,
+        viewCount: article.viewCount,
+        commentCount: article.commentCount,
       },
       include: articleInclude,
     });
@@ -123,11 +134,17 @@ export default class ArticleRepository implements IArticleRepository {
     return this.toEntity(row);
   }
 
-  async findCounts(query: ArticleQueryFilter): Promise<number> {
+  async findCounts(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<number> {
     return this.prisma.client.articles.count({
       where: {
         ...(query?.id && { id: query.id.toString() }),
         ...(query?.category && { categoryId: query.category.id }),
+        ...(option?.excludeId && { NOT: { id: option.excludeId.toString() } }),
+        ...(option?.search && {
+          title: { contains: option.search },
+          content: { contains: option.search },
+          id: { contains: option.search },
+        }),
       },
     });
   }

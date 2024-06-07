@@ -4,6 +4,6 @@ import ArticleTag from '../domain/entities/article-tag.entity';
 
 export const ARTICE_TAG_REPOSITORY = Symbol('ARTICE_TAG_REPOSITORY');
 export interface IArticleTagRepository {
-  createMany(article: Article, tags: ArticleTag[]): Promise<void>;
+  createMany(article: Article, tags: ArticleTag[], tx: TX): Promise<void>;
   deleteByArticleId(articleId: string, tx: TX): Promise<void>;
 }

@@ -14,7 +14,7 @@ export default class ArticleTagService {
     private readonly tagService: TagService,
   ) {}
 
-  async createTags(article: Article, tagNames: string[]) {
+  async createTags(article: Article, tagNames: string[], tx: TX): Promise<void> {
     const tagsByName = await this.tagQueryService.findManyByNames(tagNames);
 
     const existingTagNames = tagsByName.map((tag) => tag.name);
@@ -22,7 +22,7 @@ export default class ArticleTagService {
 
     const newTags = await this.tagService.createMany(newTagNames);
     const tags = [...tagsByName, ...newTags].map((tag) => ArticleTag.create({ article, tag }));
-    await this.articleTagRepository.createMany(article, tags);
+    await this.articleTagRepository.createMany(article, tags, tx);
   }
 
   async deleteByArticleId(articleId: string, tx: TX): Promise<void> {
