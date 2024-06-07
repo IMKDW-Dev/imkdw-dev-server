@@ -22,7 +22,7 @@ import {
   IArticleCommentRepository,
 } from '../../repository/article-comment/article-comment-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../../infra/database/prisma';
-import { Transactional } from '@nestjs-cls/transactional';
+import { UpdateArticleDto } from '../../dto/internal/article/update-article.dto';
 
 @Injectable()
 export default class ArticleService {
@@ -58,11 +58,11 @@ export default class ArticleService {
     });
     newArticle.addHashOnId();
 
-    // TODO: 트랜잭션 처리
-    const createdArticle = await this.articleRepository.save(newArticle);
-    await this.articleTagService.createTags(createdArticle, dto.tags);
-
-    return ResponseCreateArticleDto.create(createdArticle);
+    return this.prisma.client.$transaction(async (tx) => {
+      const createdArticle = await this.articleRepository.save(newArticle, tx);
+      await this.articleTagService.createTags(createdArticle, dto.tags, tx);
+      return ResponseCreateArticleDto.create(createdArticle);
+    });
   }
 
   async getArticleDetail(articleId: string): Promise<ArticleDto> {
@@ -76,7 +76,7 @@ export default class ArticleService {
 
   async addCommentCount(article: Article): Promise<void> {
     article.addCommentCount();
-    await this.articleRepository.update(article.id, article);
+    await this.articleRepository.update(article);
   }
 
   async getArticles(dto: GetArticlesDto): Promise<ResponseGetArticlesDto> {
@@ -91,6 +91,7 @@ export default class ArticleService {
       }
     }
 
+    // TODO: 리팩토링
     switch (dto.sort) {
       case GetArticleSort.LATEST:
         articles = await this.articleRepository.findMany(
@@ -103,7 +104,7 @@ export default class ArticleService {
             search: dto?.search,
           },
         );
-        allCounts = await this.articleRepository.findCounts({ category });
+        allCounts = await this.articleRepository.findCounts({ category }, { search: dto?.search });
         break;
       case GetArticleSort.POPULAR:
         articles = await this.articleRepository.findMany(
@@ -116,7 +117,7 @@ export default class ArticleService {
             search: dto?.search,
           },
         );
-        allCounts = await this.articleRepository.findCounts({ category });
+        allCounts = await this.articleRepository.findCounts({ category }, { search: dto?.search });
         break;
       default:
         break;
@@ -140,7 +141,7 @@ export default class ArticleService {
     }
 
     article.addViewCount();
-    await this.articleRepository.update(article.id, article);
+    await this.articleRepository.update(article);
   }
 
   async deleteArticle(articleId: string): Promise<void> {
@@ -156,5 +157,20 @@ export default class ArticleService {
         this.articleRepository.delete(article, tx),
       ]);
     });
+  }
+
+  async updateArticle(articleId: string, dto: UpdateArticleDto) {
+    const article = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
+    if (!article) {
+      throw new ArticleNotFoundException(articleId);
+    }
+
+    if (dto?.thumbnail) {
+      const thumbnail = await this.articleImageService.getThumbnail(articleId, dto.thumbnail);
+      article.changeThumbnail(thumbnail);
+    }
+
+    const updatedArticle = await this.articleRepository.update(article);
+    return ArticleMapper.toDto(updatedArticle);
   }
 }

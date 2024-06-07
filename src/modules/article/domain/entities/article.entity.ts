@@ -3,19 +3,7 @@ import Category from '../../../category/domain/entities/category.entity';
 import Tag from '../../../tag/domain/entities/tag.entity';
 import ArticleComment from '../article-comment.entity';
 
-interface Props {
-  id?: ArticleId;
-  title?: string;
-  category?: Category;
-  content?: string;
-  visible?: boolean;
-  thumbnail?: string;
-  viewCount?: number;
-  commentCount?: number;
-  createdAt?: Date;
-  tags?: Tag[];
-  comments?: ArticleComment[];
-}
+interface Props extends Partial<Article> {}
 
 export default class Article {
   constructor(props: Props) {
@@ -31,6 +19,7 @@ export default class Article {
     this.tags = props.tags;
     this.comments = props.comments;
   }
+
   id: ArticleId;
   title: string;
   category: Category;
@@ -53,6 +42,10 @@ export default class Article {
 
   addViewCount() {
     this.viewCount += 1;
+  }
+
+  changeThumbnail(thumbnail: string) {
+    this.thumbnail = thumbnail;
   }
 
   static create(props: Props): Article {

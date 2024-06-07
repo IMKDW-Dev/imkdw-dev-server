@@ -25,6 +25,7 @@ import GetArticlesQuery from '../dto/request/article/get-article.dto';
 import ResponseCreateArticleDto from '../dto/response/create-article.dto';
 import ArticleDto from '../dto/article.dto';
 import ResponseGetArticlesDto from '../dto/response/get-article.dto';
+import RequestUpdateArticleDto from '../dto/request/article/update-article.dto';
 
 @ApiTags('게시글')
 @Controller({ path: 'articles', version: '1' })
@@ -70,5 +71,18 @@ export default class ArticleController {
   @Delete(':articleId')
   async deleteArticle(@Param('articleId') articleId: string) {
     return this.articleService.deleteArticle(articleId);
+  }
+
+  @Swagger.updateArticle('게시글 수정')
+  @UseGuards(AdminGuard)
+  @UseInterceptors(FileInterceptor('thumbnailImage'))
+  @Roles(UserRoles.ADMIN)
+  @Patch(':articleId')
+  async updateArticle(
+    @Param('articleId') articleId: string,
+    @Body() dto: RequestUpdateArticleDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<ArticleDto> {
+    return this.articleService.updateArticle(articleId, { ...dto, thumbnail: file });
   }
 }

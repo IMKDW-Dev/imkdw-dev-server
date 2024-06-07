@@ -2,7 +2,7 @@ export interface QueryOption<T = never> {
   /**
    * 조회할 데이터의 개수
    */
-  limit: number;
+  limit?: number;
 
   /**
    * 순서 조정
@@ -19,7 +19,7 @@ export interface QueryOption<T = never> {
   /**
    * 페이징을 위한 커서
    */
-  page: number;
+  page?: number;
 
   /**
    * 검색어

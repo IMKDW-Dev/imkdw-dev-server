@@ -39,4 +39,7 @@ export const getArticles = (summary: string) =>
 export const addViewCount = (summary: string) =>
   applyDecorators(ApiOperation({ summary }), ApiParam({ name: 'articleId', description: '게시글 아이디' }));
 
-export const deleteArticle = (summary: string) => applyDecorators(ApiOperation({ summary }));
+export const deleteArticle = (summary: string) =>
+  applyDecorators(ApiOperation({ summary }), ApiParam({ description: '삭제할 게시글 아이디', name: 'articleId' }));
+
+export const updateArticle = (summary: string) => applyDecorators(ApiOperation({ summary }));
