@@ -61,7 +61,7 @@ export default class ArticleDto {
   visible: boolean;
 
   @ApiProperty({ description: '썸네일', example: 'https://image.com/article.png' })
-  thumbnail: string;
+  thumbnail: string | Express.Multer.File;
 
   @ApiProperty({ description: '조회수', example: 0 })
   viewCount: number;

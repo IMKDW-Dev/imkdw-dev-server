@@ -127,6 +127,7 @@ export default class ArticleRepository implements IArticleRepository {
         visible: article.visible,
         viewCount: article.viewCount,
         commentCount: article.commentCount,
+        categoryId: article.category.id,
       },
       include: articleInclude,
     });

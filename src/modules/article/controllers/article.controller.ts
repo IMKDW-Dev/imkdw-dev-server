@@ -75,7 +75,7 @@ export default class ArticleController {
 
   @Swagger.updateArticle('게시글 수정')
   @UseGuards(AdminGuard)
-  @UseInterceptors(FileInterceptor('thumbnailImage'))
+  @UseInterceptors(FileInterceptor('thumbnail'))
   @Roles(UserRoles.ADMIN)
   @Patch(':articleId')
   async updateArticle(
