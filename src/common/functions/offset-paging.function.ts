@@ -15,7 +15,7 @@ export interface OffsetPagingResult<T> {
 // eslint-disable-next-line import/prefer-default-export
 export const getOffsetPagingResult = <T>(params: Params<T>): OffsetPagingResult<T> => {
   const { currentPage, items, limit, totalCount } = params;
-  const totalPage = Math.ceil(totalCount / limit);
+  const totalPage = Math.ceil(totalCount / limit) || 1;
   const hasNextPage = currentPage < totalPage;
   const hasPreviousPage = currentPage > 1;
 
