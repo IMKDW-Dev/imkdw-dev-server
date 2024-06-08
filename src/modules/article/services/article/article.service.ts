@@ -165,9 +165,22 @@ export default class ArticleService {
       throw new ArticleNotFoundException(articleId);
     }
 
+    article.changeTitle(dto.title);
+    article.changeContent(dto.content);
+    article.changeVisible(dto.visible);
+
     if (dto?.thumbnail) {
       const thumbnail = await this.articleImageService.getThumbnail(articleId, dto.thumbnail);
       article.changeThumbnail(thumbnail);
+    }
+
+    if (dto?.categoryId) {
+      const category = await this.categoryQueryService.findOne({ id: dto.categoryId });
+      if (!category) {
+        throw new CategoryNotFoundException(dto.categoryId);
+      }
+
+      article.changeCategory(category);
     }
 
     const updatedArticle = await this.articleRepository.update(article);

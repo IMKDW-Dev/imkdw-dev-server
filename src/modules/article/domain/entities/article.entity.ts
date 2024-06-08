@@ -44,8 +44,24 @@ export default class Article {
     this.viewCount += 1;
   }
 
+  changeTitle(title: string) {
+    this.title = title;
+  }
+
+  changeContent(content: string) {
+    this.content = content;
+  }
+
+  changeVisible(visible: boolean) {
+    this.visible = visible;
+  }
+
   changeThumbnail(thumbnail: string) {
     this.thumbnail = thumbnail;
+  }
+
+  changeCategory(category: Category) {
+    this.category = category;
   }
 
   static create(props: Props): Article {
