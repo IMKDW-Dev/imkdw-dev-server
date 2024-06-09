@@ -6,8 +6,8 @@ import { IArticleCommentRepository } from '../repository/article-comment/article
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { ArticleCommentQueryFilter } from '../repository/article-comment/article-comment-query.filter';
 import User from '../../user/domain/entities/user.entity';
-import ArticleComment from '../domain/article-comment.entity';
 import { TX } from '../../../@types/prisma/prisma.type';
+import ArticleComment from '../domain/entities/article-comment.entity';
 
 type IArticleComment = Prisma.articleCommentsGetPayload<{
   include: {

@@ -11,6 +11,7 @@ import { FORBIDDEN_EXCEPTIONS } from '../../../common/exceptions/403';
 import ResponseGetUserInfoDto from '../dto/response/user-info.dto';
 import RequestUpdateUserInfoDto from '../dto/request/update-user-info.dto';
 import UserDto from '../dto/user.dto';
+import ResponseGetUserCountDto from '../dto/response/user-count.dto';
 
 export const getUserInfo = (summary: string) =>
   applyDecorators(
@@ -30,3 +31,6 @@ export const updateUserInfo = (summary: string) =>
     ApiBody({ type: RequestUpdateUserInfoDto }),
     ApiCreatedResponse({ type: UserDto }),
   );
+
+export const getUserCount = (summary: string) =>
+  applyDecorators(ApiOperation({ summary }), ApiOkResponse({ type: ResponseGetUserCountDto }));

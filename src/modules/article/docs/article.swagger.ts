@@ -10,9 +10,9 @@ import {
 } from '@nestjs/swagger';
 import RequestCreateArticleDto from '../dto/request/article/create-article.dto';
 import { GetArticleSort } from '../enums/article.enum';
-import ResponseCreateArticleDto from '../dto/response/create-article.dto';
+import ResponseCreateArticleDto from '../dto/response/article/create-article.dto';
 import ArticleDto from '../dto/article.dto';
-import ResponseGetArticlesDto from '../dto/response/get-article.dto';
+import ResponseGetArticlesDto from '../dto/response/article/get-article.dto';
 
 export const createArticle = (summary: string) =>
   applyDecorators(

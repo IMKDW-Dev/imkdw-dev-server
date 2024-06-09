@@ -1,6 +1,6 @@
 import ArticleCommentDto from '../dto/article-comment.dto';
 import * as UserMapper from '../../user/mappers/user.mapper';
-import ArticleComment from '../domain/article-comment.entity';
+import ArticleComment from '../domain/entities/article-comment.entity';
 
 // eslint-disable-next-line import/prefer-default-export
 export const toDto = (articleComment: ArticleComment): ArticleCommentDto =>

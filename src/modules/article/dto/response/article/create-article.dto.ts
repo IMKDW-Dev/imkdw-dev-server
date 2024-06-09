@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import Article from '../../domain/entities/article.entity';
+import Article from '../../../domain/entities/article.entity';
 
 export default class ResponseCreateArticleDto {
   constructor(id: string) {

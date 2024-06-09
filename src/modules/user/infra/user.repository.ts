@@ -67,6 +67,10 @@ export default class UserRepository implements IUserRepository {
     return this.toEntity(updatedRow);
   }
 
+  async count(): Promise<number> {
+    return this.prisma.client.users.count();
+  }
+
   private toEntity(user: IUser): User {
     const role = UserRole.create({ id: user.role.id, name: user.role.name });
     const oAuthProvider = UserOAuthProvider.create({ id: user.oAuthProvider.id, provider: user.oAuthProvider.name });

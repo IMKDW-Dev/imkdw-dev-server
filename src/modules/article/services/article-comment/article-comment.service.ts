@@ -1,17 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
+
+import { ArticleCommentNotFoundException, ArticleNotFoundException } from '../../../../common/exceptions/404';
+import { CannotReplyOnReplyCommentException } from '../../../../common/exceptions/403';
 import {
   ARTICLE_COMMENT_REPOSITORY,
   IArticleCommentRepository,
-} from '../../../repository/article-comment/article-comment-repo.interface';
-import ArticleQueryService from '../article-query.service';
-import { ArticleCommentNotFoundException, ArticleNotFoundException } from '../../../../../common/exceptions/404';
-import { CannotReplyOnReplyCommentException } from '../../../../../common/exceptions/403';
-import ArticleId from '../../../domain/value-objects/article-id.vo';
-import ArticleCommentDto from '../../../dto/article-comment.dto';
-import UserQueryService from '../../../../user/services/user-query.service';
-import ArticleService from '../article.service';
-import { CreateCommentDto } from '../../../dto/internal/article-comment/create-comment.dto';
-import ArticleComment from '../../../domain/article-comment.entity';
+} from '../../repository/article-comment/article-comment-repo.interface';
+import ArticleService from '../article/article.service';
+import ArticleQueryService from '../article/article-query.service';
+import UserQueryService from '../../../user/services/user-query.service';
+import ArticleCommentDto from '../../dto/article-comment.dto';
+import { CreateCommentDto } from '../../dto/internal/article-comment/create-comment.dto';
+import ArticleId from '../../domain/value-objects/article-id.vo';
+import ArticleComment from '../../domain/entities/article-comment.entity';
 
 @Injectable()
 export default class ArticleCommentService {

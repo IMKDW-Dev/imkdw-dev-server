@@ -12,10 +12,10 @@ import { GetArticlesDto } from '../../dto/internal/article/get-article.dto';
 import { GetArticleSort } from '../../enums/article.enum';
 import Article from '../../domain/entities/article.entity';
 import ArticleId from '../../domain/value-objects/article-id.vo';
-import ResponseCreateArticleDto from '../../dto/response/create-article.dto';
+import ResponseCreateArticleDto from '../../dto/response/article/create-article.dto';
 import ArticleDto from '../../dto/article.dto';
 import * as ArticleMapper from '../../mappers/article.mapper';
-import ResponseGetArticlesDto from '../../dto/response/get-article.dto';
+import ResponseGetArticlesDto from '../../dto/response/article/get-article.dto';
 import { getOffsetPagingResult } from '../../../../common/functions/offset-paging.function';
 import {
   ARTICLE_COMMENT_REPOSITORY,
@@ -130,8 +130,6 @@ export default class ArticleService {
       limit: dto.limit,
       currentPage: dto.page,
     });
-
-    console.log(offsetPagingResult);
 
     return ResponseGetArticlesDto.create(offsetPagingResult);
   }

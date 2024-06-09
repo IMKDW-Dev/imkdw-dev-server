@@ -22,9 +22,9 @@ import UserRoles from '../../user/enums/user-role.enum';
 import RequestCreateArticleDto from '../dto/request/article/create-article.dto';
 import { Public } from '../../auth/decorators/public.decorator';
 import GetArticlesQuery from '../dto/request/article/get-article.dto';
-import ResponseCreateArticleDto from '../dto/response/create-article.dto';
+import ResponseCreateArticleDto from '../dto/response/article/create-article.dto';
 import ArticleDto from '../dto/article.dto';
-import ResponseGetArticlesDto from '../dto/response/get-article.dto';
+import ResponseGetArticlesDto from '../dto/response/article/get-article.dto';
 import RequestUpdateArticleDto from '../dto/request/article/update-article.dto';
 
 @ApiTags('게시글')

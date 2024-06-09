@@ -52,4 +52,8 @@ export default class UserService {
     const updatedRow = await this.userRepository.update(userId, user);
     return UserMapper.toDto(updatedRow);
   }
+
+  async getUserCount(): Promise<number> {
+    return this.userRepository.count();
+  }
 }
