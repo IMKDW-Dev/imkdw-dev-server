@@ -10,4 +10,6 @@ export interface IUserRepository {
   save(user: User): Promise<User>;
 
   update(userId: string, user: User): Promise<User>;
+
+  count(): Promise<number>;
 }

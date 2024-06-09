@@ -11,8 +11,8 @@ import User from '../../user/domain/entities/user.entity';
 import Category from '../../category/domain/entities/category.entity';
 import Tag from '../../tag/domain/entities/tag.entity';
 import { ArticleQueryOption } from '../repository/article/article-query.option';
-import ArticleComment from '../domain/article-comment.entity';
 import { TX } from '../../../@types/prisma/prisma.type';
+import ArticleComment from '../domain/entities/article-comment.entity';
 
 type IArticle = Prisma.articlesGetPayload<{
   include: {

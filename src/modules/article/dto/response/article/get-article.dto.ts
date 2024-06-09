@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import ResponseOffsetPagingDto from '../../../../common/dto/response/offset-paging.dto';
-import ArticleDto from '../article.dto';
-import { OffsetPagingResult } from '../../../../common/functions/offset-paging.function';
+import ResponseOffsetPagingDto from '../../../../../common/dto/response/offset-paging.dto';
+import ArticleDto from '../../article.dto';
+import { OffsetPagingResult } from '../../../../../common/functions/offset-paging.function';
 
 interface Props extends OffsetPagingResult<ArticleDto> {}
 

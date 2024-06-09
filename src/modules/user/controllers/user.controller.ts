@@ -6,6 +6,8 @@ import ResponseGetUserInfoDto from '../dto/response/user-info.dto';
 import RequestUpdateUserInfoDto from '../dto/request/update-user-info.dto';
 import UserGuard from '../../auth/guards/user.guard';
 import * as Swagger from '../docs/user.swagger';
+import { Public } from '../../auth/decorators/public.decorator';
+import ResponseGetUserCountDto from '../dto/response/user-count.dto';
 
 @Controller({ path: 'users', version: '1' })
 export default class UserController {
@@ -28,5 +30,13 @@ export default class UserController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.userService.updateUserInfo(userId, { ...dto, profileImage: file });
+  }
+
+  @Swagger.getUserCount('유저 수 조회')
+  @Public()
+  @Get('stats/count')
+  async getUserCount(): Promise<ResponseGetUserCountDto> {
+    const userCount = await this.userService.getUserCount();
+    return { userCount };
   }
 }

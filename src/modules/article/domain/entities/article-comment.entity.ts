@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNumber, IsString } from 'class-validator';
-import User from '../../user/domain/entities/user.entity';
-import IsCommentContent from '../decorators/validation/is-comment-content.decorator';
+import User from '../../../user/domain/entities/user.entity';
+import IsCommentContent from '../../decorators/validation/is-comment-content.decorator';
 
 interface Props extends Partial<ArticleComment> {}
 

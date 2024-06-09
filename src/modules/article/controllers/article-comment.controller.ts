@@ -1,9 +1,9 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
-import ArticleCommentService from '../services/article/article-comment/article-comment.service';
 import Requester from '../../../common/decorators/requester.decorator';
 import { IRequester } from '../../../common/types/common.type';
 import RequestCreateCommentDto from '../dto/request/article-comment/create-comment.dto';
 import * as Swagger from '../docs/article-comment.swagger';
+import ArticleCommentService from '../services/article-comment/article-comment.service';
 
 @Controller({ path: 'articles/:articleId/comments', version: '1' })
 export default class ArticleCommentController {
