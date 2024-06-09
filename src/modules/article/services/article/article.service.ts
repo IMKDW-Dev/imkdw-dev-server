@@ -131,8 +131,6 @@ export default class ArticleService {
       currentPage: dto.page,
     });
 
-    console.log(offsetPagingResult);
-
     return ResponseGetArticlesDto.create(offsetPagingResult);
   }
 
