@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.588.0",
+    "@aws-sdk/s3-request-presigner": "^3.592.0",
     "@nestjs-cls/transactional": "^2.3.1",
     "@nestjs-cls/transactional-adapter-prisma": "^1.2.1",
     "@nestjs/cli": "^10.3.2",
