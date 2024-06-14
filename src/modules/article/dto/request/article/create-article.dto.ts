@@ -19,4 +19,9 @@ export default class RequestCreateArticleDto extends PickType(ArticleDto, ['id',
 
   @ApiProperty({ description: '게시글 썸네일', type: 'string', format: 'binary' })
   thumbnail: Express.Multer.File;
+
+  @ApiProperty({ description: '업로드된 이미지의 이름들', example: ['image1.jpg', 'image2.jpg'] })
+  @IsArray()
+  @IsString({ each: true })
+  images: string[];
 }

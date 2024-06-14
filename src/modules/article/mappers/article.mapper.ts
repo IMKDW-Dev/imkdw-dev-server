@@ -9,7 +9,7 @@ export const toDto = (article: Article) =>
     id: article.id.toString(),
     title: article.title,
     category: CategoryMapper.toDto(article.category),
-    content: article.content,
+    content: article.content.getContent(),
     visible: article.visible,
     thumbnail: article.thumbnail,
     viewCount: article.viewCount,

@@ -2,6 +2,7 @@ import ArticleId from '../value-objects/article-id.vo';
 import Category from '../../../category/domain/entities/category.entity';
 import Tag from '../../../tag/domain/entities/tag.entity';
 import ArticleComment from './article-comment.entity';
+import ArticleContent from '../value-objects/article-content.vo';
 
 interface Props extends Partial<Article> {}
 
@@ -23,7 +24,7 @@ export default class Article {
   id: ArticleId;
   title: string;
   category: Category;
-  content: string;
+  content: ArticleContent;
   visible: boolean;
   thumbnail: string;
   viewCount: number;
@@ -40,16 +41,14 @@ export default class Article {
     this.id.addHash();
   }
 
+  replaceContentImageUrl() {}
+
   addViewCount() {
     this.viewCount += 1;
   }
 
   changeTitle(title: string) {
     this.title = title;
-  }
-
-  changeContent(content: string) {
-    this.content = content;
   }
 
   changeVisible(visible: boolean) {
@@ -62,6 +61,10 @@ export default class Article {
 
   changeCategory(category: Category) {
     this.category = category;
+  }
+
+  changeContent(content: ArticleContent) {
+    this.content = content;
   }
 
   static create(props: Props): Article {

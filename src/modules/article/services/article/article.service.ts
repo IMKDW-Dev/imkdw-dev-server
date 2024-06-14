@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
+import { ConfigService } from '@nestjs/config';
 
 import { ARTICLE_REPOSITORY, IArticleRepository } from '../../repository/article/article-repo.interface';
 import { CreateArticleDto } from '../../dto/internal/article/create-article.dto';
@@ -23,6 +24,7 @@ import {
 } from '../../repository/article-comment/article-comment-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../../infra/database/prisma';
 import { UpdateArticleDto } from '../../dto/internal/article/update-article.dto';
+import ArticleContent from '../../domain/value-objects/article-content.vo';
 
 @Injectable()
 export default class ArticleService {
@@ -33,6 +35,7 @@ export default class ArticleService {
     private readonly articleImageService: ArticleImageService,
     private readonly articleTagService: ArticleTagService,
     private readonly categoryQueryService: CategoryQueryService,
+    private readonly configService: ConfigService,
   ) {}
 
   async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<ResponseCreateArticleDto> {
@@ -41,22 +44,23 @@ export default class ArticleService {
       throw new CategoryNotFoundException(dto.categoryId);
     }
 
-    const articleId = new ArticleId(dto.id);
+    const articleId = new ArticleId(dto.id).addHash();
     const article = await this.articleRepository.findOne({ id: articleId });
     if (article) {
       throw new DuplicateArticleIdException(dto.id.toString());
     }
 
-    const thumbnail = await this.articleImageService.getThumbnail(dto.id.toString(), file);
+    const thumbnail = await this.articleImageService.getThumbnail(articleId, file);
+    const copiedImageUrls = await this.articleImageService.copyContentImages(articleId, dto.images);
+
     const newArticle = Article.create({
       id: articleId,
       title: dto.title,
-      content: dto.content,
+      content: new ArticleContent(dto.content).replaceImageUrls(copiedImageUrls),
       thumbnail,
       category,
       visible: dto.visible,
     });
-    newArticle.addHashOnId();
 
     return this.prisma.client.$transaction(async (tx) => {
       const createdArticle = await this.articleRepository.save(newArticle, tx);
@@ -166,11 +170,11 @@ export default class ArticleService {
     }
 
     article.changeTitle(dto.title);
-    article.changeContent(dto.content);
+    article.changeContent(new ArticleContent(dto.content));
     article.changeVisible(dto.visible);
 
     if (dto?.thumbnail) {
-      const thumbnail = await this.articleImageService.getThumbnail(articleId, dto.thumbnail);
+      const thumbnail = await this.articleImageService.getThumbnail(article.id, dto.thumbnail);
       article.changeThumbnail(thumbnail);
     }
 
@@ -179,8 +183,12 @@ export default class ArticleService {
       if (!category) {
         throw new CategoryNotFoundException(dto.categoryId);
       }
-
       article.changeCategory(category);
+    }
+
+    if (dto?.images && dto.images.length) {
+      const copiedImageUrls = await this.articleImageService.copyContentImages(article.id, dto.images);
+      article.changeContent(article.content.replaceImageUrls(copiedImageUrls));
     }
 
     const updatedArticle = await this.articleRepository.update(article);

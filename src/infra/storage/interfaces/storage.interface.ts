@@ -6,4 +6,6 @@ export interface IStorageService {
   upload(filePath: string, file: Buffer, contentType: ContentType): Promise<string>;
 
   getUploadUrl(filename: string): Promise<string>;
+
+  copyFile(fromPath: string, toPath: string): Promise<void>;
 }

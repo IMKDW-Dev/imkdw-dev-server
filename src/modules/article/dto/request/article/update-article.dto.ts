@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType, PickType } from '@nestjs/swagger';
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 import ArticleDto from '../../article.dto';
@@ -16,4 +16,10 @@ export default class RequestUpdateArticleDto extends PartialType(
   @Type(() => Number)
   @IsOptional()
   categoryId: number;
+
+  @ApiProperty({ description: '업로드된 이미지의 이름들', example: ['image1.jpg', 'image2.jpg'] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  images: string[];
 }
