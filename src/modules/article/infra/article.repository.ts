@@ -13,6 +13,7 @@ import Tag from '../../tag/domain/entities/tag.entity';
 import { ArticleQueryOption } from '../repository/article/article-query.option';
 import { TX } from '../../../@types/prisma/prisma.type';
 import ArticleComment from '../domain/entities/article-comment.entity';
+import ArticleContent from '../domain/value-objects/article-content.vo';
 
 type IArticle = Prisma.articlesGetPayload<{
   include: {
@@ -64,6 +65,7 @@ export default class ArticleRepository implements IArticleRepository {
       where: {
         ...(query?.id && { id: query.id.toString() }),
         ...(query?.category && { categoryId: query.category.id }),
+        ...(!query?.includePrivate && { visible: true }),
       },
       include: articleInclude,
     });
@@ -76,6 +78,7 @@ export default class ArticleRepository implements IArticleRepository {
         ...(query?.id && { id: query.id.toString() }),
         ...(query?.category && { categoryId: query.category.id }),
         ...(option?.excludeId && { NOT: { id: option.excludeId.toString() } }),
+        ...(!query?.includePrivate && { visible: true }),
         ...(option?.search && {
           OR: [
             {
@@ -107,7 +110,7 @@ export default class ArticleRepository implements IArticleRepository {
       data: {
         id: article.id.toString(),
         title: article.title,
-        content: article.content,
+        content: article.content.getContent(),
         thumbnail: article.thumbnail,
         categoryId: article.category.id,
         visible: article.visible,
@@ -122,7 +125,7 @@ export default class ArticleRepository implements IArticleRepository {
       where: { id: article.id.toString() },
       data: {
         title: article.title,
-        content: article.content,
+        content: article.content.getContent(),
         thumbnail: article.thumbnail,
         visible: article.visible,
         viewCount: article.viewCount,
@@ -148,6 +151,19 @@ export default class ArticleRepository implements IArticleRepository {
         }),
       },
     });
+  }
+
+  async findIds(query: ArticleQueryFilter): Promise<string[]> {
+    const rows = await this.prisma.client.articles.findMany({
+      where: {
+        ...(!query?.includePrivate && { visible: true }),
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return rows.map((row) => row.id);
   }
 
   async delete(article: Article, tx: TX = this.prisma.client): Promise<void> {
@@ -196,7 +212,7 @@ export default class ArticleRepository implements IArticleRepository {
     return Article.create({
       id: new ArticleId(row.id),
       title: row.title,
-      content: row.content,
+      content: new ArticleContent(row.content),
       createdAt: row.createdAt,
       thumbnail: row.thumbnail,
       viewCount: row.viewCount,

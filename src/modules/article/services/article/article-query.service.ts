@@ -10,4 +10,8 @@ export default class ArticleQueryService {
   async findOne(filter: ArticleQueryFilter): Promise<Article> {
     return this.articleRepository.findOne(filter);
   }
+
+  async findIds(filter: ArticleQueryFilter) {
+    return this.articleRepository.findIds(filter);
+  }
 }

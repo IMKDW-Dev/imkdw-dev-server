@@ -6,7 +6,7 @@ import OAuthService from '../services/oauth.service';
 import * as Swagger from '../docs/oauth.swagger';
 import Authorization from '../../../common/decorators/authorization.decorator';
 import { COOKIE_SERVICE, ICookieService } from '../../../infra/secure/cookie/interfaces/cookie.interface';
-import { ACCESS_TOKEN_KEY } from '../constants/token.constant';
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../constants/token.constant';
 import { CookieMaxage } from '../../../infra/secure/cookie/enums/cookie.enum';
 import ResponseAuthResultDto from '../dto/response/auth-result.dto';
 import { Public } from '../decorators/public.decorator';
@@ -41,6 +41,7 @@ export default class OAuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<ResponseAuthResultDto> {
     const authResult = await this.oAuthService.kakaoOAuth(body.code, body.redirectUri);
+
     this.setCookie(res, authResult);
     return { userId: authResult.userId };
   }
@@ -58,6 +59,6 @@ export default class OAuthController {
 
   private setCookie(res: Response, { accessToken, refreshToken }: { accessToken: string; refreshToken: string }) {
     this.cookieService.setCookie(ACCESS_TOKEN_KEY, accessToken, CookieMaxage.HOUR_1, res);
-    this.cookieService.setCookie('refreshToken', refreshToken, CookieMaxage.DAY_30, res);
+    this.cookieService.setCookie(REFRESH_TOKEN_KEY, refreshToken, CookieMaxage.DAY_30, res);
   }
 }

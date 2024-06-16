@@ -1,6 +1,6 @@
 import Article from '../../../domain/entities/article.entity';
 
-export interface CreateArticleDto extends Pick<Article, 'content' | 'title' | 'visible'> {
+export interface CreateArticleDto extends Pick<Article, 'title' | 'visible'> {
   /**
    * 게시글 아이디
    */
@@ -11,6 +11,8 @@ export interface CreateArticleDto extends Pick<Article, 'content' | 'title' | 'v
    */
   categoryId: number;
 
+  content: string;
+
   /**
    * 썸네일 이미지
    */
@@ -20,4 +22,6 @@ export interface CreateArticleDto extends Pick<Article, 'content' | 'title' | 'v
    * 태그 목록
    */
   tags: string[];
+
+  images: string[];
 }

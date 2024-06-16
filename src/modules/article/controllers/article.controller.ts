@@ -26,6 +26,8 @@ import ResponseCreateArticleDto from '../dto/response/article/create-article.dto
 import ArticleDto from '../dto/article.dto';
 import ResponseGetArticlesDto from '../dto/response/article/get-article.dto';
 import RequestUpdateArticleDto from '../dto/request/article/update-article.dto';
+import Requester from '../../../common/decorators/requester.decorator';
+import { IRequester } from '../../../common/types/common.type';
 
 @ApiTags('게시글')
 @Controller({ path: 'articles', version: '1' })
@@ -47,15 +49,21 @@ export default class ArticleController {
   @Swagger.getArticleDetail('게시글 상세정보 조회')
   @Public()
   @Get(':articleId')
-  async getArticleDetail(@Param('articleId') articleId: string): Promise<ArticleDto> {
-    return this.articleService.getArticleDetail(articleId);
+  async getArticleDetail(
+    @Requester() requester: IRequester,
+    @Param('articleId') articleId: string,
+  ): Promise<ArticleDto> {
+    return this.articleService.getArticleDetail(articleId, requester?.role);
   }
 
   @Swagger.getArticles('게시글 목록 조회')
   @Public()
   @Get()
-  async getArticles(@Query() query: GetArticlesQuery): Promise<ResponseGetArticlesDto> {
-    return this.articleService.getArticles(query);
+  async getArticles(
+    @Requester() requester: IRequester,
+    @Query() query: GetArticlesQuery,
+  ): Promise<ResponseGetArticlesDto> {
+    return this.articleService.getArticles(query, requester?.role);
   }
 
   @Swagger.addViewCount('게시글 조회수 증가')

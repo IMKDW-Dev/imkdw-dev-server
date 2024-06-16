@@ -12,20 +12,18 @@ import AuthService from './services/auth.service';
 import { MY_JWT_SERVICE } from '../../infra/secure/jwt/interfaces/my-jwt.interface';
 import MyJwtService from '../../infra/secure/jwt/services/my-jwt.service';
 import CookieModule from '../../infra/secure/cookie/cookie.module';
+import AuthController from './controllers/auth.controller';
 
 @Module({
   imports: [UserModule, HttpRestModule, JwtModule.register({ secret: process.env.JWT_SECRET }), CookieModule],
-  controllers: [OAuthController],
+  controllers: [OAuthController, AuthController],
   providers: [
     OAuthService,
     GoogleOAuthProvider,
     KakaoOAuthProvider,
     GithubOAuthProvider,
     AuthService,
-    {
-      provide: MY_JWT_SERVICE,
-      useClass: MyJwtService,
-    },
+    { provide: MY_JWT_SERVICE, useClass: MyJwtService },
   ],
   exports: [MY_JWT_SERVICE],
 })
