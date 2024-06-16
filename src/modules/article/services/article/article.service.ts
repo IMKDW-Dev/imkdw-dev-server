@@ -25,6 +25,7 @@ import {
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../../infra/database/prisma';
 import { UpdateArticleDto } from '../../dto/internal/article/update-article.dto';
 import ArticleContent from '../../domain/value-objects/article-content.vo';
+import UserRoles from '../../../user/enums/user-role.enum';
 
 @Injectable()
 export default class ArticleService {
@@ -69,8 +70,11 @@ export default class ArticleService {
     });
   }
 
-  async getArticleDetail(articleId: string): Promise<ArticleDto> {
-    const articleDetail = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
+  async getArticleDetail(articleId: string, userRole: string): Promise<ArticleDto> {
+    const articleDetail = await this.articleRepository.findOne({
+      id: new ArticleId(articleId),
+      includePrivate: userRole === UserRoles.ADMIN,
+    });
     if (!articleDetail) {
       throw new ArticleNotFoundException(articleId);
     }
@@ -83,7 +87,7 @@ export default class ArticleService {
     await this.articleRepository.update(article);
   }
 
-  async getArticles(dto: GetArticlesDto): Promise<ResponseGetArticlesDto> {
+  async getArticles(dto: GetArticlesDto, userRole: string): Promise<ResponseGetArticlesDto> {
     let articles: Article[] = [];
     let allCounts = 0;
     let category = null;
@@ -99,7 +103,7 @@ export default class ArticleService {
     switch (dto.sort) {
       case GetArticleSort.LATEST:
         articles = await this.articleRepository.findMany(
-          { category },
+          { category, includePrivate: userRole === UserRoles.ADMIN },
           {
             limit: dto.limit,
             orderBy: { createdAt: 'desc' },
@@ -112,7 +116,7 @@ export default class ArticleService {
         break;
       case GetArticleSort.POPULAR:
         articles = await this.articleRepository.findMany(
-          { category },
+          { category, includePrivate: userRole === UserRoles.ADMIN },
           {
             limit: dto.limit,
             orderBy: { viewCount: 'desc' },

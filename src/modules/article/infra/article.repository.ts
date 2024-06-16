@@ -65,6 +65,7 @@ export default class ArticleRepository implements IArticleRepository {
       where: {
         ...(query?.id && { id: query.id.toString() }),
         ...(query?.category && { categoryId: query.category.id }),
+        ...(!query?.includePrivate && { visible: true }),
       },
       include: articleInclude,
     });
@@ -77,6 +78,7 @@ export default class ArticleRepository implements IArticleRepository {
         ...(query?.id && { id: query.id.toString() }),
         ...(query?.category && { categoryId: query.category.id }),
         ...(option?.excludeId && { NOT: { id: option.excludeId.toString() } }),
+        ...(!query?.includePrivate && { visible: true }),
         ...(option?.search && {
           OR: [
             {

@@ -11,12 +11,7 @@ export default class ArticleContent {
 
   replaceImageUrls(paths: { fromPath: string; toPath: string }[]) {
     paths.forEach(({ fromPath, toPath }) => {
-      console.log('-'.repeat(50));
-      console.log(this.content);
-      console.log(fromPath, toPath);
       this.content = this.content.replace(fromPath, toPath);
-      console.log(this.content);
-      console.log('-'.repeat(50));
     });
 
     return this;
