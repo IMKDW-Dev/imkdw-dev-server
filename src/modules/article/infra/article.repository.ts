@@ -153,6 +153,19 @@ export default class ArticleRepository implements IArticleRepository {
     });
   }
 
+  async findIds(query: ArticleQueryFilter): Promise<string[]> {
+    const rows = await this.prisma.client.articles.findMany({
+      where: {
+        ...(!query?.includePrivate && { visible: true }),
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return rows.map((row) => row.id);
+  }
+
   async delete(article: Article, tx: TX = this.prisma.client): Promise<void> {
     await tx.articles.delete({ where: { id: article.id.toString() } });
   }

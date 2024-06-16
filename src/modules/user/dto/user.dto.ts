@@ -18,12 +18,12 @@ export default class UserDto {
     유저 닉네임
     1. 특수문자 사용불가
     2. 공백 사용불가
-    3. 2자 이상, 22자 이하
+    3. 2자 이상, 8자 이하
     4. 한글, 영문, 숫자 사용가능
   `,
     example: 'imkdw',
     minLength: 2,
-    maxLength: 22,
+    maxLength: 8,
   })
   @IsNickname()
   nickname: string;

@@ -10,4 +10,8 @@ export default class CategoryQueryService {
   async findOne(filter: CategoryQueryFilter): Promise<Category> {
     return this.categoryRepository.findOne(filter);
   }
+
+  async findNames(filter: CategoryQueryFilter): Promise<string[]> {
+    return this.categoryRepository.findNames(filter);
+  }
 }

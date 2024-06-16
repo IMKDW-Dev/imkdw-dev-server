@@ -52,6 +52,18 @@ export default class CategoryRepository implements ICategoryRepository {
     return this.toEntity(row);
   }
 
+  async findNames(filter: CategoryQueryFilter): Promise<string[]> {
+    const rows = await this.prisma.client.categories.findMany({
+      where: {
+        ...(filter?.id && { id: filter.id }),
+        ...(filter?.name && { name: { contains: filter.name } }),
+      },
+      select: { name: true },
+    });
+
+    return rows.map((row) => row.name);
+  }
+
   async findMany(filter: CategoryQueryFilter, option?: QueryOption): Promise<Category[]> {
     const rows: ICategory[] = await this.prisma.client.categories.findMany({
       where: {

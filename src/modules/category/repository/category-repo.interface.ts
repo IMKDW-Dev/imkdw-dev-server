@@ -15,6 +15,8 @@ export interface ICategoryRepository {
   ): Promise<Category[]>;
   findNextSort(): Promise<number>;
 
+  findNames(filter: CategoryQueryFilter): Promise<string[]>;
+
   save(category: Category): Promise<Category>;
 
   update(category: Category, data: UpdateCategoryDto): Promise<Category>;

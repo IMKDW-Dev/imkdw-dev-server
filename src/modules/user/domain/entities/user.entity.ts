@@ -40,7 +40,7 @@ export default class User {
   }
 
   setDefaultNickname() {
-    this.nickname = generateCUID();
+    this.nickname = generateCUID().slice(0, 8);
   }
 
   generateId() {
