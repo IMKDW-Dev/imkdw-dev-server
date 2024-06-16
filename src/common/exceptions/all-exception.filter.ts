@@ -1,14 +1,19 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { IS_LOCAL } from '../constants/env.constant';
+import { ILogger, LOGGER } from '../../infra/logger/interfaces/logger.interface';
 
 interface ExceptionResponse {
   message: string[] | string;
   error: string;
 }
+
 @Catch()
 export default class AllExceptionsFilter implements ExceptionFilter {
-  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
+  constructor(
+    private readonly httpAdapterHost: HttpAdapterHost,
+    @Inject(LOGGER) private readonly logger: ILogger,
+  ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
@@ -24,10 +29,7 @@ export default class AllExceptionsFilter implements ExceptionFilter {
       ? exceptionResponse.message[0]
       : exceptionResponse.message;
 
-    if (IS_LOCAL) {
-      // eslint-disable-next-line no-console
-      console.error(exception);
-    }
+    this.logger.error(exception);
 
     const responseBody = {
       statusCode: httpStatus,
