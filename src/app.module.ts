@@ -19,6 +19,7 @@ import AllExceptionsFilter from './common/exceptions/all-exception.filter';
 import ContactModule from './modules/contact/contact.module';
 import { PRISMA_SERVICE, extendedPrismaClient } from './infra/database/prisma';
 import SitemapModule from './infra/sitemap/sitemap.module';
+import LoggerModule from './infra/logger/logger.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import SitemapModule from './infra/sitemap/sitemap.module';
     ArticleModule,
     ContactModule,
     SitemapModule,
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [
