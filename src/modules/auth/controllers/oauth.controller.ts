@@ -47,6 +47,7 @@ export default class OAuthController {
   }
 
   @Swagger.githubOAuth('깃허브 소셜로그인')
+  @Public()
   @Post('github')
   async githubOAuth(
     @Body() body: ReqeustGithubOAuthDto,
