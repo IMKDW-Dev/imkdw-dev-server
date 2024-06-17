@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
-import { ConfigService } from '@nestjs/config';
 
 import { ARTICLE_REPOSITORY, IArticleRepository } from '../../repository/article/article-repo.interface';
 import { CreateArticleDto } from '../../dto/internal/article/create-article.dto';
@@ -36,7 +35,6 @@ export default class ArticleService {
     private readonly articleImageService: ArticleImageService,
     private readonly articleTagService: ArticleTagService,
     private readonly categoryQueryService: CategoryQueryService,
-    private readonly configService: ConfigService,
   ) {}
 
   async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<ResponseCreateArticleDto> {
