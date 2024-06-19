@@ -4,6 +4,7 @@ import UserOAuthProvider from './user-oauth-provider.entity';
 import UserRole from './user-role.entity';
 import { generateCUID } from '../../../../common/utils/cuid';
 import { generateUUID } from '../../../../common/utils/uuid';
+import { DEFAULT_PROFILE } from '../../constants/user.constant';
 
 interface UserProps {
   id?: string;
@@ -36,7 +37,7 @@ export default class User {
   role: UserRole;
 
   setDefaultProfile() {
-    this.profile = 'https://static.imkdw.dev/images/default_profile.png';
+    this.profile = DEFAULT_PROFILE;
   }
 
   setDefaultNickname() {

@@ -9,7 +9,6 @@ export default class ArticleId {
 
   addHash() {
     this.id = `${this.id}-${generateCUID().slice(0, 8)}`;
-    return this;
   }
 
   toString() {

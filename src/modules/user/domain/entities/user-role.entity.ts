@@ -7,15 +7,11 @@ export enum UserRoles {
   ADMIN = 'admin',
 }
 
-export interface UserRoleProps {
-  id: number;
-  name: string;
-}
+export interface UserRoleProps extends Partial<UserRole> {}
 
 export default class UserRole {
   constructor(props: UserRoleProps) {
-    this.id = props.id;
-    this.name = props.name;
+    Object.assign(this, props);
   }
 
   @ApiProperty({ description: 'PK', example: 1, type: Number })

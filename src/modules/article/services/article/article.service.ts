@@ -43,7 +43,9 @@ export default class ArticleService {
       throw new CategoryNotFoundException(dto.categoryId);
     }
 
-    const articleId = new ArticleId(dto.id).addHash();
+    const articleId = new ArticleId(dto.id);
+    articleId.addHash();
+
     const article = await this.articleRepository.findOne({ id: articleId });
     if (article) {
       throw new DuplicateArticleIdException(dto.id.toString());
@@ -52,10 +54,13 @@ export default class ArticleService {
     const thumbnail = await this.articleImageService.getThumbnail(articleId, file);
     const copiedImageUrls = await this.articleImageService.copyContentImages(articleId, dto.images);
 
+    const articleContent = new ArticleContent(dto.content);
+    articleContent.replaceImageUrls(copiedImageUrls);
+
     const newArticle = Article.create({
       id: articleId,
       title: dto.title,
-      content: new ArticleContent(dto.content).replaceImageUrls(copiedImageUrls),
+      content: articleContent,
       thumbnail,
       category,
       visible: dto.visible,
@@ -190,7 +195,8 @@ export default class ArticleService {
 
     if (dto?.images && dto.images.length) {
       const copiedImageUrls = await this.articleImageService.copyContentImages(article.id, dto.images);
-      article.changeContent(article.content.replaceImageUrls(copiedImageUrls));
+      article.content.replaceImageUrls(copiedImageUrls);
+      article.changeContent(article.content);
     }
 
     const updatedArticle = await this.articleRepository.update(article);
