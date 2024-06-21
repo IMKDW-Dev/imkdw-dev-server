@@ -1,8 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import UserService from '../../user/services/user.service';
 import UserOAuthProvider from '../../user/domain/entities/user-oauth-provider.entity';
-import { parseRefreshTokenByCookie } from '../../functions/cookie.function';
-import { InvalidRefreshTokenException, RefreshTokenExpiredException } from '../../../common/exceptions/401';
 import TokenService from '../../token/services/token.service';
 
 @Injectable()
@@ -15,7 +13,6 @@ export default class AuthService {
   login(userId: string) {
     const accessToken = this.tokenService.generateAccessToken(userId);
     const refreshToken = this.tokenService.generateRefreshToken(userId);
-
     return { accessToken, refreshToken, userId };
   }
 
@@ -24,17 +21,7 @@ export default class AuthService {
     return this.login(registerdUser.id);
   }
 
-  refreshToken(cookies: string) {
-    const refreshToken = parseRefreshTokenByCookie(cookies);
-    if (!refreshToken) {
-      throw new InvalidRefreshTokenException(cookies);
-    }
-
-    try {
-      const userId = this.tokenService.verify(refreshToken);
-      return this.tokenService.generateAccessToken(userId);
-    } catch {
-      throw new RefreshTokenExpiredException(cookies);
-    }
+  refreshToken(cookies: string): string {
+    return this.tokenService.refresh(cookies);
   }
 }
