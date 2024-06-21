@@ -2,10 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { IMyJwtService, JwtTokenType } from '../interfaces/my-jwt.interface';
-
 @Injectable()
-export default class MyJwtService implements IMyJwtService {
+export default class TokenService {
   private ACCESS_TOKEN_EXPIRES_IN: string;
   private REFRESH_TOKEN_EXPIRES_IN: string;
 
@@ -17,9 +15,12 @@ export default class MyJwtService implements IMyJwtService {
     this.REFRESH_TOKEN_EXPIRES_IN = this.configService.get<string>('JWT_REFRESH_TOKEN_EXPIRES_IN');
   }
 
-  generateToken(tokenType: JwtTokenType, userId: string): string {
-    const expiresIn = tokenType === 'access' ? this.ACCESS_TOKEN_EXPIRES_IN : this.REFRESH_TOKEN_EXPIRES_IN;
-    return this.jwtService.sign({ userId }, { expiresIn });
+  generateAccessToken(userId: string) {
+    return this.jwtService.sign({ userId }, { expiresIn: this.ACCESS_TOKEN_EXPIRES_IN });
+  }
+
+  generateRefreshToken(userId: string) {
+    return this.jwtService.sign({ userId }, { expiresIn: this.REFRESH_TOKEN_EXPIRES_IN });
   }
 
   verify(token: string): string {
