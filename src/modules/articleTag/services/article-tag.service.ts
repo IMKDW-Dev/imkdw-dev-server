@@ -19,7 +19,6 @@ export default class ArticleTagService {
 
     const existingTagNames = tagsByName.map((tag) => tag.name);
     const newTagNames = tagNames.filter((name) => !existingTagNames.includes(name));
-
     const newTags = await this.tagService.createMany(newTagNames);
 
     const tags = [...tagsByName, ...newTags].map((tag) => ArticleTag.create({ article, tag }));
