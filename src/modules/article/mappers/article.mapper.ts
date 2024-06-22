@@ -2,6 +2,7 @@ import Article from '../domain/entities/article.entity';
 import ArticleDto from '../dto/article.dto';
 import * as ArticleCommentMapper from './article-comment.mapper';
 import * as CategoryMapper from '../../category/mappers/category.mapper';
+import * as TagMapper from '../../tag/mappers/tag.mapper';
 
 // eslint-disable-next-line import/prefer-default-export
 export const toDto = (article: Article) =>
@@ -15,6 +16,6 @@ export const toDto = (article: Article) =>
     viewCount: article.viewCount,
     commentCount: article.commentCount,
     createdAt: article.createdAt,
-    tags: article.tags.map((tag) => tag.toDto()),
+    tags: article.tags.map((tag) => TagMapper.toDto(tag)),
     comments: article.comments.map((comment) => ArticleCommentMapper.toDto(comment)),
   });

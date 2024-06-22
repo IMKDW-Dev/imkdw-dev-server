@@ -15,10 +15,11 @@ export default class ArticleTagService {
   ) {}
 
   async createTags(article: Article, tagNames: string[], tx: TX): Promise<void> {
-    const tagsByName = await this.tagQueryService.findManyByNames(tagNames);
+    const existTags = await this.tagQueryService.findManyByNames(tagNames);
 
-    const existingTagNames = tagsByName.map((tag) => tag.name);
+    const existTagNames = existTags.map((tag) => tag.name);
     const newTagNames = tagNames.filter((name) => !existingTagNames.includes(name));
+
     const newTags = await this.tagService.createMany(newTagNames);
 
     const tags = [...tagsByName, ...newTags].map((tag) => ArticleTag.create({ article, tag }));
