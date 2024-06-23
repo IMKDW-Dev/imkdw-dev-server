@@ -26,3 +26,14 @@ jobs:
 
       - name: Test IMKDW-Dev
         run: pnpm test
+
+      - name: CI 결과 슬랙에 푸쉬
+        uses: 8398a7/action-slack@v3
+        with:
+          author_name: '[SERVER] IMKDW DEV CI Result'
+          status: ${{ job.status }}
+          fields: repo,message,author,took
+          text: ${{ steps.set_text.outputs.text }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
+        if: always()
