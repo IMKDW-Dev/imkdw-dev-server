@@ -12,6 +12,16 @@ on:
 jobs:
   Ubuntu:
     runs-on: ubuntu-latest
+    services:
+      test-db:
+        image: mysql:8.0
+        environment:
+        MYSQL_ROOT_PASSWORD: 1234
+        MYSQL_DATABASE: test
+        MYSQL_USER: root
+        MYSQL_PASSWORD: 1234
+    ports:
+      - '3306:3306'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
