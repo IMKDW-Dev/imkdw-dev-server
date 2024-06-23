@@ -2,10 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNumber, IsString } from 'class-validator';
 
-interface Props {
-  id: number;
-  name: string;
-}
+interface Props extends TagDto {}
 
 export default class TagDto {
   constructor(id: number, name: string) {

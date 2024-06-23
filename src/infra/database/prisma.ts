@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import { ClsService } from 'nestjs-cls';
 
 export const PRISMA_SERVICE = 'PRISMA_SERVICE';
-const prismaClient = new PrismaClient({});
+const prismaClient = new PrismaClient();
 
 export const extendedPrismaClient = (cls: ClsService) =>
   prismaClient.$extends({
@@ -48,7 +48,10 @@ export const extendedPrismaClient = (cls: ClsService) =>
             });
           }
 
-          return (prismaClient as any)[model].createMany({});
+          return (prismaClient as any)[model].createMany({
+            ...args,
+            data: { ...args.data, createUser: userId, updateUser: userId },
+          });
         },
         async update({ model, args }) {
           const userId = cls.get('userId');
@@ -81,4 +84,5 @@ export const extendedPrismaClient = (cls: ClsService) =>
       },
     },
   });
+
 export interface ExtendedPrismaClient extends PrismaClient {}

@@ -1,17 +1,8 @@
-interface Props {
-  id?: number;
-  name?: string;
-  email?: string;
-  subject?: string;
-  message?: string;
-}
+interface Props extends Partial<Contact> {}
+
 export default class Contact {
   constructor(props: Props) {
-    this.id = props.id;
-    this.name = props.name;
-    this.email = props.email;
-    this.subject = props.subject;
-    this.message = props.message;
+    Object.assign(this, props);
   }
 
   id: number;

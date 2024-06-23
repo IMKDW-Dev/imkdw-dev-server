@@ -1,4 +1,4 @@
-import ArticleContent from '../../domain/value-objects/article-content.vo';
+import ArticleContent from '../../../../domain/value-objects/article-content.vo';
 
 describe('ArticleContent', () => {
   describe('replaceImageUrls', () => {
