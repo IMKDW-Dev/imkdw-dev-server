@@ -1,17 +1,16 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { IMyJwtService, MY_JWT_SERVICE } from '../../../infra/secure/jwt/interfaces/my-jwt.interface';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { IRequester } from '../../../common/types/common.type';
 import UserQueryService from '../../user/services/user-query.service';
-import { parseRefreshTokenByCookie } from '../../functions/cookie.function';
+import TokenService from '../../token/services/token.service';
 
 @Injectable()
 export default class JwtGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    @Inject(MY_JWT_SERVICE) private readonly myJwtService: IMyJwtService,
+    private readonly tokenService: TokenService,
     private readonly userQueryService: UserQueryService,
   ) {}
 
@@ -21,10 +20,10 @@ export default class JwtGuard implements CanActivate {
       context.getClass(),
     ]);
     const request = context.switchToHttp().getRequest<Request>();
-    const token = parseRefreshTokenByCookie(request.headers.cookie);
+    const { accessToken } = this.tokenService.parseJwtTokenByCookie(request.headers.cookie);
 
     try {
-      const userId = this.myJwtService.verify(token) ?? '';
+      const userId = this.tokenService.verify(accessToken) ?? '';
 
       const user = await this.userQueryService.findOne({ id: userId });
       if (!user) throw new UnauthorizedException();

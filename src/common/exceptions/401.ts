@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 export const UNAUTHORIZED_EXCEPTIONS = {
-  INVALID_REFRESH_TOKEN: '401001',
+  INVALID_JWT_TOKEN: '401001',
   REFRESH_TOKEN_EXPIRED: '401002',
 } as const;
 
@@ -11,9 +11,9 @@ class UnauthorizedException extends HttpException {
   }
 }
 
-export class InvalidRefreshTokenException extends UnauthorizedException {
+export class InvalidJwtTokenException extends UnauthorizedException {
   constructor(cookie: string) {
-    super(UNAUTHORIZED_EXCEPTIONS.INVALID_REFRESH_TOKEN, `Invalid refresh token of cookie, ${cookie}`);
+    super(UNAUTHORIZED_EXCEPTIONS.INVALID_JWT_TOKEN, `Invalid refresh token of cookie, ${cookie}`);
   }
 }
 

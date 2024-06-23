@@ -37,12 +37,6 @@ export default class Article {
     this.commentCount += 1;
   }
 
-  addHashOnId() {
-    this.id.addHash();
-  }
-
-  replaceContentImageUrl() {}
-
   addViewCount() {
     this.viewCount += 1;
   }

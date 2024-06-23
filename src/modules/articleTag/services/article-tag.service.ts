@@ -5,6 +5,7 @@ import TagService from '../../tag/services/tag.service';
 import Article from '../../article/domain/entities/article.entity';
 import ArticleTag from '../domain/entities/article-tag.entity';
 import { TX } from '../../../@types/prisma/prisma.type';
+import { getNewTags } from '../functions/separate-tag.function';
 
 @Injectable()
 export default class ArticleTagService {
@@ -15,14 +16,10 @@ export default class ArticleTagService {
   ) {}
 
   async createTags(article: Article, tagNames: string[], tx: TX): Promise<void> {
-    const tagsByName = await this.tagQueryService.findManyByNames(tagNames);
+    const existTags = await this.tagQueryService.findManyByNames(tagNames);
+    const createdTags = await this.tagService.createMany(getNewTags(existTags, tagNames), tx);
 
-    const existingTagNames = tagsByName.map((tag) => tag.name);
-    const newTagNames = tagNames.filter((name) => !existingTagNames.includes(name));
-
-    const newTags = await this.tagService.createMany(newTagNames);
-
-    const tags = [...tagsByName, ...newTags].map((tag) => ArticleTag.create({ article, tag }));
+    const tags = [...existTags, ...createdTags].map((tag) => ArticleTag.create({ article, tag }));
     await this.articleTagRepository.createMany(article, tags, tx);
   }
 

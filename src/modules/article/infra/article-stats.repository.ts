@@ -11,7 +11,11 @@ export default class ArticleStatsRepository implements IArticleStatsRepository {
   constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
 
   async findStats(): Promise<ArticleStats> {
-    const articles = await this.prisma.client.articles.findMany();
+    const articles = await this.prisma.client.articles.findMany({
+      where: {
+        visible: true,
+      },
+    });
     const commentCount = await this.prisma.client.articleComments.count();
 
     return this.toEntity(articles, commentCount);

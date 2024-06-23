@@ -9,15 +9,13 @@ export default class ArticleContent {
     return this.content;
   }
 
+  changeContent(content: string) {
+    this.content = content;
+  }
+
   replaceImageUrls(paths: { fromPath: string; toPath: string }[]) {
     paths.forEach(({ fromPath, toPath }) => {
       this.content = this.content.replace(fromPath, toPath);
     });
-
-    return this;
-  }
-
-  changeContent(content: string) {
-    this.content = content;
   }
 }

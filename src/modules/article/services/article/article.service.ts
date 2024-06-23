@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
-import { ConfigService } from '@nestjs/config';
 
 import { ARTICLE_REPOSITORY, IArticleRepository } from '../../repository/article/article-repo.interface';
 import { CreateArticleDto } from '../../dto/internal/article/create-article.dto';
@@ -36,7 +35,6 @@ export default class ArticleService {
     private readonly articleImageService: ArticleImageService,
     private readonly articleTagService: ArticleTagService,
     private readonly categoryQueryService: CategoryQueryService,
-    private readonly configService: ConfigService,
   ) {}
 
   async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<ResponseCreateArticleDto> {
@@ -45,19 +43,26 @@ export default class ArticleService {
       throw new CategoryNotFoundException(dto.categoryId);
     }
 
-    const articleId = new ArticleId(dto.id).addHash();
+    const articleId = new ArticleId(dto.id);
+    articleId.addHash();
+
     const article = await this.articleRepository.findOne({ id: articleId });
     if (article) {
       throw new DuplicateArticleIdException(dto.id.toString());
     }
 
     const thumbnail = await this.articleImageService.getThumbnail(articleId, file);
-    const copiedImageUrls = await this.articleImageService.copyContentImages(articleId, dto.images);
+
+    const articleContent = new ArticleContent(dto.content);
+    if (dto?.images && dto.images.length) {
+      const copiedImageUrls = await this.articleImageService.copyContentImages(articleId, dto.images);
+      articleContent.replaceImageUrls(copiedImageUrls);
+    }
 
     const newArticle = Article.create({
       id: articleId,
       title: dto.title,
-      content: new ArticleContent(dto.content).replaceImageUrls(copiedImageUrls),
+      content: articleContent,
       thumbnail,
       category,
       visible: dto.visible,
@@ -142,8 +147,12 @@ export default class ArticleService {
     return ResponseGetArticlesDto.create(offsetPagingResult);
   }
 
-  async addViewCount(articleId: string): Promise<void> {
-    const article = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
+  async addViewCount(articleId: string, userRole: string): Promise<void> {
+    const article = await this.articleRepository.findOne({
+      id: new ArticleId(articleId),
+      includePrivate: userRole === UserRoles.ADMIN,
+    });
+
     if (!article) {
       throw new ArticleNotFoundException(articleId);
     }
@@ -192,7 +201,8 @@ export default class ArticleService {
 
     if (dto?.images && dto.images.length) {
       const copiedImageUrls = await this.articleImageService.copyContentImages(article.id, dto.images);
-      article.changeContent(article.content.replaceImageUrls(copiedImageUrls));
+      article.content.replaceImageUrls(copiedImageUrls);
+      article.changeContent(article.content);
     }
 
     const updatedArticle = await this.articleRepository.update(article);

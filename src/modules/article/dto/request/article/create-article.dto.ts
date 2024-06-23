@@ -1,6 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsNumber, IsString } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
 
 import ArticleDto from '../../article.dto';
 
@@ -23,5 +23,6 @@ export default class RequestCreateArticleDto extends PickType(ArticleDto, ['id',
   @ApiProperty({ description: '업로드된 이미지의 이름들', example: ['image1.jpg', 'image2.jpg'] })
   @IsArray()
   @IsString({ each: true })
+  @IsOptional()
   images: string[];
 }

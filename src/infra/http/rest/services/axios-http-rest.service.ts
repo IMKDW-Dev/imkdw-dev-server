@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { HttpRestService } from '../interfaces/http-rest.interface';
+import { IHttpRestService } from '../interfaces/http-rest.interface';
 
 @Injectable()
-export default class AxiosHttpRestService implements HttpRestService {
+export default class AxiosHttpRestService implements IHttpRestService {
   private instance: AxiosInstance;
 
   constructor() {
