@@ -1,0 +1,36 @@
+name: ci
+on:
+  push:
+    paths:
+      - 'prisma/**'
+      - 'src/**'
+      - 'test/**'
+      - 'package.json'
+  pull_request:
+    paths:
+      - 'prisma/**'
+      - 'src/**'
+      - 'test/**'
+      - 'package.json'
+
+jobs:
+  Ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install IMKDW-Dev
+        run: pnpm install
+
+      - name: Compile IMKDW-Dev
+        run: pnpm build
+
+      - name: Validate through EsLint
+        run: pnpm eslint
+
+      - name: Test IMKDW-Dev
+        run: pnpm test

@@ -14,10 +14,11 @@ export default function IsArticleId(validationOptions?: ValidationOptions) {
           /**
            * * 게시글 아이디 유효성 규칙
            * 1. 공백이 있으면 안된다.
-           * 2. 1~245자까지 허용된다
+           * 2. 10~245자까지 허용된다.
+           * 3. 영문, 숫자, 특수문자만 포함한다.
            */
           if (!articleId) return false;
-          const articleIdRegex = /^[^\s]{1,245}$/;
+          const articleIdRegex = /^[a-zA-Z0-9!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,245}$/;
           return articleIdRegex.test(articleId);
         },
       },

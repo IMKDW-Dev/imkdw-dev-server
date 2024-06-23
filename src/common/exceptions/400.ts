@@ -7,6 +7,8 @@ export const BAD_REQUEST_EXCEPTIONS = {
   INVALID_ARTICLE_ID: '400003',
   INVALID_ARTICLE_TITLE: '400004',
   INVALID_ARTICLE_CONTENT: '400005',
+  INVALID_TAG_NAME: '400006',
+  INVALID_COMMENT_CONTENT: '400007',
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

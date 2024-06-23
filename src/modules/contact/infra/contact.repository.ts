@@ -11,15 +11,7 @@ export default class ContactRepository implements IContactRepository {
   constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
 
   async save(contact: Contact): Promise<Contact> {
-    const row = await this.prisma.client.contacts.create({
-      data: {
-        name: contact.name,
-        email: contact.email,
-        subject: contact.subject,
-        message: contact.message,
-      },
-    });
-
+    const row = await this.prisma.client.contacts.create({ data: contact });
     return this.toEntity(row);
   }
 

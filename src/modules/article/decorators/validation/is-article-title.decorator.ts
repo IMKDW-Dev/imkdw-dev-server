@@ -13,10 +13,10 @@ export default function IsArticleTitle(validationOptions?: ValidationOptions) {
         validate(title: string) {
           /**
            * * 게시글 제목 유효성 규칙
-           * 1. 1~255자까지 허용된다
+           * 1. 10~255자까지 허용된다
            */
           if (!title) return false;
-          const titleRegex = /^.{1,255}$/;
+          const titleRegex = /^.{10,255}$/;
           return titleRegex.test(title);
         },
       },
