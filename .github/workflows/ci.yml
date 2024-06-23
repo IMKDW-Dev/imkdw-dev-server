@@ -35,5 +35,5 @@ jobs:
           fields: repo,message,author,took
           text: ${{ steps.set_text.outputs.text }}
         env:
-          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         if: always()
