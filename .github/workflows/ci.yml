@@ -1,17 +1,9 @@
 name: ci
 on:
-  push:
-    paths:
-      - 'prisma/**'
-      - 'src/**'
-      - 'test/**'
-      - 'package.json'
   pull_request:
-    paths:
-      - 'prisma/**'
-      - 'src/**'
-      - 'test/**'
-      - 'package.json'
+    branches:
+      - develop
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   Ubuntu:
