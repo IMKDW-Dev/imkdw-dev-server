@@ -69,8 +69,8 @@ export default class ArticleController {
   @Swagger.addViewCount('게시글 조회수 증가')
   @Public()
   @Patch(':articleId/view')
-  async addViewCount(@Param('articleId') articleId: string) {
-    return this.articleService.addViewCount(articleId);
+  async addViewCount(@Param('articleId') articleId: string, @Requester() requester: IRequester) {
+    return this.articleService.addViewCount(articleId, requester?.role);
   }
 
   @Swagger.deleteArticle('게시글 삭제')

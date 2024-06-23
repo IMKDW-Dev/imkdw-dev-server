@@ -52,10 +52,12 @@ export default class ArticleService {
     }
 
     const thumbnail = await this.articleImageService.getThumbnail(articleId, file);
-    const copiedImageUrls = await this.articleImageService.copyContentImages(articleId, dto.images);
 
     const articleContent = new ArticleContent(dto.content);
-    articleContent.replaceImageUrls(copiedImageUrls);
+    if (dto?.images && dto.images.length) {
+      const copiedImageUrls = await this.articleImageService.copyContentImages(articleId, dto.images);
+      articleContent.replaceImageUrls(copiedImageUrls);
+    }
 
     const newArticle = Article.create({
       id: articleId,
@@ -145,8 +147,12 @@ export default class ArticleService {
     return ResponseGetArticlesDto.create(offsetPagingResult);
   }
 
-  async addViewCount(articleId: string): Promise<void> {
-    const article = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
+  async addViewCount(articleId: string, userRole: string): Promise<void> {
+    const article = await this.articleRepository.findOne({
+      id: new ArticleId(articleId),
+      includePrivate: userRole === UserRoles.ADMIN,
+    });
+
     if (!article) {
       throw new ArticleNotFoundException(articleId);
     }
