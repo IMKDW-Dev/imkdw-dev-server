@@ -12,7 +12,6 @@ import { GetArticlesDto } from '../../dto/internal/article/get-article.dto';
 import { GetArticleSort } from '../../enums/article.enum';
 import Article from '../../domain/entities/article.entity';
 import ArticleId from '../../domain/value-objects/article-id.vo';
-import ResponseCreateArticleDto from '../../dto/response/article/create-article.dto';
 import ArticleDto from '../../dto/article.dto';
 import * as ArticleMapper from '../../mappers/article.mapper';
 import ResponseGetArticlesDto from '../../dto/response/article/get-article.dto';
@@ -25,6 +24,7 @@ import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../../infra/database
 import { UpdateArticleDto } from '../../dto/internal/article/update-article.dto';
 import ArticleContent from '../../domain/value-objects/article-content.vo';
 import UserRoles from '../../../user/enums/user-role.enum';
+import CategoryService from '../../../category/services/category.service';
 
 @Injectable()
 export default class ArticleService {
@@ -35,9 +35,10 @@ export default class ArticleService {
     private readonly articleImageService: ArticleImageService,
     private readonly articleTagService: ArticleTagService,
     private readonly categoryQueryService: CategoryQueryService,
+    private readonly categoryService: CategoryService,
   ) {}
 
-  async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<ResponseCreateArticleDto> {
+  async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<Article> {
     const category = await this.categoryQueryService.findOne({ id: dto.categoryId });
     if (!category) {
       throw new CategoryNotFoundException(dto.categoryId);
@@ -71,7 +72,8 @@ export default class ArticleService {
     return this.prisma.client.$transaction(async (tx) => {
       const createdArticle = await this.articleRepository.save(newArticle, tx);
       await this.articleTagService.createTags(createdArticle, dto.tags, tx);
-      return ResponseCreateArticleDto.create(createdArticle);
+      await this.categoryService.addArticleCount(category, tx);
+      return createdArticle;
     });
   }
 

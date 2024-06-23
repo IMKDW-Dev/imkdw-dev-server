@@ -9,6 +9,7 @@ import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
 import CategoryDto from '../dto/category.dto';
 import { CategoryHaveArticlesException } from '../../../common/exceptions/403';
 import * as CategoryMapper from '../mappers/category.mapper';
+import { TX } from '../../../@types/prisma/prisma.type';
 
 @Injectable()
 export default class CategoryService {
@@ -27,8 +28,11 @@ export default class CategoryService {
     const newCategory = Category.create({ name: dto.name, sort: nextSort, desc: dto.desc });
 
     const category = await this.categoryRepository.save(newCategory);
+
     const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
-    const updatedCategory = await this.categoryRepository.update(category, { image: thumbnail });
+    category.changeImage(thumbnail);
+
+    const updatedCategory = await this.categoryRepository.update(category, null);
 
     return CategoryMapper.toDto(updatedCategory);
   }
@@ -57,11 +61,11 @@ export default class CategoryService {
     }
 
     if (dto?.sort) {
-      await this.categoryRepository.updateSort(categoryId, dto.sort);
+      const updatedCategory = await this.categoryRepository.updateSort(categoryId, dto.sort);
+      category.changeSort(updatedCategory.sort);
     }
 
-    const { sort, ...withoutSort } = updateData;
-    const updatedCategory = await this.categoryRepository.update(category, withoutSort);
+    const updatedCategory = await this.categoryRepository.update(category, null);
     return CategoryDto.create(updatedCategory);
   }
 
@@ -73,6 +77,11 @@ export default class CategoryService {
     }
 
     await this.categoryRepository.delete(category);
+  }
+
+  async addArticleCount(category: Category, tx: TX) {
+    category.addArticleCount();
+    await this.categoryRepository.update(category, tx);
   }
 
   async checkCategoryAndReturn(categoryId: number): Promise<Category> {

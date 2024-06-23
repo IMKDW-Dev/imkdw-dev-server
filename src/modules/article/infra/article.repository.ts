@@ -207,6 +207,7 @@ export default class ArticleRepository implements IArticleRepository {
       image: row.category.image,
       desc: row.category.desc,
       sort: row.category.sort,
+      articleCount: row.category.articleCount,
     });
 
     return Article.create({

@@ -140,11 +140,12 @@ model articleTags {
 }
 
 model categories {
-  id    Int     @id @default(autoincrement())
-  name  String  @unique @db.VarChar(20)
-  image String? @db.VarChar(255)
-  desc  String  @db.VarChar(255)
-  sort  Int
+  id           Int     @id @default(autoincrement())
+  name         String  @unique @db.VarChar(20)
+  image        String? @db.VarChar(255)
+  desc         String  @db.VarChar(255)
+  articleCount Int     @default(0) @map("article_cnt")
+  sort         Int
 
   createdAt  DateTime   @default(now()) @map("create_at")
   createUser String     @default("_system") @map("create_user")

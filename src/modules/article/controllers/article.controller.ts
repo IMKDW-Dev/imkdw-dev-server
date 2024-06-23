@@ -43,7 +43,8 @@ export default class ArticleController {
     @Body() dto: RequestCreateArticleDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ResponseCreateArticleDto> {
-    return this.articleService.createArticle(dto, file);
+    const createdArticle = await this.articleService.createArticle(dto, file);
+    return ResponseCreateArticleDto.create(createdArticle);
   }
 
   @Swagger.getArticleDetail('게시글 상세정보 조회')

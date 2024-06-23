@@ -20,6 +20,6 @@ import StorageModule from '../../infra/storage/storage.module';
       useClass: CategoryRepository,
     },
   ],
-  exports: [CategoryQueryService],
+  exports: [CategoryQueryService, CategoryService],
 })
 export default class CategoryModule {}

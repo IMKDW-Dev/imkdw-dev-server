@@ -1,9 +1,9 @@
 import { InjectionToken } from '@nestjs/common';
 import { CategoryQueryFilter } from './category-query.filter';
 import Category from '../domain/entities/category.entity';
-import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
 import { QueryOption } from '../../../common/interfaces/common-query.filter';
 import Article from '../../article/domain/entities/article.entity';
+import { TX } from '../../../@types/prisma/prisma.type';
 
 export const CATEGORY_REPOSITORY: InjectionToken = Symbol('CATEGORY_REPOSITORY');
 
@@ -19,8 +19,8 @@ export interface ICategoryRepository {
 
   save(category: Category): Promise<Category>;
 
-  update(category: Category, data: UpdateCategoryDto): Promise<Category>;
-  updateSort(id: number, newSort: number): Promise<void>;
+  update(category: Category, tx: TX): Promise<Category>;
+  updateSort(id: number, newSort: number): Promise<Category>;
 
   delete(category: Category): Promise<void>;
 }
