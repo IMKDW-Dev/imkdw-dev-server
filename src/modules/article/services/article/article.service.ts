@@ -82,6 +82,7 @@ export default class ArticleService {
       id: new ArticleId(articleId),
       includePrivate: userRole === UserRoles.ADMIN,
     });
+
     if (!articleDetail) {
       throw new ArticleNotFoundException(articleId);
     }

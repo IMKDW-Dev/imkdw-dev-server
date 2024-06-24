@@ -12,16 +12,6 @@ on:
 jobs:
   Ubuntu:
     runs-on: ubuntu-latest
-    services:
-      test-db:
-        image: mysql:8.0
-        environment:
-        MYSQL_ROOT_PASSWORD: 1234
-        MYSQL_DATABASE: test
-        MYSQL_USER: root
-        MYSQL_PASSWORD: 1234
-    ports:
-      - '3306:3306'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -29,19 +19,19 @@ jobs:
         with:
           version: 8
 
-      - name: Install IMKDW-Dev
+      - name: Install pnpm
         run: pnpm install
 
-      - name: Compile IMKDW-Dev
+      - name: Build
         run: pnpm build
 
-      - name: Validate through EsLint
+      - name: Lint
         run: pnpm eslint
 
-      - name: Test IMKDW-Dev
+      - name: Test
         run: pnpm test
 
-      - name: CI 결과 슬랙에 푸쉬
+      - name: Push CI Result on Slack
         uses: 8398a7/action-slack@v3
         with:
           author_name: '[SERVER] IMKDW DEV CI Result'

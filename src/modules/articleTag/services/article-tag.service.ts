@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ARTICE_TAG_REPOSITORY, IArticleTagRepository } from '../repository/article-tag-repo.inteface';
+import { ARTICLE_TAG_REPOSITORY, IArticleTagRepository } from '../repository/article-tag-repo.inteface';
 import TagQueryService from '../../tag/services/tag-query.service';
 import TagService from '../../tag/services/tag.service';
 import Article from '../../article/domain/entities/article.entity';
@@ -10,7 +10,7 @@ import { getNewTags } from '../functions/separate-tag.function';
 @Injectable()
 export default class ArticleTagService {
   constructor(
-    @Inject(ARTICE_TAG_REPOSITORY) private readonly articleTagRepository: IArticleTagRepository,
+    @Inject(ARTICLE_TAG_REPOSITORY) private readonly articleTagRepository: IArticleTagRepository,
     private readonly tagQueryService: TagQueryService,
     private readonly tagService: TagService,
   ) {}

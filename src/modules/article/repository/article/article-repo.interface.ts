@@ -9,7 +9,7 @@ export interface IArticleRepository {
   findMany(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<Article[]>;
   findCounts(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<number>;
   findIds(query: ArticleQueryFilter): Promise<string[]>;
-  save(article: Article, tx: TX): Promise<Article>;
+  save(article: Article, tx?: TX): Promise<Article>;
   update(article: Article): Promise<Article>;
   delete(article: Article, tx: TX): Promise<void>;
 }
