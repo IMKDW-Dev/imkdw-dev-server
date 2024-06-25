@@ -4,10 +4,11 @@ import { categories } from '@prisma/client';
 
 import { ICategoryRepository } from '../repository/category-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
-import Category from '../domain/entities/category.entity';
 import { CategoryQueryFilter } from '../repository/category-query.filter';
 import { QueryOption } from '../../../common/interfaces/common-query.filter';
 import { TX } from '../../../@types/prisma/prisma.type';
+import { CategoryQueryOption } from '../repository/category-query.option';
+import Category from '../domain/models/category.model';
 
 @Injectable()
 export default class CategoryRepository implements ICategoryRepository {
@@ -28,13 +29,22 @@ export default class CategoryRepository implements ICategoryRepository {
     return maxSort._max.sort ? maxSort._max.sort + 1 : 1;
   }
 
+  async findAll(option: CategoryQueryOption): Promise<Category[]> {
+    const rows = await this.prisma.client.categories.findMany({
+      ...(option?.limit && { take: option.limit }),
+      orderBy: { sort: 'asc' },
+    });
+
+    return rows.map((row) => this.toEntity(row));
+  }
+
   async save(category: Category): Promise<Category> {
     const row = await this.prisma.client.categories.create({
       data: {
-        name: category.name,
-        sort: category.sort,
-        desc: category.desc,
-        image: category.image,
+        name: category.getName(),
+        sort: category.getSort(),
+        desc: category.getDesc(),
+        image: category.getImage(),
       },
     });
 
@@ -68,12 +78,12 @@ export default class CategoryRepository implements ICategoryRepository {
 
   async update(category: Category, tx: TX = this.prisma.client): Promise<Category> {
     const updatedCategory = await tx.categories.update({
-      where: { id: category.id },
+      where: { id: category.getId() },
       data: {
-        name: category.name,
-        desc: category.desc,
-        image: category.image,
-        sort: category.sort,
+        name: category.getName(),
+        desc: category.getDesc(),
+        image: category.getImage(),
+        sort: category.getSort(),
       },
     });
 
@@ -105,17 +115,17 @@ export default class CategoryRepository implements ICategoryRepository {
   }
 
   async delete(category: Category): Promise<void> {
-    await this.prisma.client.categories.delete({ where: { id: category.id } });
+    await this.prisma.client.categories.delete({ where: { id: category.getId() } });
   }
 
   private toEntity(category: categories) {
-    return Category.create({
-      id: category.id,
-      name: category.name,
-      image: category.image,
-      desc: category.desc,
-      sort: category.sort,
-      articleCount: category.articleCount,
-    });
+    return new Category.builder()
+      .setId(category.id)
+      .setName(category.name)
+      .setDesc(category.desc)
+      .setImage(category.image)
+      .setSort(category.sort)
+      .setArticleCount(category.articleCount)
+      .build();
   }
 }

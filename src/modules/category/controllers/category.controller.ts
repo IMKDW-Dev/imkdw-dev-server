@@ -39,10 +39,10 @@ export default class CategoryController {
   @UseGuards(AdminGuard)
   @Roles(userRoles.admin.name)
   async createCategory(
-    @Body() body: RequestCreateCategoryDto,
+    @Body() dto: RequestCreateCategoryDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<CategoryDto> {
-    return this.categoryService.createCategory({ name: body.name, desc: body.desc, image: file });
+    return this.categoryService.createCategory({ name: dto.name, desc: dto.desc, image: file });
   }
 
   @Swagger.getCategories('카테고리 목록 조회')
@@ -52,7 +52,7 @@ export default class CategoryController {
     @Query('limit', new DefaultValuePipe(999), ParseIntPipe) limit?: number,
   ): Promise<ResponseGetCategoriesDto> {
     const categories = await this.categoryService.getCategories(limit);
-    return ResponseGetCategoriesDto.create(categories);
+    return new ResponseGetCategoriesDto(categories);
   }
 
   @Swagger.getCategory('카테고리 상세 조회')

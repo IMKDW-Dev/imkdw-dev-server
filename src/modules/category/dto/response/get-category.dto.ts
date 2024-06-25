@@ -8,8 +8,4 @@ export default class ResponseGetCategoriesDto {
 
   @ApiProperty({ description: '카테고리 목록', type: [CategoryDto] })
   categories: CategoryDto[];
-
-  static create(categories: CategoryDto[]): ResponseGetCategoriesDto {
-    return new ResponseGetCategoriesDto(categories);
-  }
 }

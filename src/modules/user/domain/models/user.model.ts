@@ -5,7 +5,7 @@ import UserOAuthProvider from './user-oauth-provider.model';
 import UserRole from './user-role.model';
 
 export default class User {
-  constructor(
+  private constructor(
     id: UserId,
     email: string,
     nickname: Nickname,
