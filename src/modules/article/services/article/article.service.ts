@@ -23,8 +23,8 @@ import {
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../../infra/database/prisma';
 import { UpdateArticleDto } from '../../dto/internal/article/update-article.dto';
 import ArticleContent from '../../domain/value-objects/article-content.vo';
-import UserRoles from '../../../user/enums/user-role.enum';
 import CategoryService from '../../../category/services/category.service';
+import { userRoles } from '../../../user/domain/models/user-role.model';
 
 @Injectable()
 export default class ArticleService {
@@ -80,7 +80,7 @@ export default class ArticleService {
   async getArticleDetail(articleId: string, userRole: string): Promise<ArticleDto> {
     const articleDetail = await this.articleRepository.findOne({
       id: new ArticleId(articleId),
-      includePrivate: userRole === UserRoles.ADMIN,
+      includePrivate: userRole === userRoles.admin.name,
     });
 
     if (!articleDetail) {
@@ -111,7 +111,7 @@ export default class ArticleService {
     switch (dto.sort) {
       case GetArticleSort.LATEST:
         articles = await this.articleRepository.findMany(
-          { category, includePrivate: userRole === UserRoles.ADMIN },
+          { category, includePrivate: userRole === userRoles.admin.name },
           {
             limit: dto.limit,
             orderBy: { createdAt: 'desc' },
@@ -124,7 +124,7 @@ export default class ArticleService {
         break;
       case GetArticleSort.POPULAR:
         articles = await this.articleRepository.findMany(
-          { category, includePrivate: userRole === UserRoles.ADMIN },
+          { category, includePrivate: userRole === userRoles.admin.name },
           {
             limit: dto.limit,
             orderBy: { viewCount: 'desc' },
@@ -153,7 +153,7 @@ export default class ArticleService {
   async addViewCount(articleId: string, userRole: string): Promise<void> {
     const article = await this.articleRepository.findOne({
       id: new ArticleId(articleId),
-      includePrivate: userRole === UserRoles.ADMIN,
+      includePrivate: userRole === userRoles.admin.name,
     });
 
     if (!article) {

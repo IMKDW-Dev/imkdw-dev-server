@@ -14,8 +14,8 @@ class ConfilctException extends HttpException {
 }
 
 export class DuplicateEmailException extends ConfilctException {
-  constructor(email?: string) {
-    super(CONFLICT_EXCEPTIONS.DUPLICATE_EMAIL, `${email} is already in use`);
+  constructor(error: unknown) {
+    super(CONFLICT_EXCEPTIONS.DUPLICATE_EMAIL, error);
   }
 }
 
@@ -32,7 +32,7 @@ export class DuplicateArticleIdException extends ConfilctException {
 }
 
 export class DuplicateNicknameException extends ConfilctException {
-  constructor(nickname?: string) {
-    super(CONFLICT_EXCEPTIONS.DUPLICATE_NICKNAME, `${nickname} is already in use`);
+  constructor(error: unknown) {
+    super(CONFLICT_EXCEPTIONS.DUPLICATE_NICKNAME, error);
   }
 }

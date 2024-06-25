@@ -6,10 +6,7 @@ export const USER_REPOSITORY: InjectionToken = Symbol('USER_REPOSITORY');
 
 export interface IUserRepository {
   findOne(filter: UserQueryFilter): Promise<User | null>;
-
   save(user: User): Promise<User>;
-
-  update(userId: string, user: User): Promise<User>;
-
+  update(user: User): Promise<User>;
   count(): Promise<number>;
 }

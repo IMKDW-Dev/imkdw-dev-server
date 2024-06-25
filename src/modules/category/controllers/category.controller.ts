@@ -19,13 +19,13 @@ import { ApiTags } from '@nestjs/swagger';
 import * as Swagger from '../docs/category.swagger';
 import AdminGuard from '../../auth/guards/admin.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import UserRoles from '../../user/enums/user-role.enum';
 import CategoryService from '../services/category.service';
 import RequestCreateCategoryDto from '../dto/request/create-category.dto';
 import { Public } from '../../auth/decorators/public.decorator';
 import RequestUpdateCategoryDto from '../dto/request/update-category.dto';
 import CategoryDto from '../dto/category.dto';
 import ResponseGetCategoriesDto from '../dto/response/get-category.dto';
+import { userRoles } from '../../user/domain/models/user-role.model';
 
 @ApiTags('카테고리')
 @Controller({ path: 'categories', version: '1' })
@@ -37,7 +37,7 @@ export default class CategoryController {
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   @UseGuards(AdminGuard)
-  @Roles(UserRoles.ADMIN)
+  @Roles(userRoles.admin.name)
   async createCategory(
     @Body() body: RequestCreateCategoryDto,
     @UploadedFile() file: Express.Multer.File,
@@ -65,7 +65,7 @@ export default class CategoryController {
   // TODO: 이미지 검증 파이프 추가하기
   @Swagger.updateCategory('카테고리 수정')
   @UseGuards(AdminGuard)
-  @Roles(UserRoles.ADMIN)
+  @Roles(userRoles.admin.name)
   @UseInterceptors(FileInterceptor('image'))
   @Patch(':categoryId')
   async updateCategory(
@@ -78,7 +78,7 @@ export default class CategoryController {
 
   @Swagger.deleteCategory('카테고리 삭제')
   @UseGuards(AdminGuard)
-  @Roles(UserRoles.ADMIN)
+  @Roles(userRoles.admin.name)
   @Delete(':categoryId')
   async deleteCategory(@Param('categoryId', ParseIntPipe) categoryId: number): Promise<void> {
     await this.categoryService.deleteCategory(categoryId);

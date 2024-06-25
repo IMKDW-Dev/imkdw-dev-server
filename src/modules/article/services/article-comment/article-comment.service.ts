@@ -8,11 +8,11 @@ import {
 } from '../../repository/article-comment/article-comment-repo.interface';
 import ArticleService from '../article/article.service';
 import ArticleQueryService from '../article/article-query.service';
-import UserQueryService from '../../../user/services/user-query.service';
 import ArticleCommentDto from '../../dto/article-comment.dto';
 import { CreateCommentDto } from '../../dto/internal/article-comment/create-comment.dto';
 import ArticleId from '../../domain/value-objects/article-id.vo';
 import ArticleComment from '../../domain/entities/article-comment.entity';
+import UserService from '../../../user/services/user.service';
 
 @Injectable()
 export default class ArticleCommentService {
@@ -20,13 +20,13 @@ export default class ArticleCommentService {
     @Inject(ARTICLE_COMMENT_REPOSITORY) private readonly articleCommentRepository: IArticleCommentRepository,
     private readonly articleService: ArticleService,
     private readonly articleQueryService: ArticleQueryService,
-    private readonly userQueryService: UserQueryService,
+    private readonly userQueryService: UserService,
   ) {}
 
   async createComment(dto: CreateCommentDto): Promise<ArticleCommentDto> {
     const article = await this.articleQueryService.findOne({ id: new ArticleId(dto.articleId) });
     if (!article) {
-      throw new ArticleNotFoundException(dto.articleId);
+      throw new ArticleNotFoundException(`게시글을 찾을 수 없습니다. 게시글 ID: '${dto.articleId}`);
     }
 
     const user = await this.userQueryService.findOne({ id: dto.userId });

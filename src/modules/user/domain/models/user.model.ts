@@ -40,6 +40,22 @@ export default class User {
     return this.profile.toString();
   }
 
+  getEmail(): string {
+    return this.email;
+  }
+
+  getRoleId(): number {
+    return this.role.getId();
+  }
+
+  getRole() {
+    return this.role.toString();
+  }
+
+  getOAuthProviderId(): number {
+    return this.oAuthProvider.getId();
+  }
+
   isSignupWithOAuth(provider: UserOAuthProvider) {
     return this.oAuthProvider.equals(provider);
   }

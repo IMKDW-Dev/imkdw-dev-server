@@ -1,22 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import UserQueryService from '../../user/services/user-query.service';
 import { DuplicateEmailException } from '../../../common/exceptions/409';
 import AuthService from './auth.service';
-import UserOAuthQueryService from '../../user/services/user-oauth-query.service';
-import { OAuthProviders } from '../../user/domain/models/user-oauth-provider.model';
 import { HTTP_REST_SERVICE, IHttpRestService } from '../../../infra/http/rest/interfaces/http-rest.interface';
 import { GithubUserInfo, GoogleOAuthUserInfo } from '../../../@types/auth/oauth/google.type';
 import { KakaoOAuthToken, KakaoUserInfo } from '../../../@types/auth/oauth/kakao.type';
 import { GithubOAuthToken } from '../../../@types/auth/oauth/github.type';
+import UserOAuthProvider from '../../user/domain/models/user-oauth-provider.model';
+import UserService from '../../user/services/user.service';
 
 @Injectable()
 export default class OAuthService {
   constructor(
-    private readonly userQueryService: UserQueryService,
-    private readonly userOAuthProviderQueryService: UserOAuthQueryService,
     private readonly authService: AuthService,
+    private readonly userService: UserService,
     @Inject(HTTP_REST_SERVICE) private readonly httpRestService: IHttpRestService,
     private readonly configService: ConfigService,
   ) {}
@@ -28,7 +26,7 @@ export default class OAuthService {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
-    return this.handleOAuth(OAuthProviders.GOOGLE, userInfo.email);
+    return this.handleOAuth(UserOAuthProvider.GOOGLE, userInfo.email);
   }
 
   async kakaoOAuth(code: string, redirectUri: string) {
@@ -55,7 +53,7 @@ export default class OAuthService {
       },
     });
 
-    return this.handleOAuth(OAuthProviders.KAKAO, userInfo.kakao_account.email);
+    return this.handleOAuth(UserOAuthProvider.KAKAO, userInfo.kakao_account.email);
   }
 
   async githubOAuth(code: string, redirectUri: string) {
@@ -81,21 +79,20 @@ export default class OAuthService {
       headers: { Authorization: `token ${getTokenResponse.access_token}` },
     });
 
-    return this.handleOAuth(OAuthProviders.GITHUB, userInfo.email);
+    return this.handleOAuth(UserOAuthProvider.GITHUB, userInfo.email);
   }
 
-  private async handleOAuth(provider: OAuthProviders, email: string) {
-    const userByEmail = await this.userQueryService.findOne({ email });
-    const userOAuthProvider = await this.userOAuthProviderQueryService.findOne({ name: provider });
+  private async handleOAuth(provider: UserOAuthProvider, email: string) {
+    const userByEmail = await this.userService.findOne({ email });
 
-    if (userByEmail && userByEmail.isSignupWithOAuth(userOAuthProvider)) {
-      return this.authService.login(userByEmail.id);
+    if (userByEmail && userByEmail.isSignupWithOAuth(provider)) {
+      return this.authService.login(userByEmail.getId());
     }
 
     if (userByEmail) {
-      throw new DuplicateEmailException();
+      throw new DuplicateEmailException(`${email}은 이미 사용중인 이메일입니다.`);
     }
 
-    return this.authService.register(email, userOAuthProvider);
+    return this.authService.register(email, provider);
   }
 }

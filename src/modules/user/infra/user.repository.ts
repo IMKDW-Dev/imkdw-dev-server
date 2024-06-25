@@ -1,12 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CustomPrismaService } from 'nestjs-prisma';
+import * as UserMapper from '../mappers/user.mapper';
 
 import User from '../domain/models/user.model';
 import { UserQueryFilter } from '../repository/user/user-query.filter';
 import { IUserRepository } from '../repository/user/user-repo.interface';
-import UserRole from '../domain/models/user-role.model';
-import UserOAuthProvider from '../domain/models/user-oauth-provider.model';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 
 type IUser = Prisma.usersGetPayload<{
@@ -26,11 +25,7 @@ export default class UserRepository implements IUserRepository {
   constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
 
   async findOne(where: UserQueryFilter): Promise<User | null> {
-    const row: IUser = await this.prisma.client.users.findFirst({
-      where,
-      include: userInclude,
-    });
-
+    const row: IUser = await this.prisma.client.users.findFirst({ where, include: userInclude });
     if (!row) {
       return null;
     }
@@ -41,12 +36,12 @@ export default class UserRepository implements IUserRepository {
   async save(user: User): Promise<User> {
     const row: IUser = await this.prisma.client.users.create({
       data: {
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        profile: user.profile,
-        roleId: user.role.id,
-        oAuthProviderId: user.oAuthProvider.id,
+        id: user.getId(),
+        email: user.getEmail(),
+        nickname: user.getNickname(),
+        profile: user.getProfile(),
+        roleId: user.getRoleId(),
+        oAuthProviderId: user.getOAuthProviderId(),
       },
       include: userInclude,
     });
@@ -54,12 +49,12 @@ export default class UserRepository implements IUserRepository {
     return this.toEntity(row);
   }
 
-  async update(userId: string, user: User): Promise<User> {
+  async update(user: User): Promise<User> {
     const updatedRow: IUser = await this.prisma.client.users.update({
-      where: { id: userId },
+      where: { id: user.getId() },
       data: {
-        nickname: user.nickname,
-        profile: user.profile,
+        nickname: user.getNickname(),
+        profile: user.getProfile(),
       },
       include: userInclude,
     });
@@ -72,16 +67,6 @@ export default class UserRepository implements IUserRepository {
   }
 
   private toEntity(user: IUser): User {
-    const role = UserRole.create({ id: user.role.id, name: user.role.name });
-    const oAuthProvider = UserOAuthProvider.create({ id: user.oAuthProvider.id, provider: user.oAuthProvider.name });
-
-    return User.create({
-      id: user.id,
-      email: user.email,
-      nickname: user.nickname,
-      profile: user.profile,
-      role,
-      oAuthProvider,
-    });
+    return UserMapper.toModel(user, user.role, user.oAuthProvider);
   }
 }

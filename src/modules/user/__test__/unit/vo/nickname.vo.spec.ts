@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import { InvalidNicknameException } from '../../../../../common/exceptions/400';
 import Nickname from '../../../domain/vo/nickname.vo';
 
@@ -32,7 +31,7 @@ describe('Nickname', () => {
   describe('toString', () => {
     it('toString 메서드를 통해 닉네임을 반환한다', () => {
       // Given
-      const nickname = faker.person.firstName();
+      const nickname = 'nickname';
 
       // When, Then
       expect(new Nickname(nickname).toString()).toBe(nickname);

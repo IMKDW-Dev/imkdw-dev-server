@@ -29,7 +29,7 @@ export default class UserController {
     @Body() dto: RequestUpdateUserInfoDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.userService.updateUserInfo(userId, { ...dto, profileImage: file });
+    return this.userService.updateUser(userId, { ...dto, profileImage: file });
   }
 
   @Swagger.getUserCount('유저 수 조회')

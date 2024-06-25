@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import { DEFAULT_PROFILE } from '../../../constants/user.constant';
 import User from '../../../domain/models/user.model';
 
@@ -28,7 +27,7 @@ describe('User', () => {
 
     it('닉네임 변경이 가능하다', () => {
       // Given
-      const nickname = faker.person.firstName();
+      const nickname = 'nickname';
 
       // When
       sut.changeNickname(nickname);
@@ -45,7 +44,7 @@ describe('User', () => {
 
     it('프로필 이미지 변경이 가능하다', () => {
       // Given
-      const newProfileUrl = faker.image.url();
+      const newProfileUrl = 'https://image.com';
 
       // When
       sut.changeProfile(newProfileUrl);

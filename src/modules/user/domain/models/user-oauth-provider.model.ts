@@ -20,6 +20,10 @@ export default class UserOAuthProvider {
   private id: number;
   private provider: string;
 
+  getId(): number {
+    return this.id;
+  }
+
   equals(provider: UserOAuthProvider): boolean {
     return this.provider === provider.provider;
   }

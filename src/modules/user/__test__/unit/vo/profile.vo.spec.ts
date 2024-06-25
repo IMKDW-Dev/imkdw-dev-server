@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import { DEFAULT_PROFILE } from '../../../constants/user.constant';
 import Profile from '../../../domain/vo/profile.vo';
 
@@ -18,7 +17,7 @@ describe('Profile', () => {
   describe('toString', () => {
     it('프로필을 문자열로 반환한다', () => {
       // Given
-      const profile = faker.image.url();
+      const profile = 'https://image.com';
 
       // When, Then
       expect(new Profile(profile).toString()).toBe(profile);

@@ -13,7 +13,7 @@ export default class UserImageService {
   ) {}
 
   async getProfileImage(user: User, image: Express.Multer.File): Promise<string> {
-    const BASIC_PATH = `users/${user.id}`;
+    const BASIC_PATH = `users/${user.getId()}`;
 
     const originalPath = `${BASIC_PATH}/original.${image.originalname.split('.').pop()}`;
     this.storageService.upload(originalPath, image.buffer, ContentType.IMAGE);
