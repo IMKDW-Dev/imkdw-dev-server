@@ -6,7 +6,7 @@ import { Public } from '../decorators/public.decorator';
 import Cookie from '../../../common/decorators/cookie.decorator';
 import AuthService from '../services/auth.service';
 import { COOKIE_SERVICE, ICookieService } from '../../../infra/secure/cookie/interfaces/cookie.interface';
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../constants/token.constant';
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../../token/constants/token.constant';
 import { CookieMaxage } from '../../../infra/secure/cookie/enums/cookie.enum';
 
 @Controller({ path: 'auth', version: '1' })

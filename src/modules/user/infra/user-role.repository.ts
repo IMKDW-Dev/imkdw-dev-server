@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CustomPrismaService } from 'nestjs-prisma';
 
 import { IUserRoleRepository } from '../repository/role/user-role-repo.interface';
-import UserRole from '../domain/entities/user-role.entity';
+import UserRole from '../domain/models/user-role.model';
 import { UserRoleQueryFilter } from '../repository/role/user-role-query.filter';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 

@@ -7,7 +7,7 @@ import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/pr
 import Article from '../domain/entities/article.entity';
 import { ArticleQueryFilter } from '../repository/article/article-query.filter';
 import ArticleId from '../domain/value-objects/article-id.vo';
-import User from '../../user/domain/entities/user.entity';
+import User from '../../user/domain/models/user.model';
 import Category from '../../category/domain/entities/category.entity';
 import Tag from '../../tag/domain/entities/tag.entity';
 import { ArticleQueryOption } from '../repository/article/article-query.option';

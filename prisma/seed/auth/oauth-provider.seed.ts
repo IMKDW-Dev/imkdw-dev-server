@@ -1,15 +1,18 @@
 import { userOAuthProviders } from '@prisma/client';
-import { OAuthProviders } from '../../../src/modules/user/domain/entities/user-oauth-provider.entity';
+import { oAuthProviders } from '../../../src/modules/user/domain/models/user-oauth-provider.model';
 
-const oAuthProviderSeed: Pick<userOAuthProviders, 'name'>[] = [
+const oAuthProviderSeed: Pick<userOAuthProviders, 'id' | 'name'>[] = [
   {
-    name: OAuthProviders.GOOGLE,
+    id: oAuthProviders.google.id,
+    name: oAuthProviders.google.provider,
   },
   {
-    name: OAuthProviders.GITHUB,
+    id: oAuthProviders.github.id,
+    name: oAuthProviders.github.provider,
   },
   {
-    name: OAuthProviders.KAKAO,
+    id: oAuthProviders.kakao.id,
+    name: oAuthProviders.kakao.provider,
   },
 ];
 

@@ -6,7 +6,7 @@ import OAuthService from '../services/oauth.service';
 import * as Swagger from '../docs/oauth.swagger';
 import Authorization from '../../../common/decorators/authorization.decorator';
 import { COOKIE_SERVICE, ICookieService } from '../../../infra/secure/cookie/interfaces/cookie.interface';
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../constants/token.constant';
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from '../../token/constants/token.constant';
 import { CookieMaxage } from '../../../infra/secure/cookie/enums/cookie.enum';
 import ResponseAuthResultDto from '../dto/response/auth-result.dto';
 import { Public } from '../decorators/public.decorator';

@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client';
 import { IArticleCommentRepository } from '../repository/article-comment/article-comment-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { ArticleCommentQueryFilter } from '../repository/article-comment/article-comment-query.filter';
-import User from '../../user/domain/entities/user.entity';
+import User from '../../user/domain/models/user.model';
 import { TX } from '../../../@types/prisma/prisma.type';
 import ArticleComment from '../domain/entities/article-comment.entity';
 

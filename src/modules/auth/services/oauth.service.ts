@@ -5,7 +5,7 @@ import UserQueryService from '../../user/services/user-query.service';
 import { DuplicateEmailException } from '../../../common/exceptions/409';
 import AuthService from './auth.service';
 import UserOAuthQueryService from '../../user/services/user-oauth-query.service';
-import { OAuthProviders } from '../../user/domain/entities/user-oauth-provider.entity';
+import { OAuthProviders } from '../../user/domain/models/user-oauth-provider.model';
 import { HTTP_REST_SERVICE, IHttpRestService } from '../../../infra/http/rest/interfaces/http-rest.interface';
 import { GithubUserInfo, GoogleOAuthUserInfo } from '../../../@types/auth/oauth/google.type';
 import { KakaoOAuthToken, KakaoUserInfo } from '../../../@types/auth/oauth/kakao.type';

@@ -1,6 +1,6 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import UserRoles from '../../enums/user-role.enum';
-import User from '../../domain/entities/user.entity';
+import User from '../../domain/models/user.model';
 import UserDto from '../user.dto';
 
 export default class ResponseGetUserInfoDto extends PickType(UserDto, ['nickname', 'profile']) {

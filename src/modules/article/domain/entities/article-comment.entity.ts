@@ -1,4 +1,4 @@
-import User from '../../../user/domain/entities/user.entity';
+import User from '../../../user/domain/models/user.model';
 
 interface Props extends Partial<ArticleComment> {}
 

@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import UserOAuthProvider from '../domain/entities/user-oauth-provider.entity';
+import UserOAuthProvider from '../domain/models/user-oauth-provider.model';
 import { IUserRoleRepository, USER_ROLE_REPOSITORY } from '../repository/role/user-role-repo.interface';
 import { IUserRepository, USER_REPOSITORY } from '../repository/user/user-repo.interface';
 import UserRoles from '../enums/user-role.enum';
 import ResponseGetUserInfoDto from '../dto/response/user-info.dto';
-import User from '../domain/entities/user.entity';
+import User from '../domain/models/user.model';
 import { UpdateUserInfoDto } from '../dto/internal/update-user-info.dto';
 import UserImageService from './user-image.service';
 import { DuplicateNicknameException } from '../../../common/exceptions/409';
@@ -21,9 +21,6 @@ export default class UserService {
   async createUser(email: string, oAuthProvider: UserOAuthProvider) {
     const userRole = await this.userRoleRepository.findOne({ name: UserRoles.NORMAL });
     const newUser = User.create({ email, oAuthProvider, role: userRole });
-    newUser.generateId();
-    newUser.setDefaultProfile();
-    newUser.setDefaultNickname();
     return this.userRepository.save(newUser);
   }
 

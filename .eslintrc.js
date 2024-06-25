@@ -30,5 +30,6 @@ module.exports = {
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     '@typescript-eslint/lines-between-class-members': 'off',
     'no-underscore-dangle': 'off',
+    'new-cap': 'off',
   },
 };

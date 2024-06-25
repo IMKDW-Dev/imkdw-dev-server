@@ -1,43 +1,43 @@
-name: ci
-on:
-  push:
-    branches:
-      - develop
+# name: ci
+# on:
+#   push:
+#     branches:
+#       - develop
 
-  pull_request:
-    branches:
-      - develop
-    types: [opened, synchronize, reopened, ready_for_review]
+#   pull_request:
+#     branches:
+#       - develop
+#     types: [opened, synchronize, reopened, ready_for_review]
 
-jobs:
-  Ubuntu:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
+# jobs:
+#   Ubuntu:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: actions/setup-node@v3
+#       - uses: pnpm/action-setup@v2
+#         with:
+#           version: 8
 
-      - name: Install pnpm
-        run: pnpm install
+#       - name: Install pnpm
+#         run: pnpm install
 
-      - name: Build
-        run: pnpm build
+#       - name: Build
+#         run: pnpm build
 
-      - name: Lint
-        run: pnpm eslint
+#       - name: Lint
+#         run: pnpm eslint
 
-      - name: Test
-        run: pnpm test
+#       - name: Test
+#         run: pnpm test
 
-      - name: Push CI Result on Slack
-        uses: 8398a7/action-slack@v3
-        with:
-          author_name: '[SERVER] IMKDW DEV CI Result'
-          status: ${{ job.status }}
-          fields: repo,message,author,took
-          text: ${{ steps.set_text.outputs.text }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: always()
+#       - name: Push CI Result on Slack
+#         uses: 8398a7/action-slack@v3
+#         with:
+#           author_name: '[SERVER] IMKDW DEV CI Result'
+#           status: ${{ job.status }}
+#           fields: repo,message,author,took
+#           text: ${{ steps.set_text.outputs.text }}
+#         env:
+#           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#         if: always()

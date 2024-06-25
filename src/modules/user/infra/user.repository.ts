@@ -2,11 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CustomPrismaService } from 'nestjs-prisma';
 
-import User from '../domain/entities/user.entity';
+import User from '../domain/models/user.model';
 import { UserQueryFilter } from '../repository/user/user-query.filter';
 import { IUserRepository } from '../repository/user/user-repo.interface';
-import UserRole from '../domain/entities/user-role.entity';
-import UserOAuthProvider from '../domain/entities/user-oauth-provider.entity';
+import UserRole from '../domain/models/user-role.model';
+import UserOAuthProvider from '../domain/models/user-oauth-provider.model';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 
 type IUser = Prisma.usersGetPayload<{

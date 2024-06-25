@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import UserService from '../../user/services/user.service';
-import UserOAuthProvider from '../../user/domain/entities/user-oauth-provider.entity';
+import UserOAuthProvider from '../../user/domain/models/user-oauth-provider.model';
 import TokenService from '../../token/services/token.service';
 
 @Injectable()
