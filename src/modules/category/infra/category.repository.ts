@@ -38,8 +38,8 @@ export default class CategoryRepository implements ICategoryRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
-  async save(category: Category): Promise<Category> {
-    const row = await this.prisma.client.categories.create({
+  async save(category: Category, tx: TX = this.prisma.client): Promise<Category> {
+    const row = await tx.categories.create({
       data: {
         name: category.getName(),
         sort: category.getSort(),

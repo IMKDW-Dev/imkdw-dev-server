@@ -24,8 +24,8 @@ class ForbiddenException extends HttpException {
 }
 
 export class CannotReplyOnReplyCommentException extends ForbiddenException {
-  constructor(commentId?: unknown) {
-    super(FORBIDDEN_EXCEPTIONS.CANNOT_REPLY_ON_REPLY_COMMENT, `Cannot reply on reply comment ${commentId}`);
+  constructor(error: unknown) {
+    super(FORBIDDEN_EXCEPTIONS.CANNOT_REPLY_ON_REPLY_COMMENT, error);
   }
 }
 

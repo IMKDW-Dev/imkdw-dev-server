@@ -6,12 +6,10 @@ import { CreateArticleDto } from '../../dto/internal/article/create-article.dto'
 import { DuplicateArticleIdException } from '../../../../common/exceptions/409';
 import ArticleTagService from '../../../articleTag/services/article-tag.service';
 import ArticleImageService from './article-image.service';
-import CategoryQueryService from '../../../category/services/category-query.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../../common/exceptions/404';
 import { GetArticlesDto } from '../../dto/internal/article/get-article.dto';
 import { GetArticleSort } from '../../enums/article.enum';
-import Article from '../../domain/entities/article.entity';
-import ArticleId from '../../domain/value-objects/article-id.vo';
+import ArticleId from '../../domain/vo/article-id.vo';
 import ArticleDto from '../../dto/article.dto';
 import * as ArticleMapper from '../../mappers/article.mapper';
 import ResponseGetArticlesDto from '../../dto/response/article/get-article.dto';
@@ -22,9 +20,11 @@ import {
 } from '../../repository/article-comment/article-comment-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../../infra/database/prisma';
 import { UpdateArticleDto } from '../../dto/internal/article/update-article.dto';
-import ArticleContent from '../../domain/value-objects/article-content.vo';
+import ArticleContent from '../../domain/vo/article-content.vo';
 import CategoryService from '../../../category/services/category.service';
 import { userRoles } from '../../../user/domain/models/user-role.model';
+import { ArticleQueryFilter } from '../../repository/article/article-query.filter';
+import Article from '../../domain/models/article.model';
 
 @Injectable()
 export default class ArticleService {
@@ -34,40 +34,36 @@ export default class ArticleService {
     @Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>,
     private readonly articleImageService: ArticleImageService,
     private readonly articleTagService: ArticleTagService,
-    private readonly categoryQueryService: CategoryQueryService,
     private readonly categoryService: CategoryService,
   ) {}
 
-  async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<Article> {
-    const category = await this.categoryQueryService.findOne({ id: dto.categoryId });
-    if (!category) {
-      throw new CategoryNotFoundException(dto.categoryId);
+  async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<ArticleDto> {
+    const category = await this.categoryService.findOneOrThrow({ categoryId: dto.categoryId });
+
+    const article = await this.findOneOrThrow({ articleId: dto.id });
+    if (article) {
+      throw new DuplicateArticleIdException(dto.id.toString());
     }
 
     const articleId = new ArticleId(dto.id);
     articleId.addHash();
 
-    const article = await this.articleRepository.findOne({ id: articleId });
-    if (article) {
-      throw new DuplicateArticleIdException(dto.id.toString());
-    }
-
-    const thumbnail = await this.articleImageService.getThumbnail(articleId, file);
+    const thumbnail = await this.articleImageService.getThumbnail(articleId.toString(), file);
 
     const articleContent = new ArticleContent(dto.content);
     if (dto?.images && dto.images.length) {
-      const copiedImageUrls = await this.articleImageService.copyContentImages(articleId, dto.images);
-      articleContent.replaceImageUrls(copiedImageUrls);
+      const copiedImageUrls = await this.articleImageService.copyContentImages(article.getId(), dto.images);
+      articleContent.updateImageUrls(copiedImageUrls);
     }
 
-    const newArticle = Article.create({
-      id: articleId,
-      title: dto.title,
-      content: articleContent,
-      thumbnail,
-      category,
-      visible: dto.visible,
-    });
+    const newArticle = new Article.builder()
+      .setId(articleId)
+      .setTitle(dto.title)
+      .setContent(articleContent)
+      .setThumbnail(thumbnail)
+      .setCategory(category)
+      .setVisible(dto.visible)
+      .build();
 
     return this.prisma.client.$transaction(async (tx) => {
       const createdArticle = await this.articleRepository.save(newArticle, tx);
@@ -78,10 +74,7 @@ export default class ArticleService {
   }
 
   async getArticleDetail(articleId: string, userRole: string): Promise<ArticleDto> {
-    const articleDetail = await this.articleRepository.findOne({
-      id: new ArticleId(articleId),
-      includePrivate: userRole === userRoles.admin.name,
-    });
+    const articleDetail = await this.findOneOrThrow({ articleId, includePrivate: userRole === userRoles.admin.name });
 
     if (!articleDetail) {
       throw new ArticleNotFoundException(articleId);
@@ -90,28 +83,20 @@ export default class ArticleService {
     return ArticleMapper.toDto(articleDetail);
   }
 
-  async addCommentCount(article: Article): Promise<void> {
-    article.addCommentCount();
-    await this.articleRepository.update(article);
-  }
-
   async getArticles(dto: GetArticlesDto, userRole: string): Promise<ResponseGetArticlesDto> {
     let articles: Article[] = [];
     let allCounts = 0;
     let category = null;
 
     if (dto?.categoryId) {
-      category = await this.categoryQueryService.findOne({ id: dto.categoryId });
-      if (!category) {
-        throw new CategoryNotFoundException(dto.categoryId);
-      }
+      category = await this.categoryService.findOneOrThrow({ categoryId: dto.categoryId });
     }
 
     // TODO: 리팩토링
     switch (dto.sort) {
       case GetArticleSort.LATEST:
         articles = await this.articleRepository.findMany(
-          { category, includePrivate: userRole === userRoles.admin.name },
+          { categoryId: category.getId(), includePrivate: userRole === userRoles.admin.name },
           {
             limit: dto.limit,
             orderBy: { createdAt: 'desc' },
@@ -120,11 +105,11 @@ export default class ArticleService {
             search: dto?.search,
           },
         );
-        allCounts = await this.articleRepository.findCounts({ category }, { search: dto?.search });
+        allCounts = await this.articleRepository.findCounts({ categoryId: category.getId() }, { search: dto?.search });
         break;
       case GetArticleSort.POPULAR:
         articles = await this.articleRepository.findMany(
-          { category, includePrivate: userRole === userRoles.admin.name },
+          { categoryId: category.getId(), includePrivate: userRole === userRoles.admin.name },
           {
             limit: dto.limit,
             orderBy: { viewCount: 'desc' },
@@ -133,7 +118,7 @@ export default class ArticleService {
             search: dto?.search,
           },
         );
-        allCounts = await this.articleRepository.findCounts({ category }, { search: dto?.search });
+        allCounts = await this.articleRepository.findCounts({ categoryId: category.getId() }, { search: dto?.search });
         break;
       default:
         break;
@@ -152,7 +137,6 @@ export default class ArticleService {
 
   async addViewCount(articleId: string, userRole: string): Promise<void> {
     const article = await this.articleRepository.findOne({
-      id: new ArticleId(articleId),
       includePrivate: userRole === userRoles.admin.name,
     });
 
@@ -165,10 +149,7 @@ export default class ArticleService {
   }
 
   async deleteArticle(articleId: string): Promise<void> {
-    const article = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
-    if (!article) {
-      throw new ArticleNotFoundException(articleId);
-    }
+    const article = await this.findOneOrThrow({ articleId });
 
     await this.prisma.client.$transaction(async (tx) => {
       await Promise.all([
@@ -180,22 +161,18 @@ export default class ArticleService {
   }
 
   async updateArticle(articleId: string, dto: UpdateArticleDto) {
-    const article = await this.articleRepository.findOne({ id: new ArticleId(articleId) });
-    if (!article) {
-      throw new ArticleNotFoundException(articleId);
-    }
-
+    const article = await this.findOneOrThrow({ articleId });
     article.changeTitle(dto.title);
     article.changeContent(new ArticleContent(dto.content));
     article.changeVisible(dto.visible);
 
     if (dto?.thumbnail) {
-      const thumbnail = await this.articleImageService.getThumbnail(article.id, dto.thumbnail);
+      const thumbnail = await this.articleImageService.getThumbnail(article.getId(), dto.thumbnail);
       article.changeThumbnail(thumbnail);
     }
 
     if (dto?.categoryId) {
-      const category = await this.categoryQueryService.findOne({ id: dto.categoryId });
+      const category = await this.categoryService.findOneOrThrow({ categoryId: dto.categoryId });
       if (!category) {
         throw new CategoryNotFoundException(dto.categoryId);
       }
@@ -203,12 +180,28 @@ export default class ArticleService {
     }
 
     if (dto?.images && dto.images.length) {
-      const copiedImageUrls = await this.articleImageService.copyContentImages(article.id, dto.images);
-      article.content.replaceImageUrls(copiedImageUrls);
-      article.changeContent(article.content);
+      const copiedImageUrls = await this.articleImageService.copyContentImages(article.getId(), dto.images);
+      article.updateImageUrls(copiedImageUrls);
     }
 
     const updatedArticle = await this.articleRepository.update(article);
     return ArticleMapper.toDto(updatedArticle);
+  }
+
+  async findOneOrThrow(filter: ArticleQueryFilter): Promise<Article> {
+    const article = await this.articleRepository.findOne(filter);
+    if (!article) {
+      throw new ArticleNotFoundException(`${filter}을 찾을 수 없습니다.`);
+    }
+
+    return article;
+  }
+
+  async findOne(filter: ArticleQueryFilter): Promise<Article> {
+    return this.articleRepository.findOne(filter);
+  }
+
+  async findIds(filter: ArticleQueryFilter) {
+    return this.articleRepository.findIds(filter);
   }
 }

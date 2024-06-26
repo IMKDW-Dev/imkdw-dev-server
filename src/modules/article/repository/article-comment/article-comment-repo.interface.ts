@@ -1,5 +1,5 @@
 import { TX } from '../../../../@types/prisma/prisma.type';
-import ArticleComment from '../../domain/entities/article-comment.entity';
+import ArticleComment from '../../domain/models/article-comment.model';
 import { ArticleCommentQueryFilter } from './article-comment-query.filter';
 
 export const ARTICLE_COMMENT_REPOSITORY = Symbol('ARTICLE_COMMENT_REPOSITORY');

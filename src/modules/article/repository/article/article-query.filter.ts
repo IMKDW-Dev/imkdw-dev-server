@@ -1,5 +1,5 @@
-import Article from '../../domain/entities/article.entity';
-
-export interface ArticleQueryFilter extends Partial<Pick<Article, 'id' | 'category'>> {
+export interface ArticleQueryFilter {
+  articleId?: string;
+  categoryId?: number;
   includePrivate?: boolean;
 }

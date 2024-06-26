@@ -4,8 +4,8 @@ import { CustomPrismaService } from 'nestjs-prisma';
 import { IArticleTagRepository } from '../repository/article-tag-repo.inteface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import Article from '../../article/domain/entities/article.entity';
-import ArticleTag from '../domain/entities/article-tag.entity';
 import { TX } from '../../../@types/prisma/prisma.type';
+import ArticleTag from '../domain/models/article-tag.model';
 
 @Injectable()
 export default class ArticleTagRepository implements IArticleTagRepository {
@@ -15,7 +15,7 @@ export default class ArticleTagRepository implements IArticleTagRepository {
     await tx.articleTags.createMany({
       data: articleTags.map((articleTag) => ({
         articleId: article.id.toString(),
-        tagId: articleTag.tag.id,
+        tagId: articleTag.getTagId(),
       })),
     });
   }

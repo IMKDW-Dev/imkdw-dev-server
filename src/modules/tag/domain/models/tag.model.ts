@@ -11,7 +11,7 @@ export default class Tag {
     return this.id;
   }
 
-  getName() {
+  toString() {
     return this.name;
   }
 

@@ -1,4 +1,4 @@
 export interface CategoryQueryFilter {
-  id?: number;
+  categoryId?: number;
   name?: string;
 }

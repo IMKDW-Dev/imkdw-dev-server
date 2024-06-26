@@ -5,7 +5,6 @@ import { IImageService, IMAGE_SERVICE } from '../../../../infra/image/interfaces
 import { IStorageService, STORAGE_SERVICE } from '../../../../infra/storage/interfaces/storage.interface';
 import ContentType from '../../../../infra/storage/enums/s3-content-type.enum';
 import { generateUUID } from '../../../../common/utils/uuid';
-import ArticleId from '../../domain/value-objects/article-id.vo';
 
 @Injectable()
 export default class ArticleImageService {
@@ -17,8 +16,8 @@ export default class ArticleImageService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getThumbnail(articleId: ArticleId, image: Express.Multer.File): Promise<string> {
-    const BASIC_PATH = `articles/${articleId.toString()}`;
+  async getThumbnail(articleId: string, image: Express.Multer.File): Promise<string> {
+    const BASIC_PATH = `articles/${articleId}`;
 
     const originalPath = `${BASIC_PATH}/thumbnail/original.${image.originalname.split('.').pop()}`;
     this.storageService.upload(originalPath, image.buffer, ContentType.IMAGE);
@@ -28,10 +27,10 @@ export default class ArticleImageService {
     return this.storageService.upload(thumbnailPath, thumbnailImage, ContentType.IMAGE);
   }
 
-  async copyContentImages(articleId: ArticleId, images: string[]) {
+  async copyContentImages(articleId: string, images: string[]) {
     const copyImagePromises = images.map(async (image) => {
       const fromPath = `${this.configService.get<string>('S3_PRESIGNED_BUCKET_NAME')}/${image}`;
-      const toPath = `articles/${articleId.toString()}/content-images/${image}`;
+      const toPath = `articles/${articleId}/content-images/${image}`;
       this.storageService.copyFile(fromPath, toPath);
       return {
         fromPath: `${this.configService.get<string>('S3_PRESIGNED_BUCKET_URL')}/${image}`,

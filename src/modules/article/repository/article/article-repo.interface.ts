@@ -1,5 +1,5 @@
 import { TX } from '../../../../@types/prisma/prisma.type';
-import Article from '../../domain/entities/article.entity';
+import Article from '../../domain/models/article.model';
 import { ArticleQueryFilter } from './article-query.filter';
 import { ArticleQueryOption } from './article-query.option';
 

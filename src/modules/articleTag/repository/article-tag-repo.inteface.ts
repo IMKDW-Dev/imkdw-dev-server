@@ -1,6 +1,6 @@
 import { TX } from '../../../@types/prisma/prisma.type';
 import Article from '../../article/domain/entities/article.entity';
-import ArticleTag from '../domain/entities/article-tag.entity';
+import ArticleTag from '../domain/models/article-tag.model';
 
 export const ARTICLE_TAG_REPOSITORY = Symbol('ARTICLE_TAG_REPOSITORY');
 export interface IArticleTagRepository {

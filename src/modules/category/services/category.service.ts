@@ -1,4 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { CustomPrismaService } from 'nestjs-prisma';
+
 import { CATEGORY_REPOSITORY, ICategoryRepository } from '../repository/category-repo.interface';
 import { DuplicateCategoryNameException } from '../../../common/exceptions/409';
 import { CreateCategoryDto } from '../dto/internal/create-category.dto';
@@ -10,7 +12,6 @@ import { CategoryHaveArticlesException } from '../../../common/exceptions/403';
 import * as CategoryMapper from '../mappers/category.mapper';
 import { TX } from '../../../@types/prisma/prisma.type';
 import Category from '../domain/models/category.model';
-import { CustomPrismaService } from 'nestjs-prisma';
 import { ExtendedPrismaClient } from '../../../infra/database/prisma';
 import { CategoryQueryFilter } from '../repository/category-query.filter';
 
@@ -33,10 +34,11 @@ export default class CategoryService {
     const createdCategory = await this.prisma.client.$transaction(async (tx) => {
       const category = await this.categoryRepository.save(
         new Category.builder().setName(dto.name).setDesc(dto.desc).setSort(nextSort).build(),
+        tx,
       );
       const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
       category.changeImage(thumbnail);
-      return this.categoryRepository.update(category);
+      return this.categoryRepository.update(category, tx);
     });
 
     return CategoryMapper.toDto(createdCategory);
@@ -57,7 +59,7 @@ export default class CategoryService {
   }
 
   async updateCategory(categoryId: number, dto: UpdateCategoryDto, file: Express.Multer.File): Promise<CategoryDto> {
-    const category = await this.checkCategoryAndReturn(categoryId);
+    const category = await this.findOneOrThrow({ categoryId });
 
     const updateData = { ...dto };
 
@@ -76,7 +78,7 @@ export default class CategoryService {
   }
 
   async deleteCategory(categoryId: number) {
-    const category = await this.checkCategoryAndReturn(categoryId);
+    const category = await this.findOneOrThrow({ categoryId });
 
     if (category.isHaveArticles()) {
       throw new CategoryHaveArticlesException();
@@ -90,17 +92,13 @@ export default class CategoryService {
     await this.categoryRepository.update(category, tx);
   }
 
-  async checkCategoryAndReturn(categoryId: number): Promise<Category> {
-    const category = await this.categoryRepository.findOne({ id: categoryId });
+  async findOneOrThrow(filter: CategoryQueryFilter): Promise<Category> {
+    const category = await this.categoryRepository.findOne(filter);
     if (!category) {
-      throw new CategoryNotFoundException();
+      throw new CategoryNotFoundException(`${filter} not found`);
     }
 
     return category;
-  }
-
-  async findOne(filter: CategoryQueryFilter): Promise<Category> {
-    return this.categoryRepository.findOne(filter);
   }
 
   async findNames(filter: CategoryQueryFilter): Promise<string[]> {

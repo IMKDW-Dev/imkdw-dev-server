@@ -26,7 +26,9 @@ export default class JwtGuard implements CanActivate {
       const userId = this.tokenService.verify(accessToken) ?? '';
 
       const user = await this.userService.findOne({ id: userId });
-      if (!user) throw new UnauthorizedException();
+      if (!user) {
+        throw new UnauthorizedException();
+      }
 
       const requester: IRequester = { userId: user.getId(), role: user.getRole() };
       request.user = requester;
