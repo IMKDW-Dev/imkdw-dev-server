@@ -3,12 +3,12 @@ import { IStorageService, STORAGE_SERVICE } from '../interfaces/storage.interfac
 import * as Swagger from '../docs/storage.swagger';
 import AdminGuard from '../../../modules/auth/guards/admin.guard';
 import { Roles } from '../../../modules/auth/decorators/roles.decorator';
-import UserRoles from '../../../modules/user/enums/user-role.enum';
 import ResponseGetUploadUrlDto from '../dto/response/get-upload-url.dto';
+import { userRoles } from '../../../modules/user/domain/models/user-role.model';
 
 @Controller({ path: 'storage', version: '1' })
 @UseGuards(AdminGuard)
-@Roles(UserRoles.ADMIN)
+@Roles(userRoles.admin.name)
 export default class StorageController {
   constructor(@Inject(STORAGE_SERVICE) private readonly storageService: IStorageService) {}
 

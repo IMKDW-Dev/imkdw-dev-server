@@ -1,6 +1,8 @@
-import Article from '../../../domain/entities/article.entity';
-
-export interface UpdateArticleDto extends Partial<Pick<Article, 'title' | 'visible' | 'viewCount' | 'commentCount'>> {
+export interface UpdateArticleDto {
+  title?: string;
+  visible?: boolean;
+  viewCount?: number;
+  commentCount?: number;
   thumbnail?: Express.Multer.File;
   categoryId?: number;
   content?: string;

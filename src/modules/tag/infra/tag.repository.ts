@@ -20,11 +20,11 @@ export default class TagRepository implements ITagRepository {
   }
 
   async createMany(tags: Tag[], tx: TX = this.prisma.client): Promise<Tag[]> {
-    const tagsData = tags.map((tag) => ({ name: tag.getName() }));
+    const tagsData = tags.map((tag) => ({ name: tag.toString() }));
     await tx.tags.createMany({ data: tagsData });
 
     const createdRows = await tx.tags.findMany({
-      where: { name: { in: tags.map((tag) => tag.getName()) } },
+      where: { name: { in: tags.map((tag) => tag.toString()) } },
     });
     return createdRows.map(this.toEntity);
   }

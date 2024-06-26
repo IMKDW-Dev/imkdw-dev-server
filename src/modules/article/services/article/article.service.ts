@@ -12,6 +12,7 @@ import { GetArticleSort } from '../../enums/article.enum';
 import ArticleId from '../../domain/vo/article-id.vo';
 import ArticleDto from '../../dto/article.dto';
 import * as ArticleMapper from '../../mappers/article.mapper';
+import * as ArticleCommentMapper from '../../mappers/article-comment.mapper';
 import ResponseGetArticlesDto from '../../dto/response/article/get-article.dto';
 import { getOffsetPagingResult } from '../../../../common/functions/offset-paging.function';
 import {
@@ -25,6 +26,7 @@ import CategoryService from '../../../category/services/category.service';
 import { userRoles } from '../../../user/domain/models/user-role.model';
 import { ArticleQueryFilter } from '../../repository/article/article-query.filter';
 import Article from '../../domain/models/article.model';
+import { ArticleQueryOption } from '../../repository/article/article-query.option';
 
 @Injectable()
 export default class ArticleService {
@@ -69,70 +71,40 @@ export default class ArticleService {
       const createdArticle = await this.articleRepository.save(newArticle, tx);
       await this.articleTagService.createTags(createdArticle, dto.tags, tx);
       await this.categoryService.addArticleCount(category, tx);
-      return createdArticle;
+      return ArticleMapper.toDto(createdArticle);
     });
   }
 
   async getArticleDetail(articleId: string, userRole: string): Promise<ArticleDto> {
     const articleDetail = await this.findOneOrThrow({ articleId, includePrivate: userRole === userRoles.admin.name });
-
-    if (!articleDetail) {
-      throw new ArticleNotFoundException(articleId);
-    }
+    const comments = await this.articleCommentRepository.findMany({ articleId: articleDetail.getId() });
+    articleDetail.setComments(comments);
 
     return ArticleMapper.toDto(articleDetail);
   }
 
   async getArticles(dto: GetArticlesDto, userRole: string): Promise<ResponseGetArticlesDto> {
-    let articles: Article[] = [];
-    let allCounts = 0;
-    let category = null;
+    const queryFilter: ArticleQueryFilter = {
+      includePrivate: userRole === userRoles.admin.name,
+      categoryId: dto?.categoryId,
+    };
 
-    if (dto?.categoryId) {
-      category = await this.categoryService.findOneOrThrow({ categoryId: dto.categoryId });
-    }
+    const queryOption: ArticleQueryOption = {
+      page: dto.page,
+      limit: dto.limit,
+      orderBy: dto.sort === GetArticleSort.LATEST ? { createdAt: 'desc' } : { viewCount: 'desc' },
+      excludeId: dto?.excludeId,
+      search: dto?.search,
+    };
 
-    // TODO: 리팩토링
-    switch (dto.sort) {
-      case GetArticleSort.LATEST:
-        articles = await this.articleRepository.findMany(
-          { categoryId: category.getId(), includePrivate: userRole === userRoles.admin.name },
-          {
-            limit: dto.limit,
-            orderBy: { createdAt: 'desc' },
-            excludeId: dto?.excludeId,
-            page: dto.page,
-            search: dto?.search,
-          },
-        );
-        allCounts = await this.articleRepository.findCounts({ categoryId: category.getId() }, { search: dto?.search });
-        break;
-      case GetArticleSort.POPULAR:
-        articles = await this.articleRepository.findMany(
-          { categoryId: category.getId(), includePrivate: userRole === userRoles.admin.name },
-          {
-            limit: dto.limit,
-            orderBy: { viewCount: 'desc' },
-            excludeId: dto?.excludeId,
-            page: dto.page,
-            search: dto?.search,
-          },
-        );
-        allCounts = await this.articleRepository.findCounts({ categoryId: category.getId() }, { search: dto?.search });
-        break;
-      default:
-        break;
-    }
-
-    const articleDtos = articles.map(ArticleMapper.toDto);
-    const offsetPagingResult = getOffsetPagingResult({
-      items: articleDtos,
+    const articles = await this.articleRepository.findMany(queryFilter, queryOption);
+    const allCounts = await this.articleRepository.findCounts(queryFilter, queryOption);
+    return getOffsetPagingResult({
+      items: articles.map((article) => ArticleMapper.toDto(article)),
       totalCount: allCounts,
       limit: dto.limit,
       currentPage: dto.page,
     });
-
-    return ResponseGetArticlesDto.create(offsetPagingResult);
   }
 
   async addViewCount(articleId: string, userRole: string): Promise<void> {
@@ -191,14 +163,10 @@ export default class ArticleService {
   async findOneOrThrow(filter: ArticleQueryFilter): Promise<Article> {
     const article = await this.articleRepository.findOne(filter);
     if (!article) {
-      throw new ArticleNotFoundException(`${filter}을 찾을 수 없습니다.`);
+      throw new ArticleNotFoundException(`${JSON.stringify(filter)}을 찾을 수 없습니다.`);
     }
 
     return article;
-  }
-
-  async findOne(filter: ArticleQueryFilter): Promise<Article> {
-    return this.articleRepository.findOne(filter);
   }
 
   async findIds(filter: ArticleQueryFilter) {

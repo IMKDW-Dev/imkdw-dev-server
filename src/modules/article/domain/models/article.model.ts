@@ -15,7 +15,6 @@ export default class Article {
     viewCount: number,
     createdAt: Date,
     tags: Tag[],
-    comments: ArticleComment[],
   ) {
     this.id = id;
     this.title = title;
@@ -26,7 +25,7 @@ export default class Article {
     this.viewCount = viewCount;
     this.createdAt = createdAt;
     this.tags = tags;
-    this.comments = comments;
+    this.comments = [];
   }
 
   private id: ArticleId;
@@ -40,6 +39,9 @@ export default class Article {
   private tags: Tag[];
   private comments: ArticleComment[];
 
+  /**
+   * GETTER
+   */
   getId() {
     return this.id.toString();
   }
@@ -68,6 +70,25 @@ export default class Article {
     return this.category.getId();
   }
 
+  getCreatedAt() {
+    return this.createdAt;
+  }
+
+  getTags() {
+    return this.tags;
+  }
+
+  getComments() {
+    return this.comments;
+  }
+
+  getCategory() {
+    return this.category;
+  }
+
+  /**
+   * OTHERS
+   */
   changeTitle(title: string) {
     this.title = title;
   }
@@ -96,6 +117,10 @@ export default class Article {
     this.content.updateImageUrls(paths);
   }
 
+  setComments(comments: ArticleComment[]) {
+    this.comments = comments;
+  }
+
   static builder = class {
     id: ArticleId;
     title: string;
@@ -106,7 +131,6 @@ export default class Article {
     viewCount: number;
     createdAt: Date;
     tags: Tag[];
-    comments: ArticleComment[];
 
     setId(id: ArticleId): this {
       this.id = id;
@@ -153,11 +177,6 @@ export default class Article {
       return this;
     }
 
-    setComments(comments: ArticleComment[]): this {
-      this.comments = comments;
-      return this;
-    }
-
     build(): Article {
       return new Article(
         this.id,
@@ -169,7 +188,6 @@ export default class Article {
         this.viewCount,
         this.createdAt,
         this.tags,
-        this.comments,
       );
     }
   };

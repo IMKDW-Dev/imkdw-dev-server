@@ -1,5 +1,5 @@
 import { TX } from '../../../@types/prisma/prisma.type';
-import Article from '../../article/domain/entities/article.entity';
+import Article from '../../article/domain/models/article.model';
 import ArticleTag from '../domain/models/article-tag.model';
 
 export const ARTICLE_TAG_REPOSITORY = Symbol('ARTICLE_TAG_REPOSITORY');

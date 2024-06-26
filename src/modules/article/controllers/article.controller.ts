@@ -21,7 +21,6 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 import RequestCreateArticleDto from '../dto/request/article/create-article.dto';
 import { Public } from '../../auth/decorators/public.decorator';
 import GetArticlesQuery from '../dto/request/article/get-article.dto';
-import ResponseCreateArticleDto from '../dto/response/article/create-article.dto';
 import ArticleDto from '../dto/article.dto';
 import ResponseGetArticlesDto from '../dto/response/article/get-article.dto';
 import RequestUpdateArticleDto from '../dto/request/article/update-article.dto';
@@ -42,9 +41,8 @@ export default class ArticleController {
   async createArticle(
     @Body() dto: RequestCreateArticleDto,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ResponseCreateArticleDto> {
-    const createdArticle = await this.articleService.createArticle(dto, file);
-    return ResponseCreateArticleDto.create(createdArticle);
+  ): Promise<ArticleDto> {
+    return this.articleService.createArticle(dto, file);
   }
 
   @Swagger.getArticleDetail('게시글 상세정보 조회')

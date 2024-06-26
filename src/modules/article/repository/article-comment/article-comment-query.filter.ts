@@ -1,3 +1,4 @@
 export interface ArticleCommentQueryFilter {
-  commentId?: number;
+  id?: number;
+  articleId?: string;
 }

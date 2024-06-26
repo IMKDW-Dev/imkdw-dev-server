@@ -12,7 +12,7 @@ import { CategoryHaveArticlesException } from '../../../common/exceptions/403';
 import * as CategoryMapper from '../mappers/category.mapper';
 import { TX } from '../../../@types/prisma/prisma.type';
 import Category from '../domain/models/category.model';
-import { ExtendedPrismaClient } from '../../../infra/database/prisma';
+import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { CategoryQueryFilter } from '../repository/category-query.filter';
 
 @Injectable()
@@ -20,7 +20,7 @@ export default class CategoryService {
   constructor(
     @Inject(CATEGORY_REPOSITORY) private readonly categoryRepository: ICategoryRepository,
     private readonly categoryImageService: CategoryImageService,
-    private readonly prisma: CustomPrismaService<ExtendedPrismaClient>,
+    @Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>,
   ) {}
 
   async createCategory(dto: CreateCategoryDto): Promise<CategoryDto> {

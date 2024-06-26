@@ -31,5 +31,6 @@ module.exports = {
     '@typescript-eslint/lines-between-class-members': 'off',
     'no-underscore-dangle': 'off',
     'new-cap': 'off',
+    'arrow-body-style': 'off',
   },
 };

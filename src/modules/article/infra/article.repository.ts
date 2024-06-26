@@ -5,14 +5,15 @@ import { Prisma } from '@prisma/client';
 import { IArticleRepository } from '../repository/article/article-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { ArticleQueryFilter } from '../repository/article/article-query.filter';
-import ArticleId from '../domain/vo/article-id.vo';
-import User from '../../user/domain/models/user.model';
 import { ArticleQueryOption } from '../repository/article/article-query.option';
 import { TX } from '../../../@types/prisma/prisma.type';
-import ArticleContent from '../domain/vo/article-content.vo';
 import Article from '../domain/models/article.model';
 
-type IArticle = Prisma.articlesGetPayload<{
+import * as CategoryMapper from '../../category/mappers/category.mapper';
+import * as TagMapper from '../../tag/mappers/tag.mapper';
+import * as ArticleMapper from '../mappers/article.mapper';
+
+export type IArticle = Prisma.articlesGetPayload<{
   include: {
     category: true;
     articleTag: {
@@ -20,36 +21,15 @@ type IArticle = Prisma.articlesGetPayload<{
         tags: true;
       };
     };
-    articleComment: {
-      include: {
-        user: true;
-        replies: {
-          include: {
-            user: true;
-          };
-        };
-      };
-    };
   };
 }>;
 
-const articleInclude = {
+export const articleInclude = {
   category: true,
   articleTag: {
     include: {
       tags: true,
     },
-  },
-  articleComment: {
-    include: {
-      user: true,
-      replies: {
-        include: {
-          user: true,
-        },
-      },
-    },
-    where: { parentId: null as number | null },
   },
 } as const;
 
@@ -164,5 +144,9 @@ export default class ArticleRepository implements IArticleRepository {
     await tx.articles.delete({ where: { id: article.getId() } });
   }
 
-  private toEntity(row: IArticle): Article {}
+  private toEntity(row: IArticle): Article {
+    const category = CategoryMapper.toModel(row.category);
+    const tags = row.articleTag.map((articleTag) => TagMapper.toModel(articleTag.tags));
+    return ArticleMapper.toModel(row, category, tags);
+  }
 }

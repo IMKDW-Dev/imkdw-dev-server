@@ -8,14 +8,14 @@ import { UserQueryFilter } from '../repository/user/user-query.filter';
 import { IUserRepository } from '../repository/user/user-repo.interface';
 import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 
-type IUser = Prisma.usersGetPayload<{
+export type IUser = Prisma.usersGetPayload<{
   include: {
     role: true;
     oAuthProvider: true;
   };
 }>;
 
-const userInclude = {
+export const userInclude = {
   role: true,
   oAuthProvider: true,
 } as const;

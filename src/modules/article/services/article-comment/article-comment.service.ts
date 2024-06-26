@@ -22,7 +22,7 @@ export default class ArticleCommentService {
   ) {}
 
   async createComment(dto: CreateCommentDto): Promise<ArticleCommentDto> {
-    const article = await this.articleService.findOneOrThrow({ articleId: dto.articleId });
+    await this.articleService.findOneOrThrow({ articleId: dto.articleId });
     const user = await this.userQueryService.findOne({ id: dto.userId });
 
     const comment = new ArticleComment.builder()
@@ -32,7 +32,7 @@ export default class ArticleCommentService {
       .build();
 
     if (dto.parentId) {
-      const parentComment = await this.findOneOrThrow({ commentId: dto.parentId });
+      const parentComment = await this.findOneOrThrow({ id: dto.parentId });
       comment.setParent(parentComment);
       comment.checkReplyAvailable();
     }

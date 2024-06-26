@@ -1,6 +1,6 @@
-import Article from '../../../domain/entities/article.entity';
-
-export interface CreateArticleDto extends Pick<Article, 'title' | 'visible'> {
+export interface CreateArticleDto {
+  title: string;
+  visible: boolean;
   id: string;
   categoryId: number;
   content: string;

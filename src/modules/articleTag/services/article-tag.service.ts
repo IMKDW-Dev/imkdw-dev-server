@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ARTICLE_TAG_REPOSITORY, IArticleTagRepository } from '../repository/article-tag-repo.inteface';
 import TagService from '../../tag/services/tag.service';
-import Article from '../../article/domain/entities/article.entity';
 import { TX } from '../../../@types/prisma/prisma.type';
 import { getNewTags } from '../functions/separate-tag.function';
 import ArticleTag from '../domain/models/article-tag.model';
+import Article from '../../article/domain/models/article.model';
 
 @Injectable()
 export default class ArticleTagService {

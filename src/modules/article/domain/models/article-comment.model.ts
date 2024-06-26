@@ -36,6 +36,10 @@ export default class ArticleComment {
     return this.author;
   }
 
+  getAuthorId(): string {
+    return this.author.getId();
+  }
+
   getArticleId(): string {
     return this.articleId;
   }

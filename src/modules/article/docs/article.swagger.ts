@@ -10,7 +10,6 @@ import {
 } from '@nestjs/swagger';
 import RequestCreateArticleDto from '../dto/request/article/create-article.dto';
 import { GetArticleSort } from '../enums/article.enum';
-import ResponseCreateArticleDto from '../dto/response/article/create-article.dto';
 import ArticleDto from '../dto/article.dto';
 import ResponseGetArticlesDto from '../dto/response/article/get-article.dto';
 
@@ -19,7 +18,7 @@ export const createArticle = (summary: string) =>
     ApiOperation({ summary }),
     ApiConsumes('multipart/form-data'),
     ApiBody({ type: RequestCreateArticleDto }),
-    ApiCreatedResponse({ type: ResponseCreateArticleDto }),
+    ApiCreatedResponse({ type: ArticleDto }),
   );
 
 export const getArticleDetail = (summary: string) =>

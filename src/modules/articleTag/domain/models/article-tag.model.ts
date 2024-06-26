@@ -1,4 +1,4 @@
-import Article from '../../../article/domain/entities/article.entity';
+import Article from '../../../article/domain/models/article.model';
 import Tag from '../../../tag/domain/models/tag.model';
 
 export default class ArticleTag {
@@ -9,10 +9,6 @@ export default class ArticleTag {
 
   private article: Article;
   private tag: Tag;
-
-  // getArticleId() {
-  //   return this.article.getId();
-  // }
 
   getTagId() {
     return this.tag.getId();

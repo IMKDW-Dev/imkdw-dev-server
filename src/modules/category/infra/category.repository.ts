@@ -53,10 +53,7 @@ export default class CategoryRepository implements ICategoryRepository {
 
   async findNames(filter: CategoryQueryFilter): Promise<string[]> {
     const rows = await this.prisma.client.categories.findMany({
-      where: {
-        ...(filter?.id && { id: filter.id }),
-        ...(filter?.name && { name: { contains: filter.name } }),
-      },
+      where: filter,
       select: { name: true },
     });
 
@@ -65,10 +62,7 @@ export default class CategoryRepository implements ICategoryRepository {
 
   async findMany(filter: CategoryQueryFilter, option?: QueryOption): Promise<Category[]> {
     const rows = await this.prisma.client.categories.findMany({
-      where: {
-        ...(filter?.id && { id: filter.id }),
-        ...(filter?.name && { name: filter.name }),
-      },
+      where: filter,
       ...(option?.limit && { take: option.limit }),
       orderBy: { sort: 'asc' },
     });

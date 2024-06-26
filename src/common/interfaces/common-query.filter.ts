@@ -1,4 +1,4 @@
-export interface QueryOption<T = never> {
+export interface QueryOption<T extends string = string> {
   /**
    * 조회할 데이터의 개수
    */
@@ -8,7 +8,7 @@ export interface QueryOption<T = never> {
    * 순서 조정
    */
   orderBy?: {
-    [key in keyof Partial<T>]: 'asc' | 'desc';
+    [key in T]?: 'asc' | 'desc';
   };
 
   /**
