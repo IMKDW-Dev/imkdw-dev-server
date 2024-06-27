@@ -8,10 +8,10 @@ describe('ArticleContent', () => {
       const paths = [{ fromPath: '/image1.png', toPath: '/image2.png' }];
 
       // Act
-      articleContent.replaceImageUrls(paths);
+      articleContent.updateImageUrls(paths);
 
       // Assert
-      expect(articleContent.getContent()).toBe('Hello, ![image1](/image2.png)!');
+      expect(articleContent.toString()).toBe('Hello, ![image1](/image2.png)!');
     });
   });
 });
