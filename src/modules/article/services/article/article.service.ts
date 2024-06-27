@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CustomPrismaService } from 'nestjs-prisma';
+import { Transactional } from '@nestjs-cls/transactional';
 
 import { ARTICLE_REPOSITORY, IArticleRepository } from '../../repository/article/article-repo.interface';
 import { CreateArticleDto } from '../../dto/internal/article/create-article.dto';
@@ -12,14 +12,12 @@ import { GetArticleSort } from '../../enums/article.enum';
 import ArticleId from '../../domain/vo/article-id.vo';
 import ArticleDto from '../../dto/article.dto';
 import * as ArticleMapper from '../../mappers/article.mapper';
-import * as ArticleCommentMapper from '../../mappers/article-comment.mapper';
 import ResponseGetArticlesDto from '../../dto/response/article/get-article.dto';
 import { getOffsetPagingResult } from '../../../../common/functions/offset-paging.function';
 import {
   ARTICLE_COMMENT_REPOSITORY,
   IArticleCommentRepository,
 } from '../../repository/article-comment/article-comment-repo.interface';
-import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../../infra/database/prisma';
 import { UpdateArticleDto } from '../../dto/internal/article/update-article.dto';
 import ArticleContent from '../../domain/vo/article-content.vo';
 import CategoryService from '../../../category/services/category.service';
@@ -27,20 +25,22 @@ import { userRoles } from '../../../user/domain/models/user-role.model';
 import { ArticleQueryFilter } from '../../repository/article/article-query.filter';
 import Article from '../../domain/models/article.model';
 import { ArticleQueryOption } from '../../repository/article/article-query.option';
+import PrismaService from '../../../../infra/database/prisma.service';
 
 @Injectable()
 export default class ArticleService {
   constructor(
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
     @Inject(ARTICLE_COMMENT_REPOSITORY) private readonly articleCommentRepository: IArticleCommentRepository,
-    @Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>,
+    private readonly prisma: PrismaService,
     private readonly articleImageService: ArticleImageService,
     private readonly articleTagService: ArticleTagService,
     private readonly categoryService: CategoryService,
   ) {}
 
+  @Transactional()
   async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<ArticleDto> {
-    const category = await this.categoryService.findOneOrThrow({ categoryId: dto.categoryId });
+    const category = await this.categoryService.findOneOrThrow({ id: dto.categoryId });
 
     const article = await this.findOneOrThrow({ articleId: dto.id });
     if (article) {
@@ -67,12 +67,10 @@ export default class ArticleService {
       .setVisible(dto.visible)
       .build();
 
-    return this.prisma.client.$transaction(async (tx) => {
-      const createdArticle = await this.articleRepository.save(newArticle, tx);
-      await this.articleTagService.createTags(createdArticle, dto.tags, tx);
-      await this.categoryService.addArticleCount(category, tx);
-      return ArticleMapper.toDto(createdArticle);
-    });
+    const createdArticle = await this.articleRepository.save(newArticle);
+    await this.articleTagService.createTags(createdArticle, dto.tags);
+    await this.categoryService.addArticleCount(category);
+    return ArticleMapper.toDto(createdArticle);
   }
 
   async getArticleDetail(articleId: string, userRole: string): Promise<ArticleDto> {
@@ -123,13 +121,9 @@ export default class ArticleService {
   async deleteArticle(articleId: string): Promise<void> {
     const article = await this.findOneOrThrow({ articleId });
 
-    await this.prisma.client.$transaction(async (tx) => {
-      await Promise.all([
-        this.articleCommentRepository.deleteByArticleId(articleId, tx),
-        this.articleTagService.deleteByArticleId(articleId, tx),
-        this.articleRepository.delete(article, tx),
-      ]);
-    });
+    await this.articleCommentRepository.deleteByArticleId(articleId);
+    await this.articleTagService.deleteByArticleId(articleId);
+    await this.articleRepository.delete(article);
   }
 
   async updateArticle(articleId: string, dto: UpdateArticleDto) {
@@ -144,7 +138,7 @@ export default class ArticleService {
     }
 
     if (dto?.categoryId) {
-      const category = await this.categoryService.findOneOrThrow({ categoryId: dto.categoryId });
+      const category = await this.categoryService.findOneOrThrow({ id: dto.categoryId });
       if (!category) {
         throw new CategoryNotFoundException(dto.categoryId);
       }

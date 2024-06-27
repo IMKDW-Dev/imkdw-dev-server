@@ -1,26 +1,25 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CustomPrismaService } from 'nestjs-prisma';
+import { Injectable } from '@nestjs/common';
 import { categories } from '@prisma/client';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
 import { ICategoryRepository } from '../repository/category-repo.interface';
-import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { CategoryQueryFilter } from '../repository/category-query.filter';
 import { QueryOption } from '../../../common/interfaces/common-query.filter';
-import { TX } from '../../../@types/prisma/prisma.type';
 import { CategoryQueryOption } from '../repository/category-query.option';
 import Category from '../domain/models/category.model';
 
 @Injectable()
 export default class CategoryRepository implements ICategoryRepository {
-  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
+  constructor(private readonly prisma: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async findOne(where: CategoryQueryFilter): Promise<Category | null> {
-    const row = await this.prisma.client.categories.findFirst({ where });
+    const row = await this.prisma.tx.categories.findFirst({ where });
     return row ? this.toEntity(row) : null;
   }
 
   async findNextSort(): Promise<number> {
-    const maxSort = await this.prisma.client.categories.aggregate({
+    const maxSort = await this.prisma.tx.categories.aggregate({
       _max: {
         sort: true,
       },
@@ -30,7 +29,7 @@ export default class CategoryRepository implements ICategoryRepository {
   }
 
   async findAll(option: CategoryQueryOption): Promise<Category[]> {
-    const rows = await this.prisma.client.categories.findMany({
+    const rows = await this.prisma.tx.categories.findMany({
       ...(option?.limit && { take: option.limit }),
       orderBy: { sort: 'asc' },
     });
@@ -38,8 +37,8 @@ export default class CategoryRepository implements ICategoryRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
-  async save(category: Category, tx: TX = this.prisma.client): Promise<Category> {
-    const row = await tx.categories.create({
+  async save(category: Category): Promise<Category> {
+    const row = await this.prisma.tx.categories.create({
       data: {
         name: category.getName(),
         sort: category.getSort(),
@@ -52,7 +51,7 @@ export default class CategoryRepository implements ICategoryRepository {
   }
 
   async findNames(filter: CategoryQueryFilter): Promise<string[]> {
-    const rows = await this.prisma.client.categories.findMany({
+    const rows = await this.prisma.tx.categories.findMany({
       where: filter,
       select: { name: true },
     });
@@ -61,7 +60,7 @@ export default class CategoryRepository implements ICategoryRepository {
   }
 
   async findMany(filter: CategoryQueryFilter, option?: QueryOption): Promise<Category[]> {
-    const rows = await this.prisma.client.categories.findMany({
+    const rows = await this.prisma.tx.categories.findMany({
       where: filter,
       ...(option?.limit && { take: option.limit }),
       orderBy: { sort: 'asc' },
@@ -70,8 +69,8 @@ export default class CategoryRepository implements ICategoryRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
-  async update(category: Category, tx: TX = this.prisma.client): Promise<Category> {
-    const updatedCategory = await tx.categories.update({
+  async update(category: Category): Promise<Category> {
+    const updatedCategory = await this.prisma.tx.categories.update({
       where: { id: category.getId() },
       data: {
         name: category.getName(),
@@ -85,22 +84,22 @@ export default class CategoryRepository implements ICategoryRepository {
   }
 
   async updateSort(categoryId: number, newSort: number): Promise<Category> {
-    const category = await this.prisma.client.categories.findFirst({ where: { id: categoryId } });
+    const category = await this.prisma.tx.categories.findFirst({ where: { id: categoryId } });
     const oldSort = category.sort;
 
     if (newSort < oldSort) {
-      await this.prisma.client.categories.updateMany({
+      await this.prisma.tx.categories.updateMany({
         where: { sort: { gte: newSort, lt: oldSort } },
         data: { sort: { increment: 1 } },
       });
     } else {
-      await this.prisma.client.categories.updateMany({
+      await this.prisma.tx.categories.updateMany({
         where: { sort: { gt: oldSort, lte: newSort } },
         data: { sort: { decrement: 1 } },
       });
     }
 
-    const updaedCategory = await this.prisma.client.categories.update({
+    const updaedCategory = await this.prisma.tx.categories.update({
       where: { id: categoryId },
       data: { sort: newSort },
     });
@@ -109,7 +108,7 @@ export default class CategoryRepository implements ICategoryRepository {
   }
 
   async delete(category: Category): Promise<void> {
-    await this.prisma.client.categories.delete({ where: { id: category.getId() } });
+    await this.prisma.tx.categories.delete({ where: { id: category.getId() } });
   }
 
   private toEntity(category: categories) {

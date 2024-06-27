@@ -1,12 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { CustomPrismaService } from 'nestjs-prisma';
 import * as UserMapper from '../mappers/user.mapper';
 
 import User from '../domain/models/user.model';
 import { UserQueryFilter } from '../repository/user/user-query.filter';
 import { IUserRepository } from '../repository/user/user-repo.interface';
-import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
+import PrismaService from '../../../infra/database/prisma.service';
 
 export type IUser = Prisma.usersGetPayload<{
   include: {
@@ -22,10 +21,10 @@ export const userInclude = {
 
 @Injectable()
 export default class UserRepository implements IUserRepository {
-  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findOne(where: UserQueryFilter): Promise<User | null> {
-    const row: IUser = await this.prisma.client.users.findFirst({ where, include: userInclude });
+    const row: IUser = await this.prisma.users.findFirst({ where, include: userInclude });
     if (!row) {
       return null;
     }
@@ -34,7 +33,7 @@ export default class UserRepository implements IUserRepository {
   }
 
   async save(user: User): Promise<User> {
-    const row: IUser = await this.prisma.client.users.create({
+    const row: IUser = await this.prisma.users.create({
       data: {
         id: user.getId(),
         email: user.getEmail(),
@@ -50,7 +49,7 @@ export default class UserRepository implements IUserRepository {
   }
 
   async update(user: User): Promise<User> {
-    const updatedRow: IUser = await this.prisma.client.users.update({
+    const updatedRow: IUser = await this.prisma.users.update({
       where: { id: user.getId() },
       data: {
         nickname: user.getNickname(),
@@ -63,7 +62,7 @@ export default class UserRepository implements IUserRepository {
   }
 
   async count(): Promise<number> {
-    return this.prisma.client.users.count();
+    return this.prisma.users.count();
   }
 
   private toEntity(user: IUser): User {

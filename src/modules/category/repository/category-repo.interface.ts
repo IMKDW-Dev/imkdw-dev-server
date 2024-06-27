@@ -1,6 +1,5 @@
 import { InjectionToken } from '@nestjs/common';
 import { CategoryQueryFilter } from './category-query.filter';
-import { TX } from '../../../@types/prisma/prisma.type';
 import Category from '../domain/models/category.model';
 import { CategoryQueryOption } from './category-query.option';
 
@@ -14,9 +13,9 @@ export interface ICategoryRepository {
 
   findNames(filter: CategoryQueryFilter): Promise<string[]>;
 
-  save(category: Category, tx?: TX): Promise<Category>;
+  save(category: Category): Promise<Category>;
 
-  update(category: Category, tx?: TX): Promise<Category>;
+  update(category: Category): Promise<Category>;
   updateSort(id: number, newSort: number): Promise<Category>;
 
   delete(category: Category): Promise<void>;

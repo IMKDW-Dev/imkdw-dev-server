@@ -17,7 +17,6 @@ export const toDto = (articleComment: ArticleComment): ArticleCommentDto => {
 };
 
 export const toModel = (comment: articleComments, author: User, replies?: ArticleComment[]) => {
-  console.log(replies);
   return new ArticleComment.builder()
     .setId(comment.id)
     .setArticleId(comment.articleId)

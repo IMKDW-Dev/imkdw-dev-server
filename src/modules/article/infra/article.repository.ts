@@ -1,12 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CustomPrismaService } from 'nestjs-prisma';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
 import { IArticleRepository } from '../repository/article/article-repo.interface';
-import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { ArticleQueryFilter } from '../repository/article/article-query.filter';
 import { ArticleQueryOption } from '../repository/article/article-query.option';
-import { TX } from '../../../@types/prisma/prisma.type';
 import Article from '../domain/models/article.model';
 
 import * as CategoryMapper from '../../category/mappers/category.mapper';
@@ -35,10 +34,10 @@ export const articleInclude = {
 
 @Injectable()
 export default class ArticleRepository implements IArticleRepository {
-  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
+  constructor(private readonly prisma: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async findOne(query: ArticleQueryFilter): Promise<Article> {
-    const row: IArticle = await this.prisma.client.articles.findFirst({
+    const row: IArticle = await this.prisma.tx.articles.findFirst({
       where: {
         ...(query?.articleId && { id: query.articleId }),
         ...(query?.categoryId && { categoryId: query.categoryId }),
@@ -50,7 +49,7 @@ export default class ArticleRepository implements IArticleRepository {
   }
 
   async findMany(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<Article[]> {
-    const rows: IArticle[] = await this.prisma.client.articles.findMany({
+    const rows: IArticle[] = await this.prisma.tx.articles.findMany({
       where: {
         ...(query?.articleId && { id: query.articleId }),
         ...(query?.categoryId && { categoryId: query.categoryId }),
@@ -73,14 +72,14 @@ export default class ArticleRepository implements IArticleRepository {
       include: articleInclude,
       orderBy: { ...option?.orderBy },
       take: option?.limit,
-      skip: (option.page - 1) * option.limit,
+      ...(option?.page && { skip: (option.page - 1) * option.limit }),
     });
 
     return rows.map((row) => this.toEntity(row));
   }
 
-  async save(article: Article, tx: TX = this.prisma.client): Promise<Article> {
-    const row: IArticle = await tx.articles.create({
+  async save(article: Article): Promise<Article> {
+    const row: IArticle = await this.prisma.tx.articles.create({
       include: articleInclude,
       data: {
         id: article.getId(),
@@ -96,7 +95,7 @@ export default class ArticleRepository implements IArticleRepository {
   }
 
   async update(article: Article): Promise<Article> {
-    const row: IArticle = await this.prisma.client.articles.update({
+    const row: IArticle = await this.prisma.tx.articles.update({
       where: { id: article.getId() },
       data: {
         title: article.getTitle(),
@@ -113,7 +112,7 @@ export default class ArticleRepository implements IArticleRepository {
   }
 
   async findCounts(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<number> {
-    return this.prisma.client.articles.count({
+    return this.prisma.tx.articles.count({
       where: {
         ...(query?.articleId && { id: query.articleId }),
         ...(query?.categoryId && { categoryId: query.categoryId }),
@@ -128,7 +127,7 @@ export default class ArticleRepository implements IArticleRepository {
   }
 
   async findIds(query: ArticleQueryFilter): Promise<string[]> {
-    const rows = await this.prisma.client.articles.findMany({
+    const rows = await this.prisma.tx.articles.findMany({
       where: {
         ...(!query?.includePrivate && { visible: true }),
       },
@@ -140,8 +139,8 @@ export default class ArticleRepository implements IArticleRepository {
     return rows.map((row) => row.id);
   }
 
-  async delete(article: Article, tx: TX = this.prisma.client): Promise<void> {
-    await tx.articles.delete({ where: { id: article.getId() } });
+  async delete(article: Article): Promise<void> {
+    await this.prisma.tx.articles.delete({ where: { id: article.getId() } });
   }
 
   private toEntity(row: IArticle): Article {

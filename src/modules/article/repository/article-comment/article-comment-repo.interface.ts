@@ -1,4 +1,3 @@
-import { TX } from '../../../../@types/prisma/prisma.type';
 import ArticleComment from '../../domain/models/article-comment.model';
 import { ArticleCommentQueryFilter } from './article-comment-query.filter';
 
@@ -8,5 +7,5 @@ export interface IArticleCommentRepository {
   findMany(filter: ArticleCommentQueryFilter): Promise<ArticleComment[]>;
   save(comment: ArticleComment): Promise<ArticleComment>;
 
-  deleteByArticleId(articleId: string, tx: TX): Promise<void>;
+  deleteByArticleId(articleId: string): Promise<void>;
 }

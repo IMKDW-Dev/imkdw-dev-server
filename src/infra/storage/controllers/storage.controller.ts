@@ -1,4 +1,5 @@
 import { Controller, Get, Inject, Query, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { IStorageService, STORAGE_SERVICE } from '../interfaces/storage.interface';
 import * as Swagger from '../docs/storage.swagger';
 import AdminGuard from '../../../modules/auth/guards/admin.guard';
@@ -6,6 +7,7 @@ import { Roles } from '../../../modules/auth/decorators/roles.decorator';
 import ResponseGetUploadUrlDto from '../dto/response/get-upload-url.dto';
 import { userRoles } from '../../../modules/user/domain/models/user-role.model';
 
+@ApiTags('[스토리지] 공통')
 @Controller({ path: 'storage', version: '1' })
 @UseGuards(AdminGuard)
 @Roles(userRoles.admin.name)

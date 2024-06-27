@@ -1,4 +1,3 @@
-import { TX } from '../../../../@types/prisma/prisma.type';
 import Article from '../../domain/models/article.model';
 import { ArticleQueryFilter } from './article-query.filter';
 import { ArticleQueryOption } from './article-query.option';
@@ -9,7 +8,7 @@ export interface IArticleRepository {
   findMany(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<Article[]>;
   findCounts(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<number>;
   findIds(query: ArticleQueryFilter): Promise<string[]>;
-  save(article: Article, tx?: TX): Promise<Article>;
+  save(article: Article): Promise<Article>;
   update(article: Article): Promise<Article>;
-  delete(article: Article, tx: TX): Promise<void>;
+  delete(article: Article): Promise<void>;
 }

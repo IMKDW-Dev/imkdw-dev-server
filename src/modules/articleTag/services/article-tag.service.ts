@@ -1,7 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ARTICLE_TAG_REPOSITORY, IArticleTagRepository } from '../repository/article-tag-repo.inteface';
 import TagService from '../../tag/services/tag.service';
-import { TX } from '../../../@types/prisma/prisma.type';
 import { getNewTags } from '../functions/separate-tag.function';
 import ArticleTag from '../domain/models/article-tag.model';
 import Article from '../../article/domain/models/article.model';
@@ -13,17 +12,17 @@ export default class ArticleTagService {
     private readonly tagService: TagService,
   ) {}
 
-  async createTags(article: Article, tagNames: string[], tx: TX): Promise<void> {
+  async createTags(article: Article, tagNames: string[]): Promise<void> {
     const existTags = await this.tagService.findManyByNames(tagNames);
-    const createdTags = await this.tagService.createMany(getNewTags(existTags, tagNames), tx);
+    const createdTags = await this.tagService.createMany(getNewTags(existTags, tagNames));
 
     const tags = [...existTags, ...createdTags].map((tag) =>
       new ArticleTag.builder().setArticle(article).setTag(tag).build(),
     );
-    await this.articleTagRepository.createMany(article, tags, tx);
+    await this.articleTagRepository.createMany(article, tags);
   }
 
-  async deleteByArticleId(articleId: string, tx: TX): Promise<void> {
-    await this.articleTagRepository.deleteByArticleId(articleId, tx);
+  async deleteByArticleId(articleId: string): Promise<void> {
+    await this.articleTagRepository.deleteByArticleId(articleId);
   }
 }

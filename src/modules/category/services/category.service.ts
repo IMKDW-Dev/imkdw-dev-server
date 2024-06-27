@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CustomPrismaService } from 'nestjs-prisma';
+import { Transactional } from '@nestjs-cls/transactional';
 
 import { CATEGORY_REPOSITORY, ICategoryRepository } from '../repository/category-repo.interface';
 import { DuplicateCategoryNameException } from '../../../common/exceptions/409';
@@ -10,38 +10,34 @@ import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
 import CategoryDto from '../dto/category.dto';
 import { CategoryHaveArticlesException } from '../../../common/exceptions/403';
 import * as CategoryMapper from '../mappers/category.mapper';
-import { TX } from '../../../@types/prisma/prisma.type';
 import Category from '../domain/models/category.model';
-import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { CategoryQueryFilter } from '../repository/category-query.filter';
+import PrismaService from '../../../infra/database/prisma.service';
 
 @Injectable()
 export default class CategoryService {
   constructor(
     @Inject(CATEGORY_REPOSITORY) private readonly categoryRepository: ICategoryRepository,
     private readonly categoryImageService: CategoryImageService,
-    @Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>,
+    private readonly prisma: PrismaService,
   ) {}
 
+  @Transactional()
   async createCategory(dto: CreateCategoryDto): Promise<CategoryDto> {
     const categoryByName = await this.categoryRepository.findOne({ name: dto.name });
     if (categoryByName) {
       throw new DuplicateCategoryNameException(dto.name);
     }
 
-    // TODO: 트랜잭션 내부에 이미지 업로드? 개선필요
     const nextSort = await this.categoryRepository.findNextSort();
-    const createdCategory = await this.prisma.client.$transaction(async (tx) => {
-      const category = await this.categoryRepository.save(
-        new Category.builder().setName(dto.name).setDesc(dto.desc).setSort(nextSort).build(),
-        tx,
-      );
-      const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
-      category.changeImage(thumbnail);
-      return this.categoryRepository.update(category, tx);
-    });
+    const category = await this.categoryRepository.save(
+      new Category.builder().setName(dto.name).setDesc(dto.desc).setSort(nextSort).build(),
+    );
+    const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
+    category.changeImage(thumbnail);
+    const updatedCategory = await this.categoryRepository.update(category);
 
-    return CategoryMapper.toDto(createdCategory);
+    return CategoryMapper.toDto(updatedCategory);
   }
 
   async getCategories(limit: number): Promise<CategoryDto[]> {
@@ -59,7 +55,7 @@ export default class CategoryService {
   }
 
   async updateCategory(categoryId: number, dto: UpdateCategoryDto, file: Express.Multer.File): Promise<CategoryDto> {
-    const category = await this.findOneOrThrow({ categoryId });
+    const category = await this.findOneOrThrow({ id: categoryId });
 
     const updateData = { ...dto };
 
@@ -78,7 +74,7 @@ export default class CategoryService {
   }
 
   async deleteCategory(categoryId: number) {
-    const category = await this.findOneOrThrow({ categoryId });
+    const category = await this.findOneOrThrow({ id: categoryId });
 
     if (category.isHaveArticles()) {
       throw new CategoryHaveArticlesException();
@@ -87,9 +83,9 @@ export default class CategoryService {
     await this.categoryRepository.delete(category);
   }
 
-  async addArticleCount(category: Category, tx: TX) {
+  async addArticleCount(category: Category) {
     category.addArticleCount();
-    await this.categoryRepository.update(category, tx);
+    await this.categoryRepository.update(category);
   }
 
   async findOneOrThrow(filter: CategoryQueryFilter): Promise<Category> {

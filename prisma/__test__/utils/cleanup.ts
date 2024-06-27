@@ -1,11 +1,9 @@
-import { CustomPrismaService } from 'nestjs-prisma';
 import { Prisma } from '@prisma/client';
-
-import { ExtendedPrismaClient } from '../../../src/infra/database/prisma';
+import PrismaService from '../../../src/infra/database/prisma.service';
 
 // eslint-disable-next-line import/prefer-default-export
-export const cleanupDatabase = async (prisma: CustomPrismaService<ExtendedPrismaClient>) => {
-  const tables: { TABLE_NAME: string }[] = await prisma.client.$queryRaw`
+export const cleanupDatabase = async (prisma: PrismaService) => {
+  const tables: { TABLE_NAME: string }[] = await prisma.$queryRaw`
     SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'test';
   `;
 
@@ -14,7 +12,7 @@ export const cleanupDatabase = async (prisma: CustomPrismaService<ExtendedPrisma
     return !seedTables.includes(TABLE_NAME);
   });
 
-  await prisma.client.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
     await tx.$executeRaw`SET FOREIGN_KEY_CHECKS = 0;`;
 
     const truncatePromises = filteredTables.map(async ({ TABLE_NAME }) =>
