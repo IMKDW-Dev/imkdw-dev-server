@@ -1,11 +1,29 @@
+import { InvalidTagNameException } from '../../../../common/exceptions/400';
+
 export default class Tag {
-  constructor(id: number, name: string) {
-    this.id = id;
-    this.name = name;
-  }
+  private static readonly MIN_NAME_LENGTH = 2;
+  private static readonly MAX_NAME_LENGTH = 20;
 
   private id: number;
   private name: string;
+
+  private constructor(id: number, name: string) {
+    this.id = id;
+    this.name = name;
+    this.validate();
+  }
+
+  private validate() {
+    if (!this.name) {
+      throw new InvalidTagNameException(`태그 이름은 필수입니다.`);
+    }
+
+    if (this.name.length < Tag.MIN_NAME_LENGTH || this.name.length > Tag.MAX_NAME_LENGTH) {
+      throw new InvalidTagNameException(
+        `태그 이름은 ${Tag.MIN_NAME_LENGTH}자 이상 ${Tag.MAX_NAME_LENGTH}자 이하여야 합니다.`,
+      );
+    }
+  }
 
   getId() {
     return this.id;

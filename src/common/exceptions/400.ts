@@ -32,3 +32,9 @@ export class InvalidUserIdException extends BadRequestException {
     super(BAD_REQUEST_EXCEPTIONS.INVALID_USER_ID, error);
   }
 }
+
+export class InvalidTagNameException extends BadRequestException {
+  constructor(error: string) {
+    super(BAD_REQUEST_EXCEPTIONS.INVALID_TAG_NAME, error);
+  }
+}
