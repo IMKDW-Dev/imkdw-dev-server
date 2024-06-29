@@ -1,5 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
+import { Request } from 'express';
 import { IS_LOCAL } from '../constants/env.constant';
 import { ILogger, LOGGER } from '../../infra/logger/interfaces/logger.interface';
 
@@ -16,8 +17,14 @@ export default class AllExceptionsFilter implements ExceptionFilter {
   ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
+    if (process.env.NODE_ENV === 'local') {
+      // eslint-disable-next-line no-console
+      console.error(exception);
+    }
+
     const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
+    const request = ctx.getRequest<Request>();
     const isHttpException = exception instanceof HttpException;
     const httpStatus = isHttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -29,7 +36,15 @@ export default class AllExceptionsFilter implements ExceptionFilter {
       ? exceptionResponse.message[0]
       : exceptionResponse.message;
 
-    this.logger.error(exception);
+    const { method, originalUrl, body } = request;
+    this.logger.error(
+      `
+      [${method}] ${originalUrl}
+      user: ${request?.user ? JSON.stringify(request.user) : 'anonymous'}
+      body: ${JSON.stringify(body)}
+      error: ${JSON.stringify(exceptionResponse)}
+    `.replace('/t', ''),
+    );
 
     const responseBody = {
       statusCode: httpStatus,

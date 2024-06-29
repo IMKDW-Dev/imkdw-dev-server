@@ -73,7 +73,7 @@ export default class CategoryController {
     @Body() dto: RequestUpdateCategoryDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<CategoryDto> {
-    return this.categoryService.updateCategory(categoryId, dto, file);
+    return this.categoryService.updateCategory(categoryId, { ...dto, image: file });
   }
 
   @Swagger.deleteCategory('카테고리 삭제')

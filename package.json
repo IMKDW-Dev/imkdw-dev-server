@@ -24,7 +24,7 @@
     "prisma:generate": "npx prisma generate",
     "prisma:studio": "npx prisma studio",
     "prisma:seed": "npx prisma db seed",
-    "db:clean": "bash ./scripts/database/clean.sh"
+    "db:clean": "bash ./scripts/database/clean.sh && npx prisma db seed"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.598.0",

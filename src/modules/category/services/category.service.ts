@@ -33,8 +33,8 @@ export default class CategoryService {
     const category = await this.categoryRepository.save(
       new Category.builder().setName(dto.name).setDesc(dto.desc).setSort(nextSort).build(),
     );
-    const thumbnail = await this.categoryImageService.getThumbnail(category, dto.image);
-    category.changeImage(thumbnail);
+    const image = await this.categoryImageService.getImage(category, dto.image);
+    category.changeImage(image);
     const updatedCategory = await this.categoryRepository.update(category);
 
     return CategoryMapper.toDto(updatedCategory);
@@ -54,17 +54,18 @@ export default class CategoryService {
     return CategoryMapper.toDto(categoryDetail);
   }
 
-  async updateCategory(categoryId: number, dto: UpdateCategoryDto, file: Express.Multer.File): Promise<CategoryDto> {
+  @Transactional()
+  async updateCategory(categoryId: number, dto: UpdateCategoryDto): Promise<CategoryDto> {
     const category = await this.findOneOrThrow({ id: categoryId });
+    category.changeName(dto.name);
+    category.changeDesc(dto.desc);
 
-    const updateData = { ...dto };
-
-    if (file) {
-      const thumbnail = await this.categoryImageService.getThumbnail(category, file);
-      updateData.image = thumbnail;
+    if (dto?.image) {
+      const image = await this.categoryImageService.getImage(category, dto.image);
+      category.changeImage(image);
     }
 
-    if (dto?.sort) {
+    if (dto.sort !== category.getSort()) {
       const updatedSortCategory = await this.categoryRepository.updateSort(categoryId, dto.sort);
       category.changeSort(updatedSortCategory.getSort());
     }

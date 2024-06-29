@@ -12,7 +12,7 @@ export default class CategoryImageService {
     @Inject(STORAGE_SERVICE) private readonly storageService: IStorageService,
   ) {}
 
-  async getThumbnail(category: Category, image: Express.Multer.File): Promise<string> {
+  async getImage(category: Category, image: Express.Multer.File): Promise<string> {
     const BASIC_PATH = `categories/${category.getId()}`;
 
     const originalPath = `${BASIC_PATH}/original.${image.originalname.split('.').pop()}`;

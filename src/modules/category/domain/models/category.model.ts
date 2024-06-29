@@ -1,17 +1,20 @@
+import CategoryDesc from '../vo/category-desc.vo';
+import CategoryName from '../vo/category-name.vo';
+
 export default class Category {
   private constructor(id: number, name: string, image: string, desc: string, sort: number, articleCount: number) {
     this.id = id;
-    this.name = name;
+    this.name = new CategoryName(name);
     this.image = image;
-    this.desc = desc;
+    this.desc = new CategoryDesc(desc);
     this.sort = sort;
     this.articleCount = articleCount;
   }
 
   private id: number;
-  private name: string;
+  private name: CategoryName;
   private image: string;
-  private desc: string;
+  private desc: CategoryDesc;
   private sort: number;
   private articleCount: number;
 
@@ -20,7 +23,7 @@ export default class Category {
   }
 
   getName() {
-    return this.name;
+    return this.name.toString();
   }
 
   getImage() {
@@ -28,7 +31,7 @@ export default class Category {
   }
 
   getDesc() {
-    return this.desc;
+    return this.desc.toString();
   }
 
   getSort() {
@@ -49,6 +52,14 @@ export default class Category {
 
   changeSort(sort: number) {
     this.sort = sort;
+  }
+
+  changeName(name: string) {
+    this.name = new CategoryName(name);
+  }
+
+  changeDesc(desc: string) {
+    this.desc = new CategoryDesc(desc);
   }
 
   isHaveArticles() {

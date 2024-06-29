@@ -2,14 +2,12 @@ import { InvalidNicknameException } from '../../../../../common/exceptions/400';
 import Nickname from '../../../domain/vo/nickname.vo';
 
 describe('Nickname', () => {
-  let sut: Nickname;
-
-  beforeEach(() => {
-    sut = new Nickname();
-  });
-
   describe('기본값', () => {
     it('닉네임이 없다면 기본값이 할당된다', () => {
+      // Given
+      const sut = new Nickname();
+
+      // When, Then
       expect(sut.toString()).toHaveLength(8);
     });
   });

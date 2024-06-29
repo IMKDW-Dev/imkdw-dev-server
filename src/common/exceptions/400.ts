@@ -21,6 +21,18 @@ class BadRequestException extends HttpException {
   }
 }
 
+export class InvalidCategoryDescException extends BadRequestException {
+  constructor(error: string) {
+    super(BAD_REQUEST_EXCEPTIONS.INVALID_CATEGORY_DESC, error);
+  }
+}
+
+export class InvalidCategoryNameException extends BadRequestException {
+  constructor(error: string) {
+    super(BAD_REQUEST_EXCEPTIONS.INVALID_CATEGORY_NAME, error);
+  }
+}
+
 export class InvalidNicknameException extends BadRequestException {
   constructor(error: string) {
     super(BAD_REQUEST_EXCEPTIONS.INVALID_NICKNAME, error);
