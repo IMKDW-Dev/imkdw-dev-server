@@ -42,19 +42,18 @@ export default class ArticleService {
   async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<ArticleDto> {
     const category = await this.categoryService.findOneOrThrow({ id: dto.categoryId });
 
-    const article = await this.findOneOrThrow({ articleId: dto.id });
+    const article = await this.articleRepository.findOne({ articleId: dto.id });
     if (article) {
       throw new DuplicateArticleIdException(dto.id.toString());
     }
 
     const articleId = new ArticleId(dto.id);
     articleId.addHash();
-
     const thumbnail = await this.articleImageService.getThumbnail(articleId.toString(), file);
 
     const articleContent = new ArticleContent(dto.content);
     if (dto?.images && dto.images.length) {
-      const copiedImageUrls = await this.articleImageService.copyContentImages(article.getId(), dto.images);
+      const copiedImageUrls = await this.articleImageService.copyContentImages(articleId.toString(), dto.images);
       articleContent.updateImageUrls(copiedImageUrls);
     }
 

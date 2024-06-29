@@ -5,6 +5,7 @@ import { ClsModule, ClsService } from 'nestjs-cls';
 import { Request } from 'express';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { ClsPluginTransactional } from '@nestjs-cls/transactional';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 import AppController from './app.controller';
 import AppService from './app.service';
@@ -46,6 +47,12 @@ import PrismaService from './infra/database/prisma.service';
         }),
       ],
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     AuthModule,
     UserModule,
     CategoryModule,

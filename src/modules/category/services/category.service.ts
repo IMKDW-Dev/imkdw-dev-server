@@ -66,7 +66,7 @@ export default class CategoryService {
     }
 
     if (dto.sort !== category.getSort()) {
-      const updatedSortCategory = await this.categoryRepository.updateSort(categoryId, dto.sort);
+      const updatedSortCategory = await this.categoryRepository.updateSort(category, dto.sort);
       category.changeSort(updatedSortCategory.getSort());
     }
 

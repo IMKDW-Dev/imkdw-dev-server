@@ -38,6 +38,7 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/platform-express": "^10.3.9",
     "@nestjs/swagger": "^7.3.1",
+    "@nestjs/throttler": "^5.2.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.15.0",
     "@types/express": "^4.17.21",

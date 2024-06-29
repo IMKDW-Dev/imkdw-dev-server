@@ -16,7 +16,7 @@ export interface ICategoryRepository {
   save(category: Category): Promise<Category>;
 
   update(category: Category): Promise<Category>;
-  updateSort(id: number, newSort: number): Promise<Category>;
+  updateSort(category: Category, newSort: number): Promise<Category>;
 
   delete(category: Category): Promise<void>;
 }

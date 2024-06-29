@@ -42,6 +42,11 @@ export default class PrismaService extends PrismaClient {
           Object.assign(newParams.args, { data: { deleteAt: new Date(), deleteUser: userId } });
           return next(newParams);
         }
+
+        if (action === 'findFirst' || action === 'findUnique' || action === 'findMany') {
+          newParams.args.where = { ...newParams.args.where, deleteAt: null };
+          return next(newParams);
+        }
       }
       return next(params);
     });

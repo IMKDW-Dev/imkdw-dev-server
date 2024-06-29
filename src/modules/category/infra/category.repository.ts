@@ -83,9 +83,8 @@ export default class CategoryRepository implements ICategoryRepository {
     return this.toEntity(updatedCategory);
   }
 
-  async updateSort(categoryId: number, newSort: number): Promise<Category> {
-    const category = await this.prisma.tx.categories.findFirst({ where: { id: categoryId } });
-    const oldSort = category.sort;
+  async updateSort(category: Category, newSort: number): Promise<Category> {
+    const oldSort = category.getSort();
 
     if (newSort < oldSort) {
       await this.prisma.tx.categories.updateMany({
@@ -100,7 +99,7 @@ export default class CategoryRepository implements ICategoryRepository {
     }
 
     const updaedCategory = await this.prisma.tx.categories.update({
-      where: { id: categoryId },
+      where: { id: category.getId() },
       data: { sort: newSort },
     });
 
