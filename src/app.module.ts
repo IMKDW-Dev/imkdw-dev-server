@@ -11,7 +11,6 @@ import AppController from './app.controller';
 import AppService from './app.service';
 import AuthModule from './modules/auth/auth.module';
 import UserModule from './modules/user/user.module';
-import LoggerMiddleware from './common/middlewares/logger.middleware';
 import JwtCookieMiddleware from './modules/auth/middlewares/jwt-cookie.middleware';
 import JwtGuard from './modules/auth/guards/jwt.guard';
 import TransformInterceptor from './common/interceptors/transform.interceptor';
@@ -24,6 +23,7 @@ import LoggerModule from './infra/logger/logger.module';
 import TokenModule from './modules/token/token.module';
 import DatabaseModule from './infra/database/database.module';
 import PrismaService from './infra/database/prisma.service';
+import LoggingInterceptor from './common/interceptors/logging.interceptor';
 
 @Module({
   imports: [
@@ -78,11 +78,14 @@ import PrismaService from './infra/database/prisma.service';
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
   ],
 })
 export default class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
     consumer
       .apply(JwtCookieMiddleware)
       .exclude({

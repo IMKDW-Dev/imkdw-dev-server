@@ -1,9 +1,9 @@
-import { Requester } from '../common/interfaces/common.interface';
+import { IRequester } from '../common/types/common.type';
 
 declare global {
   namespace Express {
     interface Request {
-      user: Requester;
+      user: IRequester;
     }
   }
 }
