@@ -64,7 +64,7 @@ export default class ArticleCommentRepository implements IArticleCommentReposito
 
   async findMany(filter: ArticleCommentQueryFilter): Promise<ArticleComment[]> {
     const rows: IArticleComment[] = await this.prisma.tx.articleComments.findMany({
-      where: filter,
+      where: { ...filter, parentId: null },
       include: articleCommentInclude,
     });
 
@@ -75,7 +75,7 @@ export default class ArticleCommentRepository implements IArticleCommentReposito
     const row = await this.prisma.tx.articleComments.create({
       data: {
         articleId: comment.getArticleId(),
-        parentId: comment.getParent().getId(),
+        ...(comment.getParent() && { parentId: comment.getParent().getId() }),
         content: comment.getContent(),
         userId: comment.getAuthorId(),
       },
