@@ -24,6 +24,7 @@ import TokenModule from './modules/token/token.module';
 import DatabaseModule from './infra/database/database.module';
 import PrismaService from './infra/database/prisma.service';
 import LoggingInterceptor from './common/interceptors/logging.interceptor';
+import AlertModule from './infra/alert/alert.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import LoggingInterceptor from './common/interceptors/logging.interceptor';
     LoggerModule,
     TokenModule,
     DatabaseModule,
+    AlertModule,
   ],
   controllers: [AppController],
   providers: [

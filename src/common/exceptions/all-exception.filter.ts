@@ -3,6 +3,8 @@ import { HttpAdapterHost } from '@nestjs/core';
 import { Request } from 'express';
 import { IS_LOCAL } from '../constants/env.constant';
 import { ILogger, LOGGER } from '../../infra/logger/interfaces/logger.interface';
+import { ALERT_SERVICE, IAlertService } from '../../infra/alert/interfaces/alert.interface';
+import { isProduction } from '../functions/enviroment.function';
 
 interface ExceptionResponse {
   message: string[] | string;
@@ -14,6 +16,7 @@ export default class AllExceptionsFilter implements ExceptionFilter {
   constructor(
     private readonly httpAdapterHost: HttpAdapterHost,
     @Inject(LOGGER) private readonly logger: ILogger,
+    @Inject(ALERT_SERVICE) private readonly alertService: IAlertService,
   ) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {
@@ -53,6 +56,14 @@ export default class AllExceptionsFilter implements ExceptionFilter {
       errorCode: customErrorCode,
       stack: exception instanceof Error ? exception.stack : '',
     });
+
+    if (isProduction() && httpStatus >= HttpStatus.INTERNAL_SERVER_ERROR) {
+      this.alertService.error({
+        error: exception instanceof Error ? exception : new Error(customErrorCode),
+        method,
+        url: originalUrl,
+      });
+    }
 
     const responseBody = {
       statusCode: httpStatus,
