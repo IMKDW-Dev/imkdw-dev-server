@@ -11,7 +11,7 @@ const { combine, timestamp, prettyPrint, printf, errors } = winston.format;
 @Injectable({ scope: Scope.TRANSIENT })
 export default class WinstonLogger implements ILogger {
   private logger: winston.Logger;
-  private transports: Transport[];
+  private transports: Transport[] = [];
 
   constructor(private readonly configService: ConfigService) {
     if (process.env.node_env === 'local') {
