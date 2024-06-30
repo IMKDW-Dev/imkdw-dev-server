@@ -33,8 +33,8 @@ export default class ArticleCommentService {
 
     if (dto.parentId) {
       const parentComment = await this.findOneOrThrow({ id: dto.parentId });
+      parentComment.checkReplyAvailable();
       comment.setParent(parentComment);
-      comment.checkReplyAvailable();
     }
 
     const createdComment = await this.articleCommentRepository.save(comment);
