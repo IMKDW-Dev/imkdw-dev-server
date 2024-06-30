@@ -13,7 +13,6 @@ export default class AppController {
   @Public()
   @Get()
   getHello(): string {
-    this.logger.debug('asdas');
     return this.appService.getHello();
   }
 }
