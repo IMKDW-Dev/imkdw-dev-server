@@ -1,10 +1,9 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { Request } from 'express';
-import { IS_LOCAL } from '../constants/env.constant';
 import { ILogger, LOGGER } from '../../infra/logger/interfaces/logger.interface';
 import { ALERT_SERVICE, IAlertService } from '../../infra/alert/interfaces/alert.interface';
-import { isProduction } from '../functions/enviroment.function';
+import { isLocal, isProduction } from '../functions/enviroment.function';
 
 interface ExceptionResponse {
   message: string[] | string;
@@ -71,7 +70,7 @@ export default class AllExceptionsFilter implements ExceptionFilter {
       path: httpAdapter.getRequestUrl(ctx.getRequest()),
       method: ctx.getRequest().method,
       errorCode: customErrorCode,
-      ...(IS_LOCAL && { description: exceptionResponse }),
+      ...(isLocal() && { description: exceptionResponse }),
     };
 
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
