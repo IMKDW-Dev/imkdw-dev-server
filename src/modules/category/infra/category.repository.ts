@@ -77,6 +77,7 @@ export default class CategoryRepository implements ICategoryRepository {
         desc: category.getDesc(),
         image: category.getImage(),
         sort: category.getSort(),
+        articleCount: category.getArticleCount(),
       },
     });
 
