@@ -4,6 +4,7 @@ export const NOT_FOUND_EXCEPTIONS = {
   CATEGORY_NOT_FOUND: '404001',
   ARTICLE_NOT_FOUND: '404002',
   ARTICLE_COMMENT_NOT_FOUND: '404003',
+  USER_NOT_FOUND: '404004',
 } as const;
 
 class NotFoundException extends HttpException {
@@ -13,19 +14,25 @@ class NotFoundException extends HttpException {
 }
 
 export class CategoryNotFoundException extends NotFoundException {
-  constructor(category?: unknown) {
-    super(NOT_FOUND_EXCEPTIONS.CATEGORY_NOT_FOUND, `Find by ${category}, but not found`);
+  constructor(error: unknown) {
+    super(NOT_FOUND_EXCEPTIONS.CATEGORY_NOT_FOUND, error);
   }
 }
 
 export class ArticleNotFoundException extends NotFoundException {
-  constructor(articleId?: unknown) {
-    super(NOT_FOUND_EXCEPTIONS.ARTICLE_NOT_FOUND, `Find by ${articleId}, but not found`);
+  constructor(error: unknown) {
+    super(NOT_FOUND_EXCEPTIONS.ARTICLE_NOT_FOUND, error);
   }
 }
 
 export class ArticleCommentNotFoundException extends NotFoundException {
-  constructor(commentId?: unknown) {
-    super(NOT_FOUND_EXCEPTIONS.ARTICLE_COMMENT_NOT_FOUND, `Find by ${commentId}, but not found`);
+  constructor(error: unknown) {
+    super(NOT_FOUND_EXCEPTIONS.ARTICLE_COMMENT_NOT_FOUND, error);
+  }
+}
+
+export class UserNotFoundException extends NotFoundException {
+  constructor(error: unknown) {
+    super(NOT_FOUND_EXCEPTIONS.USER_NOT_FOUND, error);
   }
 }

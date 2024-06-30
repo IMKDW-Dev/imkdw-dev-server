@@ -1,29 +1,28 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ARTICE_TAG_REPOSITORY, IArticleTagRepository } from '../repository/article-tag-repo.inteface';
-import TagQueryService from '../../tag/services/tag-query.service';
+import { ARTICLE_TAG_REPOSITORY, IArticleTagRepository } from '../repository/article-tag-repo.inteface';
 import TagService from '../../tag/services/tag.service';
-import Article from '../../article/domain/entities/article.entity';
-import ArticleTag from '../domain/entities/article-tag.entity';
-import { TX } from '../../../@types/prisma/prisma.type';
 import { getNewTags } from '../functions/separate-tag.function';
+import ArticleTag from '../domain/models/article-tag.model';
+import Article from '../../article/domain/models/article.model';
 
 @Injectable()
 export default class ArticleTagService {
   constructor(
-    @Inject(ARTICE_TAG_REPOSITORY) private readonly articleTagRepository: IArticleTagRepository,
-    private readonly tagQueryService: TagQueryService,
+    @Inject(ARTICLE_TAG_REPOSITORY) private readonly articleTagRepository: IArticleTagRepository,
     private readonly tagService: TagService,
   ) {}
 
-  async createTags(article: Article, tagNames: string[], tx: TX): Promise<void> {
-    const existTags = await this.tagQueryService.findManyByNames(tagNames);
-    const createdTags = await this.tagService.createMany(getNewTags(existTags, tagNames), tx);
+  async createTags(article: Article, tagNames: string[]): Promise<void> {
+    const existTags = await this.tagService.findManyByNames(tagNames);
+    const createdTags = await this.tagService.createMany(getNewTags(existTags, tagNames));
 
-    const tags = [...existTags, ...createdTags].map((tag) => ArticleTag.create({ article, tag }));
-    await this.articleTagRepository.createMany(article, tags, tx);
+    const tags = [...existTags, ...createdTags].map((tag) =>
+      new ArticleTag.builder().setArticle(article).setTag(tag).build(),
+    );
+    await this.articleTagRepository.createMany(article, tags);
   }
 
-  async deleteByArticleId(articleId: string, tx: TX): Promise<void> {
-    await this.articleTagRepository.deleteByArticleId(articleId, tx);
+  async deleteByArticleId(articleId: string): Promise<void> {
+    await this.articleTagRepository.deleteByArticleId(articleId);
   }
 }

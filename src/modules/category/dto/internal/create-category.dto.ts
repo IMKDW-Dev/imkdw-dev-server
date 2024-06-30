@@ -1,5 +1,5 @@
-import Category from '../../domain/entities/category.entity';
-
-export interface CreateCategoryDto extends Pick<Category, 'name' | 'desc'> {
+export interface CreateCategoryDto {
+  name: string;
+  desc: string;
   image: Express.Multer.File;
 }

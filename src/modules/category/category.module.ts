@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import CategoryController from './controllers/category.controller';
-import CategoryQueryService from './services/category-query.service';
 import CategoryRepository from './infra/category.repository';
 import CategoryService from './services/category.service';
 import { CATEGORY_REPOSITORY } from './repository/category-repo.interface';
@@ -12,7 +11,6 @@ import StorageModule from '../../infra/storage/storage.module';
   imports: [ImageModule, StorageModule],
   controllers: [CategoryController],
   providers: [
-    CategoryQueryService,
     CategoryService,
     CategoryImageService,
     {
@@ -20,6 +18,6 @@ import StorageModule from '../../infra/storage/storage.module';
       useClass: CategoryRepository,
     },
   ],
-  exports: [CategoryQueryService],
+  exports: [CategoryService],
 })
 export default class CategoryModule {}

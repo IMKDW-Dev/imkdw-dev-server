@@ -1,15 +1,28 @@
+import { articleComments } from '@prisma/client';
+
 import ArticleCommentDto from '../dto/article-comment.dto';
 import * as UserMapper from '../../user/mappers/user.mapper';
-import ArticleComment from '../domain/entities/article-comment.entity';
+import ArticleComment from '../domain/models/article-comment.model';
+import User from '../../user/domain/models/user.model';
 
-// eslint-disable-next-line import/prefer-default-export
-export const toDto = (articleComment: ArticleComment): ArticleCommentDto =>
-  ArticleCommentDto.create({
-    id: articleComment.id,
-    articleId: articleComment.articleId,
-    content: articleComment.content,
-    author: UserMapper.toDto(articleComment.author),
-    parentId: articleComment.parentId,
-    replies: articleComment.replies.map((reply) => toDto(reply)),
-    createdAt: articleComment.createdAt,
-  });
+export const toDto = (articleComment: ArticleComment): ArticleCommentDto => {
+  return new ArticleCommentDto(
+    articleComment.getId(),
+    articleComment.getArticleId(),
+    articleComment.getContent(),
+    articleComment.getCreatedAt(),
+    UserMapper.toDto(articleComment.getAuthor()),
+    articleComment.getReplies().map((reply) => toDto(reply)),
+  );
+};
+
+export const toModel = (comment: articleComments, author: User, replies?: ArticleComment[]) => {
+  return new ArticleComment.builder()
+    .setId(comment.id)
+    .setArticleId(comment.articleId)
+    .setContent(comment.content)
+    .setCreatedAt(comment.createdAt)
+    .setAuthor(author)
+    .setReplies(replies)
+    .build();
+};

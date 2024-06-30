@@ -1,5 +1,7 @@
-import Tag from '../domain/entities/tag.entity';
+import { tags } from '@prisma/client';
+import Tag from '../domain/models/tag.model';
 import TagDto from '../dto/tag.dto';
 
-// eslint-disable-next-line import/prefer-default-export
-export const toDto = (tag: Tag) => TagDto.create({ id: tag.id, name: tag.name });
+export const toDto = (tag: Tag) => new TagDto(tag.getId(), tag.toString());
+
+export const toModel = (tag: tags) => new Tag.builder().setId(tag.id).setName(tag.name).build();

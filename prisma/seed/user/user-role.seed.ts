@@ -1,12 +1,14 @@
-import { userRoles } from '@prisma/client';
-import UserRoles from '../../../src/modules/user/enums/user-role.enum';
+import { userRoles as PrismaUserRoles } from '@prisma/client';
+import { userRoles } from '../../../src/modules/user/domain/models/user-role.model';
 
-const userRoleSeed: Pick<userRoles, 'name'>[] = [
+const userRoleSeed: Pick<PrismaUserRoles, 'name' | 'id'>[] = [
   {
-    name: UserRoles.NORMAL,
+    id: userRoles.normal.id,
+    name: userRoles.normal.name,
   },
   {
-    name: UserRoles.ADMIN,
+    id: userRoles.admin.id,
+    name: userRoles.admin.name,
   },
 ];
 

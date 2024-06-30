@@ -1,4 +1,4 @@
-import ArticleContent from '../../../../domain/value-objects/article-content.vo';
+import ArticleContent from '../../../../domain/vo/article-content.vo';
 
 describe('ArticleContent', () => {
   describe('replaceImageUrls', () => {
@@ -8,10 +8,10 @@ describe('ArticleContent', () => {
       const paths = [{ fromPath: '/image1.png', toPath: '/image2.png' }];
 
       // Act
-      articleContent.replaceImageUrls(paths);
+      articleContent.updateImageUrls(paths);
 
       // Assert
-      expect(articleContent.getContent()).toBe('Hello, ![image1](/image2.png)!');
+      expect(articleContent.toString()).toBe('Hello, ![image1](/image2.png)!');
     });
   });
 });

@@ -1,40 +1,60 @@
-import { CustomPrismaService } from 'nestjs-prisma';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
 import { IArticleCommentRepository } from '../repository/article-comment/article-comment-repo.interface';
-import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { ArticleCommentQueryFilter } from '../repository/article-comment/article-comment-query.filter';
-import User from '../../user/domain/entities/user.entity';
-import { TX } from '../../../@types/prisma/prisma.type';
-import ArticleComment from '../domain/entities/article-comment.entity';
+import ArticleComment from '../domain/models/article-comment.model';
+import * as CommentMapper from '../mappers/article-comment.mapper';
+import * as UserMapper from '../../user/mappers/user.mapper';
 
 type IArticleComment = Prisma.articleCommentsGetPayload<{
   include: {
-    user: true;
+    user: {
+      include: {
+        role: true;
+        oAuthProvider: true;
+      };
+    };
     replies: {
       include: {
-        user: true;
+        user: {
+          include: {
+            role: true;
+            oAuthProvider: true;
+          };
+        };
       };
     };
   };
 }>;
 
 const articleCommentInclude = {
-  user: true,
+  user: {
+    include: {
+      role: true,
+      oAuthProvider: true,
+    },
+  },
   replies: {
     include: {
-      user: true,
+      user: {
+        include: {
+          role: true,
+          oAuthProvider: true,
+        },
+      },
     },
   },
 };
 
 @Injectable()
 export default class ArticleCommentRepository implements IArticleCommentRepository {
-  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
+  constructor(private readonly prisma: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async findOne(filter: ArticleCommentQueryFilter): Promise<ArticleComment> {
-    const row: IArticleComment = await this.prisma.client.articleComments.findFirst({
+    const row: IArticleComment = await this.prisma.tx.articleComments.findFirst({
       where: filter,
       include: articleCommentInclude,
     });
@@ -42,13 +62,22 @@ export default class ArticleCommentRepository implements IArticleCommentReposito
     return this.toEntity(row);
   }
 
+  async findMany(filter: ArticleCommentQueryFilter): Promise<ArticleComment[]> {
+    const rows: IArticleComment[] = await this.prisma.tx.articleComments.findMany({
+      where: filter,
+      include: articleCommentInclude,
+    });
+
+    return rows.map((row) => this.toEntity(row));
+  }
+
   async save(comment: ArticleComment): Promise<ArticleComment> {
-    const row = await this.prisma.client.articleComments.create({
+    const row = await this.prisma.tx.articleComments.create({
       data: {
-        articleId: comment.articleId,
-        parentId: comment.parentId,
-        content: comment.content,
-        userId: comment.author.id,
+        articleId: comment.getArticleId(),
+        parentId: comment.getParent().getId(),
+        content: comment.getContent(),
+        userId: comment.getAuthorId(),
       },
       include: articleCommentInclude,
     });
@@ -56,39 +85,19 @@ export default class ArticleCommentRepository implements IArticleCommentReposito
     return this.toEntity(row);
   }
 
-  async deleteByArticleId(articleId: string, tx: TX = this.prisma.client): Promise<void> {
-    await tx.articleComments.deleteMany({
+  async deleteByArticleId(articleId: string): Promise<void> {
+    await this.prisma.tx.articleComments.deleteMany({
       where: { articleId },
     });
   }
 
   private toEntity(row: IArticleComment): ArticleComment {
-    const replies = row.replies.map((reply) =>
-      ArticleComment.create({
-        id: reply.id,
-        articleId: reply.articleId,
-        author: User.create({
-          nickname: reply.user.nickname,
-          profile: reply.user.profile,
-        }),
-        content: reply.content,
-        parentId: reply.parentId,
-        replies: [],
-        createdAt: reply.createdAt,
-      }),
-    );
-
-    return ArticleComment.create({
-      id: row.id,
-      articleId: row.articleId,
-      author: User.create({
-        nickname: row.user.nickname,
-        profile: row.user.profile,
-      }),
-      content: row.content,
-      parentId: row.parentId,
-      replies,
-      createdAt: row.createdAt,
+    const replies = row.replies.map((reply) => {
+      const author = UserMapper.toModel(reply.user, reply.user.role, reply.user.oAuthProvider);
+      return CommentMapper.toModel(reply, author, []);
     });
+
+    const author = UserMapper.toModel(row.user, row.user.role, row.user.oAuthProvider);
+    return CommentMapper.toModel(row, author, replies);
   }
 }

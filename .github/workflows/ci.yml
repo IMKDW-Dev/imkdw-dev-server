@@ -19,19 +19,19 @@ jobs:
         with:
           version: 8
 
-      - name: Install IMKDW-Dev
+      - name: Install pnpm
         run: pnpm install
 
-      - name: Compile IMKDW-Dev
+      - name: Build
         run: pnpm build
 
-      - name: Validate through EsLint
+      - name: Lint
         run: pnpm eslint
 
-      - name: Test IMKDW-Dev
+      - name: Test
         run: pnpm test
 
-      - name: CI 결과 슬랙에 푸쉬
+      - name: Push CI Result on Slack
         uses: 8398a7/action-slack@v3
         with:
           author_name: '[SERVER] IMKDW DEV CI Result'

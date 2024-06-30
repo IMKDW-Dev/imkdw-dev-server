@@ -1,19 +1,8 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 export const FORBIDDEN_EXCEPTIONS = {
-  /**
-   * 대댓글에는 댓글을 등록 할 수 없다
-   */
   CANNOT_REPLY_ON_REPLY_COMMENT: '403001',
-
-  /**
-   * 게시글이 존재하는 카테고리는 삭제할 수 없다
-   */
   CATEGORY_HAVE_ARTICLES: '403002',
-
-  /**
-   * 로그인한 유저는 자신의 정보만 조회가 가능하다
-   */
   USER_MISMATCH: '403003',
 } as const;
 
@@ -24,8 +13,8 @@ class ForbiddenException extends HttpException {
 }
 
 export class CannotReplyOnReplyCommentException extends ForbiddenException {
-  constructor(commentId?: unknown) {
-    super(FORBIDDEN_EXCEPTIONS.CANNOT_REPLY_ON_REPLY_COMMENT, `Cannot reply on reply comment ${commentId}`);
+  constructor(error: unknown) {
+    super(FORBIDDEN_EXCEPTIONS.CANNOT_REPLY_ON_REPLY_COMMENT, error);
   }
 }
 

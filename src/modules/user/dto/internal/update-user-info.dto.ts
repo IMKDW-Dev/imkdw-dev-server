@@ -1,5 +1,4 @@
-import User from '../../domain/entities/user.entity';
-
-export interface UpdateUserInfoDto extends Partial<Pick<User, 'nickname'>> {
+export interface UpdateUserDto {
+  nickname?: string;
   profileImage?: Express.Multer.File;
 }

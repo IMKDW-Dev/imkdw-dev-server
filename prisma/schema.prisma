@@ -65,14 +65,13 @@ model userOAuthProviders {
 }
 
 model articles {
-  id           String  @id @db.VarChar(255)
-  title        String  @db.VarChar(255)
-  categoryId   Int     @map("category_id")
-  content      String  @db.Text
-  visible      Boolean @default(true)
-  thumbnail    String  @default("https://static.imkdw.dev/images/article-thumbnail.png") @db.VarChar(255)
-  viewCount    Int     @default(0) @map("view_cnt")
-  commentCount Int     @default(0) @map("comment_cnt")
+  id         String  @id @db.VarChar(255)
+  title      String  @db.VarChar(255)
+  categoryId Int     @map("category_id")
+  content    String  @db.Text
+  visible    Boolean @default(true)
+  thumbnail  String  @default("https://static.imkdw.dev/images/article-thumbnail.png") @db.VarChar(255)
+  viewCount  Int     @default(0) @map("view_cnt")
 
   createdAt  DateTime  @default(now()) @map("create_at")
   createUser String    @default("_system") @map("create_user")
@@ -140,11 +139,12 @@ model articleTags {
 }
 
 model categories {
-  id    Int     @id @default(autoincrement())
-  name  String  @unique @db.VarChar(20)
-  image String? @db.VarChar(255)
-  desc  String  @db.VarChar(255)
-  sort  Int
+  id           Int     @id @default(autoincrement())
+  name         String  @unique @db.VarChar(20)
+  image        String? @db.VarChar(255)
+  desc         String  @db.VarChar(255)
+  articleCount Int     @default(0) @map("article_cnt")
+  sort         Int
 
   createdAt  DateTime   @default(now()) @map("create_at")
   createUser String     @default("_system") @map("create_user")

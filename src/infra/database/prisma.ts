@@ -1,88 +1,30 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { PrismaClient } from '@prisma/client';
-import { ClsService } from 'nestjs-cls';
 
-export const PRISMA_SERVICE = 'PRISMA_SERVICE';
-const prismaClient = new PrismaClient();
-
-export const extendedPrismaClient = (cls: ClsService) =>
-  prismaClient.$extends({
+export const extendedPrismaClient = (base: PrismaClient) => {
+  return base.$extends({
     query: {
       $allModels: {
-        async findUnique({ model, args }) {
-          return (prismaClient as any)[model].findUnique({
-            ...args,
-            where: { ...args.where, deleteAt: null },
-          });
-        },
-        async findFirst({ model, args }) {
-          return (prismaClient as any)[model].findFirst({
-            ...args,
-            where: { ...args.where, deleteAt: null },
-          });
-        },
-        async findMany({ model, args }) {
-          return (prismaClient as any)[model].findMany({
-            ...args,
-            where: { ...args.where, deleteAt: null },
-          });
-        },
-        async create({ model, args }) {
-          const userId = cls.get('userId');
-          return (prismaClient as any)[model].create({
-            ...args,
-            data: { ...args.data, createUser: userId, updateUser: userId },
-          });
-        },
-        async createMany({ model, args }) {
-          const userId = cls.get('userId');
-          if (Array.isArray(args.data)) {
-            return (prismaClient as any)[model].createMany({
-              ...args,
-              data: args.data.map((data) => ({
-                ...data,
-                createUser: userId,
-                updateUser: userId,
-              })),
-            });
-          }
-
-          return (prismaClient as any)[model].createMany({
-            ...args,
-            data: { ...args.data, createUser: userId, updateUser: userId },
-          });
-        },
-        async update({ model, args }) {
-          const userId = cls.get('userId');
-          return (prismaClient as any)[model].update({
-            ...args,
-            data: { ...args.data, updateUser: userId },
-          });
-        },
-        async updateMany({ model, args }) {
-          const userId = cls.get('userId');
-          return (prismaClient as any)[model].updateMany({
-            ...args,
-            data: { ...args.data, updateUser: userId },
-          });
-        },
-        async delete({ model, args }) {
-          const userId = cls.get('userId');
-          return (prismaClient as any)[model].update({
-            ...args,
-            data: { deleteAt: new Date(), deleteUser: userId },
-          });
-        },
-        async deleteMany({ model, args }) {
-          const userId = cls.get('userId');
-          return (prismaClient as any)[model].updateMany({
-            ...args,
-            data: { deleteAt: new Date(), deleteUser: userId },
-          });
+        async findMany({ args, query }) {
+          const tempArgs = { ...args };
+          tempArgs.where = { ...tempArgs.where, deleteAt: null };
+          return query(tempArgs);
         },
       },
     },
   });
+};
 
-export interface ExtendedPrismaClient extends PrismaClient {}
+class UntypedExtendedClient extends PrismaClient {
+  constructor(options?: ConstructorParameters<typeof PrismaClient>[0]) {
+    super(options);
+
+    // eslint-disable-next-line no-constructor-return
+    return extendedPrismaClient(this) as this;
+  }
+}
+
+const ExtendedPrismaClient = UntypedExtendedClient as unknown as new (
+  options?: ConstructorParameters<typeof PrismaClient>[0],
+) => ReturnType<typeof extendedPrismaClient>;
+
+export { ExtendedPrismaClient };

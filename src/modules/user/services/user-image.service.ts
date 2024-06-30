@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IImageService, IMAGE_SERVICE } from '../../../infra/image/interfaces/image.interface';
 import { IStorageService, STORAGE_SERVICE } from '../../../infra/storage/interfaces/storage.interface';
-import User from '../domain/entities/user.entity';
+import User from '../domain/models/user.model';
 import ContentType from '../../../infra/storage/enums/s3-content-type.enum';
 import { generateUUID } from '../../../common/utils/uuid';
 
@@ -13,7 +13,7 @@ export default class UserImageService {
   ) {}
 
   async getProfileImage(user: User, image: Express.Multer.File): Promise<string> {
-    const BASIC_PATH = `users/${user.id}`;
+    const BASIC_PATH = `users/${user.getId()}`;
 
     const originalPath = `${BASIC_PATH}/original.${image.originalname.split('.').pop()}`;
     this.storageService.upload(originalPath, image.buffer, ContentType.IMAGE);

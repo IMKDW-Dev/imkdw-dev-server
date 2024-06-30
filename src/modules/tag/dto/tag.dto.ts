@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsString } from 'class-validator';
-
-interface Props extends TagDto {}
+import { IsNumber } from 'class-validator';
+import IsTagName from '../decorators/validation/is-tag-name.decorator';
 
 export default class TagDto {
   constructor(id: number, name: string) {
@@ -12,14 +11,10 @@ export default class TagDto {
 
   @ApiProperty({ description: '태그 아이디' })
   @IsNumber()
-  @Transform(({ value }) => parseInt(value, 10))
+  @Transform(({ value }) => +value)
   id: number;
 
   @ApiProperty({ description: '태그 이름' })
-  @IsString()
+  @IsTagName()
   name: string;
-
-  static create(props: Props) {
-    return new TagDto(props.id, props.name);
-  }
 }

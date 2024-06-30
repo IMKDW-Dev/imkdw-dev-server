@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import UserService from '../../user/services/user.service';
-import UserOAuthProvider from '../../user/domain/entities/user-oauth-provider.entity';
+import UserOAuthProvider from '../../user/domain/models/user-oauth-provider.model';
 import TokenService from '../../token/services/token.service';
 
 @Injectable()
@@ -18,7 +18,7 @@ export default class AuthService {
 
   async register(email: string, oAuthProvider: UserOAuthProvider) {
     const registerdUser = await this.userService.createUser(email, oAuthProvider);
-    return this.login(registerdUser.id);
+    return this.login(registerdUser.getId());
   }
 
   refreshToken(cookies: string): string {

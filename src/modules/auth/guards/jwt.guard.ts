@@ -3,15 +3,15 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { IRequester } from '../../../common/types/common.type';
-import UserQueryService from '../../user/services/user-query.service';
 import TokenService from '../../token/services/token.service';
+import UserService from '../../user/services/user.service';
 
 @Injectable()
 export default class JwtGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly tokenService: TokenService,
-    private readonly userQueryService: UserQueryService,
+    private readonly userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -25,10 +25,12 @@ export default class JwtGuard implements CanActivate {
     try {
       const userId = this.tokenService.verify(accessToken) ?? '';
 
-      const user = await this.userQueryService.findOne({ id: userId });
-      if (!user) throw new UnauthorizedException();
+      const user = await this.userService.findOne({ id: userId });
+      if (!user) {
+        throw new UnauthorizedException();
+      }
 
-      const requester: IRequester = { userId: user.id, role: user.role.toString() };
+      const requester: IRequester = { userId: user.getId(), role: user.getRole() };
       request.user = requester;
       return true;
     } catch {

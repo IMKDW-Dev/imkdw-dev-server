@@ -9,33 +9,31 @@ import IsArticleId from '../decorators/validation/is-article-id.decorator';
 import IsArticleTitle from '../decorators/validation/is-article-title.decorator';
 import IsArticleContent from '../decorators/validation/is-article-content.decorator';
 
-interface Props {
-  id: string;
-  title: string;
-  category: CategoryDto;
-  content: string;
-  visible: boolean;
-  thumbnail: string;
-  viewCount: number;
-  commentCount: number;
-  createdAt: Date;
-  tags: TagDto[];
-  comments: ArticleCommentDto[];
-}
-
 export default class ArticleDto {
-  constructor(props: Props) {
-    this.id = props.id;
-    this.title = props.title;
-    this.content = props.content;
-    this.visible = props.visible;
-    this.thumbnail = props.thumbnail;
-    this.viewCount = props.viewCount;
-    this.commentCount = props.commentCount;
-    this.createdAt = props.createdAt;
-    this.category = props.category;
-    this.tags = props.tags;
-    this.comments = props.comments;
+  constructor(
+    id: string,
+    title: string,
+    content: string,
+    visible: boolean,
+    thumbnail: string | Express.Multer.File,
+    viewCount: number,
+    commentCount: number,
+    createdAt: Date,
+    category: CategoryDto,
+    tags: TagDto[],
+    comments: ArticleCommentDto[],
+  ) {
+    this.id = id;
+    this.title = title;
+    this.content = content;
+    this.visible = visible;
+    this.thumbnail = thumbnail;
+    this.viewCount = viewCount;
+    this.commentCount = commentCount;
+    this.createdAt = createdAt;
+    this.category = category;
+    this.tags = tags;
+    this.comments = comments;
   }
 
   @ApiProperty({
@@ -81,7 +79,88 @@ export default class ArticleDto {
   @ApiProperty({ description: '댓글 목록', type: [ArticleCommentDto] })
   comments: ArticleCommentDto[];
 
-  static create(props: Props) {
-    return new ArticleDto(props);
-  }
+  static builder = class {
+    id: string;
+    title: string;
+    content: string;
+    visible: boolean;
+    thumbnail: string | Express.Multer.File;
+    viewCount: number;
+    commentCount: number;
+    createdAt: Date;
+    category: CategoryDto;
+    tags: TagDto[];
+    comments: ArticleCommentDto[];
+
+    setId(id: string) {
+      this.id = id;
+      return this;
+    }
+
+    setTitle(title: string) {
+      this.title = title;
+      return this;
+    }
+
+    setContent(content: string) {
+      this.content = content;
+      return this;
+    }
+
+    setVisible(visible: boolean) {
+      this.visible = visible;
+      return this;
+    }
+
+    setThumbnail(thumbnail: string | Express.Multer.File) {
+      this.thumbnail = thumbnail;
+      return this;
+    }
+
+    setViewCount(viewCount: number) {
+      this.viewCount = viewCount;
+      return this;
+    }
+
+    setCommentCount(commentCount: number) {
+      this.commentCount = commentCount;
+      return this;
+    }
+
+    setCreatedAt(createdAt: Date) {
+      this.createdAt = createdAt;
+      return this;
+    }
+
+    setCategory(category: CategoryDto) {
+      this.category = category;
+      return this;
+    }
+
+    setTags(tags: TagDto[]) {
+      this.tags = tags;
+      return this;
+    }
+
+    setComments(comments: ArticleCommentDto[]) {
+      this.comments = comments;
+      return this;
+    }
+
+    build() {
+      return new ArticleDto(
+        this.id,
+        this.title,
+        this.content,
+        this.visible,
+        this.thumbnail,
+        this.viewCount,
+        this.commentCount,
+        this.createdAt,
+        this.category,
+        this.tags,
+        this.comments,
+      );
+    }
+  };
 }

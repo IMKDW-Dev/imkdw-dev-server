@@ -1,12 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-interface Props extends Partial<ArticleStatsDto> {}
-
 export default class ArticleStatsDto {
-  constructor(props: Props) {
-    this.totalArticles = props.totalArticles;
-    this.totalComments = props.totalComments;
-    this.totalViews = props.totalViews;
+  constructor(totalArticles: number, totalComments: number, totalViews: number) {
+    this.totalArticles = totalArticles;
+    this.totalComments = totalComments;
+    this.totalViews = totalViews;
   }
 
   @ApiProperty({ description: '총 게시글의 수', example: 100 })
@@ -17,8 +15,4 @@ export default class ArticleStatsDto {
 
   @ApiProperty({ description: '총 조회수', example: 100 })
   totalViews: number;
-
-  static create(props: Props): ArticleStatsDto {
-    return new ArticleStatsDto(props);
-  }
 }

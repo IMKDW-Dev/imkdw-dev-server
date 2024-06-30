@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import ArticleQueryService from '../../../modules/article/services/article/article-query.service';
-import CategoryQueryService from '../../../modules/category/services/category-query.service';
+import ArticleService from '../../../modules/article/services/article/article.service';
+import CategoryService from '../../../modules/category/services/category.service';
 
 @Injectable()
 export default class SitemapService {
   constructor(
-    private readonly articleQueryService: ArticleQueryService,
-    private readonly categoryQueryService: CategoryQueryService,
+    private readonly articleService: ArticleService,
+    private readonly categoryService: CategoryService,
   ) {}
 
   async getArticleIds(): Promise<string[]> {
-    return this.articleQueryService.findIds({ includePrivate: false });
+    return this.articleService.findIds({ includePrivate: false });
   }
 
   async getCategoryNames(): Promise<string[]> {
-    return this.categoryQueryService.findNames({});
+    return this.categoryService.findNames({});
   }
 }

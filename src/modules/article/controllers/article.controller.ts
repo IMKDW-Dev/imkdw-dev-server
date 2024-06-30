@@ -18,16 +18,15 @@ import ArticleService from '../services/article/article.service';
 import * as Swagger from '../docs/article.swagger';
 import AdminGuard from '../../auth/guards/admin.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
-import UserRoles from '../../user/enums/user-role.enum';
 import RequestCreateArticleDto from '../dto/request/article/create-article.dto';
 import { Public } from '../../auth/decorators/public.decorator';
 import GetArticlesQuery from '../dto/request/article/get-article.dto';
-import ResponseCreateArticleDto from '../dto/response/article/create-article.dto';
 import ArticleDto from '../dto/article.dto';
 import ResponseGetArticlesDto from '../dto/response/article/get-article.dto';
 import RequestUpdateArticleDto from '../dto/request/article/update-article.dto';
 import Requester from '../../../common/decorators/requester.decorator';
 import { IRequester } from '../../../common/types/common.type';
+import { userRoles } from '../../user/domain/models/user-role.model';
 
 @ApiTags('게시글')
 @Controller({ path: 'articles', version: '1' })
@@ -37,12 +36,12 @@ export default class ArticleController {
   @Swagger.createArticle('게시글 생성')
   @UseInterceptors(FileInterceptor('thumbnail'))
   @UseGuards(AdminGuard)
-  @Roles(UserRoles.ADMIN)
+  @Roles(userRoles.admin.name)
   @Post()
   async createArticle(
     @Body() dto: RequestCreateArticleDto,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ResponseCreateArticleDto> {
+  ): Promise<ArticleDto> {
     return this.articleService.createArticle(dto, file);
   }
 
@@ -75,7 +74,7 @@ export default class ArticleController {
 
   @Swagger.deleteArticle('게시글 삭제')
   @UseGuards(AdminGuard)
-  @Roles(UserRoles.ADMIN)
+  @Roles(userRoles.admin.name)
   @Delete(':articleId')
   async deleteArticle(@Param('articleId') articleId: string) {
     return this.articleService.deleteArticle(articleId);
@@ -84,7 +83,7 @@ export default class ArticleController {
   @Swagger.updateArticle('게시글 수정')
   @UseGuards(AdminGuard)
   @UseInterceptors(FileInterceptor('thumbnail'))
-  @Roles(UserRoles.ADMIN)
+  @Roles(userRoles.admin.name)
   @Patch(':articleId')
   async updateArticle(
     @Param('articleId') articleId: string,

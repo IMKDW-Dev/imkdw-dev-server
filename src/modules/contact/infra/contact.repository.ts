@@ -1,17 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CustomPrismaService } from 'nestjs-prisma';
+import { Injectable } from '@nestjs/common';
 import { contacts } from '@prisma/client';
 
-import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
 import { IContactRepository } from '../repository/contact-repo.interface';
 import Contact from '../domain/entities/contact.entity';
+import PrismaService from '../../../infra/database/prisma.service';
 
 @Injectable()
 export default class ContactRepository implements IContactRepository {
-  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async save(contact: Contact): Promise<Contact> {
-    const row = await this.prisma.client.contacts.create({ data: contact });
+    const row = await this.prisma.contacts.create({ data: contact });
     return this.toEntity(row);
   }
 

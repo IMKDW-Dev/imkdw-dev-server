@@ -1,26 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUrl } from 'class-validator';
+import { IsEnum, IsUUID, IsUrl } from 'class-validator';
 
 import IsNickname from '../decorators/validation/is-nickname.decorator';
+import { userRoles } from '../domain/models/user-role.model';
 
-interface Props {
-  nickname: string;
-  profile: string;
-}
 export default class UserDto {
-  constructor(props: Props) {
-    this.nickname = props.nickname;
-    this.profile = props.profile;
+  constructor(id: string, nickname: string, profile: string, role: string) {
+    this.id = id;
+    this.nickname = nickname;
+    this.profile = profile;
+    this.role = role;
   }
 
+  @ApiProperty({ description: '유저 아이디', example: 'UUID' })
+  @IsUUID()
+  id: string;
+
   @ApiProperty({
-    description: `
-    유저 닉네임
-    1. 특수문자 사용불가
-    2. 공백 사용불가
-    3. 2자 이상, 8자 이하
-    4. 한글, 영문, 숫자 사용가능
-  `,
+    description: '닉네임',
     example: 'imkdw',
     minLength: 2,
     maxLength: 8,
@@ -28,11 +25,11 @@ export default class UserDto {
   @IsNickname()
   nickname: string;
 
-  @ApiProperty({ description: '유저 프로필사진 URL', example: 'https://temp.com/profile.jpg' })
+  @ApiProperty({ description: '프로필사진 URL', example: 'https://temp.com/profile.jpg' })
   @IsUrl()
   profile: string;
 
-  static create(props: Props) {
-    return new UserDto(props);
-  }
+  @ApiProperty({ description: '유저 권한', example: userRoles.normal.name })
+  @IsEnum([userRoles.admin.name, userRoles.normal.name])
+  role: string;
 }

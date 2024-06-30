@@ -1,58 +1,52 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { ArticleCommentNotFoundException, ArticleNotFoundException } from '../../../../common/exceptions/404';
-import { CannotReplyOnReplyCommentException } from '../../../../common/exceptions/403';
+import { ArticleCommentNotFoundException } from '../../../../common/exceptions/404';
 import {
   ARTICLE_COMMENT_REPOSITORY,
   IArticleCommentRepository,
 } from '../../repository/article-comment/article-comment-repo.interface';
 import ArticleService from '../article/article.service';
-import ArticleQueryService from '../article/article-query.service';
-import UserQueryService from '../../../user/services/user-query.service';
 import ArticleCommentDto from '../../dto/article-comment.dto';
 import { CreateCommentDto } from '../../dto/internal/article-comment/create-comment.dto';
-import ArticleId from '../../domain/value-objects/article-id.vo';
-import ArticleComment from '../../domain/entities/article-comment.entity';
+import UserService from '../../../user/services/user.service';
+import ArticleComment from '../../domain/models/article-comment.model';
+import { ArticleCommentQueryFilter } from '../../repository/article-comment/article-comment-query.filter';
+import * as ArticleCommentMapper from '../../mappers/article-comment.mapper';
 
 @Injectable()
 export default class ArticleCommentService {
   constructor(
     @Inject(ARTICLE_COMMENT_REPOSITORY) private readonly articleCommentRepository: IArticleCommentRepository,
     private readonly articleService: ArticleService,
-    private readonly articleQueryService: ArticleQueryService,
-    private readonly userQueryService: UserQueryService,
+    private readonly userQueryService: UserService,
   ) {}
 
   async createComment(dto: CreateCommentDto): Promise<ArticleCommentDto> {
-    const article = await this.articleQueryService.findOne({ id: new ArticleId(dto.articleId) });
-    if (!article) {
-      throw new ArticleNotFoundException(dto.articleId);
-    }
-
+    await this.articleService.findOneOrThrow({ articleId: dto.articleId });
     const user = await this.userQueryService.findOne({ id: dto.userId });
 
-    if (dto.parentId) {
-      const parentComment = await this.articleCommentRepository.findOne({ id: dto.parentId });
-      if (!parentComment) {
-        throw new ArticleCommentNotFoundException(dto.parentId);
-      }
+    const comment = new ArticleComment.builder()
+      .setArticleId(dto.articleId)
+      .setContent(dto.content)
+      .setAuthor(user)
+      .build();
 
-      // 답글에는 답글 작성이 불가능하다. 답글의 depth는 1로 제한
-      if (parentComment.isParentComment()) {
-        throw new CannotReplyOnReplyCommentException();
-      }
+    if (dto.parentId) {
+      const parentComment = await this.findOneOrThrow({ id: dto.parentId });
+      comment.setParent(parentComment);
+      comment.checkReplyAvailable();
     }
 
-    const comment = ArticleComment.create({
-      articleId: dto.articleId,
-      parentId: dto.parentId,
-      content: dto.content,
-      author: user,
-    });
-
-    // TODO: 트랜잭션 처리
     const createdComment = await this.articleCommentRepository.save(comment);
-    await this.articleService.addCommentCount(article);
-    return createdComment;
+    return ArticleCommentMapper.toDto(createdComment);
+  }
+
+  async findOneOrThrow(filter: ArticleCommentQueryFilter): Promise<ArticleComment> {
+    const comment = await this.articleCommentRepository.findOne(filter);
+    if (!comment) {
+      throw new ArticleCommentNotFoundException(`댓글을 찾을 수 없습니다. filter: ${filter}`);
+    }
+
+    return comment;
   }
 }

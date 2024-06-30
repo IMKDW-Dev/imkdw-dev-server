@@ -1,4 +1,7 @@
 import type { Config } from '@jest/types';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.test' });
 
 const config: Config.InitialOptions = {
   moduleFileExtensions: ['js', 'json', 'ts'],
@@ -10,7 +13,6 @@ const config: Config.InitialOptions = {
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
-  coveragePathIgnorePatterns: ['/node_modules/', '/dist/'],
 };
 
 export default config;

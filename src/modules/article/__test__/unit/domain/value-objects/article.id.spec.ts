@@ -1,4 +1,4 @@
-import ArticleId from '../../../../domain/value-objects/article-id.vo';
+import ArticleId from '../../../../domain/vo/article-id.vo';
 
 describe('ArticleId', () => {
   describe('addHash', () => {

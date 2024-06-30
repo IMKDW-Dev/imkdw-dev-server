@@ -1,21 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CustomPrismaService } from 'nestjs-prisma';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
 import { IArticleRepository } from '../repository/article/article-repo.interface';
-import { ExtendedPrismaClient, PRISMA_SERVICE } from '../../../infra/database/prisma';
-import Article from '../domain/entities/article.entity';
 import { ArticleQueryFilter } from '../repository/article/article-query.filter';
-import ArticleId from '../domain/value-objects/article-id.vo';
-import User from '../../user/domain/entities/user.entity';
-import Category from '../../category/domain/entities/category.entity';
-import Tag from '../../tag/domain/entities/tag.entity';
 import { ArticleQueryOption } from '../repository/article/article-query.option';
-import { TX } from '../../../@types/prisma/prisma.type';
-import ArticleComment from '../domain/entities/article-comment.entity';
-import ArticleContent from '../domain/value-objects/article-content.vo';
+import Article from '../domain/models/article.model';
 
-type IArticle = Prisma.articlesGetPayload<{
+import * as CategoryMapper from '../../category/mappers/category.mapper';
+import * as TagMapper from '../../tag/mappers/tag.mapper';
+import * as ArticleMapper from '../mappers/article.mapper';
+
+export type IArticle = Prisma.articlesGetPayload<{
   include: {
     category: true;
     articleTag: {
@@ -23,48 +20,27 @@ type IArticle = Prisma.articlesGetPayload<{
         tags: true;
       };
     };
-    articleComment: {
-      include: {
-        user: true;
-        replies: {
-          include: {
-            user: true;
-          };
-        };
-      };
-    };
   };
 }>;
 
-const articleInclude = {
+export const articleInclude = {
   category: true,
   articleTag: {
     include: {
       tags: true,
     },
   },
-  articleComment: {
-    include: {
-      user: true,
-      replies: {
-        include: {
-          user: true,
-        },
-      },
-    },
-    where: { parentId: null as number | null },
-  },
 } as const;
 
 @Injectable()
 export default class ArticleRepository implements IArticleRepository {
-  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: CustomPrismaService<ExtendedPrismaClient>) {}
+  constructor(private readonly prisma: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async findOne(query: ArticleQueryFilter): Promise<Article> {
-    const row: IArticle = await this.prisma.client.articles.findFirst({
+    const row: IArticle = await this.prisma.tx.articles.findFirst({
       where: {
-        ...(query?.id && { id: query.id.toString() }),
-        ...(query?.category && { categoryId: query.category.id }),
+        ...(query?.articleId && { id: query.articleId }),
+        ...(query?.categoryId && { categoryId: query.categoryId }),
         ...(!query?.includePrivate && { visible: true }),
       },
       include: articleInclude,
@@ -73,10 +49,10 @@ export default class ArticleRepository implements IArticleRepository {
   }
 
   async findMany(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<Article[]> {
-    const rows: IArticle[] = await this.prisma.client.articles.findMany({
+    const rows: IArticle[] = await this.prisma.tx.articles.findMany({
       where: {
-        ...(query?.id && { id: query.id.toString() }),
-        ...(query?.category && { categoryId: query.category.id }),
+        ...(query?.articleId && { id: query.articleId }),
+        ...(query?.categoryId && { categoryId: query.categoryId }),
         ...(option?.excludeId && { NOT: { id: option.excludeId.toString() } }),
         ...(!query?.includePrivate && { visible: true }),
         ...(option?.search && {
@@ -94,26 +70,24 @@ export default class ArticleRepository implements IArticleRepository {
         }),
       },
       include: articleInclude,
-      orderBy: {
-        ...option?.orderBy,
-      },
+      orderBy: { ...option?.orderBy },
       take: option?.limit,
-      skip: (option.page - 1) * option.limit,
+      ...(option?.page && { skip: (option.page - 1) * option.limit }),
     });
 
     return rows.map((row) => this.toEntity(row));
   }
 
-  async save(article: Article, tx: TX = this.prisma.client): Promise<Article> {
-    const row: IArticle = await tx.articles.create({
+  async save(article: Article): Promise<Article> {
+    const row: IArticle = await this.prisma.tx.articles.create({
       include: articleInclude,
       data: {
-        id: article.id.toString(),
-        title: article.title,
-        content: article.content.getContent(),
-        thumbnail: article.thumbnail,
-        categoryId: article.category.id,
-        visible: article.visible,
+        id: article.getId(),
+        title: article.getTitle(),
+        content: article.getContent(),
+        thumbnail: article.getThumbnail(),
+        categoryId: article.getCategoryId(),
+        visible: article.getVisible(),
       },
     });
 
@@ -121,16 +95,15 @@ export default class ArticleRepository implements IArticleRepository {
   }
 
   async update(article: Article): Promise<Article> {
-    const row: IArticle = await this.prisma.client.articles.update({
-      where: { id: article.id.toString() },
+    const row: IArticle = await this.prisma.tx.articles.update({
+      where: { id: article.getId() },
       data: {
-        title: article.title,
-        content: article.content.getContent(),
-        thumbnail: article.thumbnail,
-        visible: article.visible,
-        viewCount: article.viewCount,
-        commentCount: article.commentCount,
-        categoryId: article.category.id,
+        title: article.getTitle(),
+        content: article.getContent(),
+        thumbnail: article.getThumbnail(),
+        visible: article.getVisible(),
+        viewCount: article.getViewCount(),
+        categoryId: article.getCategoryId(),
       },
       include: articleInclude,
     });
@@ -139,10 +112,10 @@ export default class ArticleRepository implements IArticleRepository {
   }
 
   async findCounts(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<number> {
-    return this.prisma.client.articles.count({
+    return this.prisma.tx.articles.count({
       where: {
-        ...(query?.id && { id: query.id.toString() }),
-        ...(query?.category && { categoryId: query.category.id }),
+        ...(query?.articleId && { id: query.articleId }),
+        ...(query?.categoryId && { categoryId: query.categoryId }),
         ...(option?.excludeId && { NOT: { id: option.excludeId.toString() } }),
         ...(option?.search && {
           title: { contains: option.search },
@@ -154,7 +127,7 @@ export default class ArticleRepository implements IArticleRepository {
   }
 
   async findIds(query: ArticleQueryFilter): Promise<string[]> {
-    const rows = await this.prisma.client.articles.findMany({
+    const rows = await this.prisma.tx.articles.findMany({
       where: {
         ...(!query?.includePrivate && { visible: true }),
       },
@@ -166,61 +139,13 @@ export default class ArticleRepository implements IArticleRepository {
     return rows.map((row) => row.id);
   }
 
-  async delete(article: Article, tx: TX = this.prisma.client): Promise<void> {
-    await tx.articles.delete({ where: { id: article.id.toString() } });
+  async delete(article: Article): Promise<void> {
+    await this.prisma.tx.articles.delete({ where: { id: article.getId() } });
   }
 
   private toEntity(row: IArticle): Article {
-    const comments = row.articleComment.map((comment) => {
-      const replies = comment.replies.map((reply) =>
-        ArticleComment.create({
-          id: reply.id,
-          articleId: reply.articleId,
-          author: User.create({ nickname: reply.user.nickname, profile: reply.user.profile }),
-          content: reply.content,
-          parentId: null,
-          createdAt: reply.createdAt,
-        }),
-      );
-
-      return ArticleComment.create({
-        id: comment.id,
-        articleId: comment.articleId,
-        author: User.create({ nickname: comment.user.nickname, profile: comment.user.profile }),
-        content: comment.content,
-        parentId: null,
-        replies,
-        createdAt: comment.createdAt,
-      });
-    });
-
-    const tags = row.articleTag.map((articleTag) =>
-      Tag.create({
-        id: articleTag.tags.id,
-        name: articleTag.tags.name,
-      }),
-    );
-
-    const category = Category.create({
-      id: row.category.id,
-      name: row.category.name,
-      image: row.category.image,
-      desc: row.category.desc,
-      sort: row.category.sort,
-    });
-
-    return Article.create({
-      id: new ArticleId(row.id),
-      title: row.title,
-      content: new ArticleContent(row.content),
-      createdAt: row.createdAt,
-      thumbnail: row.thumbnail,
-      viewCount: row.viewCount,
-      commentCount: row.commentCount,
-      visible: row.visible,
-      category,
-      tags,
-      comments,
-    });
+    const category = CategoryMapper.toModel(row.category);
+    const tags = row.articleTag.map((articleTag) => TagMapper.toModel(articleTag.tags));
+    return ArticleMapper.toModel(row, category, tags);
   }
 }
