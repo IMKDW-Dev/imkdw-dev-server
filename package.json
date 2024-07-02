@@ -65,6 +65,8 @@
     "winston-transport": "^4.7.0"
   },
   "devDependencies": {
+    "@automock/adapters.nestjs": "^2.1.0",
+    "@automock/jest": "^2.1.0",
     "@faker-js/faker": "^8.4.1",
     "@jest/types": "^29.6.3",
     "@nestjs/schematics": "^10.1.1",

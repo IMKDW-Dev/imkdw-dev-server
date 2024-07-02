@@ -13,6 +13,28 @@ const config: Config.InitialOptions = {
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
+  coveragePathIgnorePatterns: [
+    '.module.ts',
+    'src/main.ts',
+    '__test__',
+    '.spec.ts',
+    '.e2e-spec.ts',
+    '.d.ts',
+    '/constants/',
+    '/enums/',
+    '/docs/',
+    'prisma.ts',
+    'prisma.service.ts',
+    'app.controller.ts',
+    'app.service.ts',
+    '.swagger.ts',
+    '/dto/',
+    '/interfaces/',
+    '/types/',
+    '/decorators/',
+    '/guards/',
+    '/middlewares/',
+  ],
 };
 
 export default config;
