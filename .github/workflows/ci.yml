@@ -123,6 +123,7 @@ jobs:
 
   alert:
     needs: [build, lint, test, e2e]
+    runs-on: ubuntu-latest
     steps:
       - name: Push CI Result on Slack
         uses: 8398a7/action-slack@v3
