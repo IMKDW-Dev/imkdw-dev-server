@@ -1,3 +1,4 @@
+import { CategoryHaveArticlesException } from '../../../../common/exceptions/403';
 import CategoryDesc from '../vo/category-desc.vo';
 import CategoryName from '../vo/category-name.vo';
 
@@ -62,8 +63,10 @@ export default class Category {
     this.desc = new CategoryDesc(desc);
   }
 
-  isHaveArticles() {
-    return this.articleCount > 0;
+  checkAvailableDelete() {
+    if (this.articleCount > 0) {
+      throw new CategoryHaveArticlesException(`카테고리에 게시글이 존재합니다.`);
+    }
   }
 
   static builder = class {

@@ -4,8 +4,8 @@ import TokenService from '../../../token/services/token.service';
 import UserService from '../../../user/services/user.service';
 import AuthService from '../../services/auth.service';
 import UserOAuthProvider from '../../../user/domain/models/user-oauth-provider.model';
-import { createUser } from '../../../../__test__/fixtures/user/create-user.test-fixture';
 import { generateUUID } from '../../../../common/utils/uuid';
+import { createUser } from '../../../user/__test__/fixtures/create-user.fixture';
 
 describe('AuthService', () => {
   let sut: AuthService;

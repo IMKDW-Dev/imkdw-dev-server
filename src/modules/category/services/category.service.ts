@@ -8,25 +8,22 @@ import CategoryImageService from './category-image.service';
 import { CategoryNotFoundException } from '../../../common/exceptions/404';
 import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
 import CategoryDto from '../dto/category.dto';
-import { CategoryHaveArticlesException } from '../../../common/exceptions/403';
 import * as CategoryMapper from '../mappers/category.mapper';
 import Category from '../domain/models/category.model';
 import { CategoryQueryFilter } from '../repository/category-query.filter';
-import PrismaService from '../../../infra/database/prisma.service';
 
 @Injectable()
 export default class CategoryService {
   constructor(
     @Inject(CATEGORY_REPOSITORY) private readonly categoryRepository: ICategoryRepository,
     private readonly categoryImageService: CategoryImageService,
-    private readonly prisma: PrismaService,
   ) {}
 
   @Transactional()
   async createCategory(dto: CreateCategoryDto): Promise<CategoryDto> {
     const categoryByName = await this.categoryRepository.findOne({ name: dto.name });
     if (categoryByName) {
-      throw new DuplicateCategoryNameException(dto.name);
+      throw new DuplicateCategoryNameException(`${dto.name}은 이미 존재하는 카테고리 이름입니다.`);
     }
 
     const nextSort = await this.categoryRepository.findNextSort();
@@ -48,7 +45,7 @@ export default class CategoryService {
   async getCategory(name: string): Promise<CategoryDto> {
     const categoryDetail = await this.categoryRepository.findOne({ name });
     if (!categoryDetail) {
-      throw new CategoryNotFoundException({ name });
+      throw new CategoryNotFoundException(`카테고리 이름 ${name}을 찾을 수 없습니다.`);
     }
 
     return CategoryMapper.toDto(categoryDetail);
@@ -76,10 +73,7 @@ export default class CategoryService {
 
   async deleteCategory(categoryId: number) {
     const category = await this.findOneOrThrow({ id: categoryId });
-
-    if (category.isHaveArticles()) {
-      throw new CategoryHaveArticlesException();
-    }
+    category.checkAvailableDelete();
 
     await this.categoryRepository.delete(category);
   }
@@ -92,7 +86,7 @@ export default class CategoryService {
   async findOneOrThrow(filter: CategoryQueryFilter): Promise<Category> {
     const category = await this.categoryRepository.findOne(filter);
     if (!category) {
-      throw new CategoryNotFoundException(`${filter} not found`);
+      throw new CategoryNotFoundException(`${JSON.stringify(filter)}에 해당하는 카테고리를 찾을 수 없습니다.`);
     }
 
     return category;

@@ -2,7 +2,6 @@ import { TestBed } from '@automock/jest';
 import OAuthService from '../../services/oauth.service';
 import UserService from '../../../user/services/user.service';
 import { HTTP_REST_SERVICE, IHttpRestService } from '../../../../infra/http/rest/interfaces/http-rest.interface';
-import { createUser } from '../../../../__test__/fixtures/user/create-user.test-fixture';
 import UserOAuthProvider from '../../../user/domain/models/user-oauth-provider.model';
 import AuthService from '../../services/auth.service';
 import { generateUUID } from '../../../../common/utils/uuid';
@@ -10,6 +9,7 @@ import { DuplicateEmailException } from '../../../../common/exceptions/409';
 import { createGoogleOAuthUserInfo } from '../fixtures/google-oauth.fixture';
 import { createKakaoOAuthToken, createKakaoUserInfo } from '../fixtures/kakao-oauth.fixture';
 import { createGithubOAuthToken, createGithubUserInfo } from '../fixtures/github-oauth.fixture';
+import { createUser } from '../../../user/__test__/fixtures/create-user.fixture';
 
 describe('OAuthService', () => {
   let sut: OAuthService;

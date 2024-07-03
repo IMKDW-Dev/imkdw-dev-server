@@ -29,10 +29,7 @@ export default class UserService {
   }
 
   async updateUser(userId: string, dto: UpdateUserDto) {
-    const user = await this.userRepository.findOne({ id: userId });
-    if (!user) {
-      throw new UserNotFoundException(`${userId} 아이디를 가진 유저를 찾을 수 없습니다.`);
-    }
+    const user = await this.findOneOrThrow({ id: userId });
 
     if (dto?.profileImage) {
       const profileImage = await this.userImageService.getProfileImage(user, dto.profileImage);
@@ -50,6 +47,15 @@ export default class UserService {
 
     const updatedUser = await this.userRepository.update(user);
     return UserMapper.toDto(updatedUser);
+  }
+
+  async findOneOrThrow(filter: UserQueryFilter) {
+    const user = await this.userRepository.findOne(filter);
+    if (!user) {
+      throw new UserNotFoundException(`유저를 찾을 수 없습니다. ${JSON.stringify(filter)}`);
+    }
+
+    return user;
   }
 
   async getUserCount(): Promise<number> {

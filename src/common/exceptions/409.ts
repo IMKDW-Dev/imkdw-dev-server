@@ -20,8 +20,8 @@ export class DuplicateEmailException extends ConfilctException {
 }
 
 export class DuplicateCategoryNameException extends ConfilctException {
-  constructor(name?: string) {
-    super(CONFLICT_EXCEPTIONS.DUPLICATE_CATEGORY_NAME, `${name} is already in use`);
+  constructor(error: unknown) {
+    super(CONFLICT_EXCEPTIONS.DUPLICATE_CATEGORY_NAME, error);
   }
 }
 
