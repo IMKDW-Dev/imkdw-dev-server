@@ -39,7 +39,7 @@ describe('AuthService', () => {
       // Given
       const [email, oAuthProvider] = ['email', UserOAuthProvider.GOOGLE];
       const [userId, accessToken, refreshToken] = [generateUUID(), 'accessToken', 'refreshToken'];
-      const user = createUser({ id: userId });
+      const user = createUser({ id: userId, provider: oAuthProvider });
 
       jest.spyOn(userService, 'createUser').mockResolvedValue(user);
       jest.spyOn(sut, 'login').mockReturnValue({ userId, accessToken, refreshToken });
