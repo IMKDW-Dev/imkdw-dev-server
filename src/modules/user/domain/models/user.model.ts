@@ -76,8 +76,8 @@ export default class User {
     oAuthProvider: UserOAuthProvider;
     role: UserRole;
 
-    setId(id: UserId) {
-      this.id = id;
+    setId(id: string) {
+      this.id = new UserId(id);
       return this;
     }
 
@@ -86,13 +86,13 @@ export default class User {
       return this;
     }
 
-    setNickname(nickname: Nickname) {
-      this.nickname = nickname;
+    setNickname(nickname: string) {
+      this.nickname = new Nickname(nickname);
       return this;
     }
 
-    setProfile(profile: Profile) {
-      this.profile = profile;
+    setProfile(profile: string) {
+      this.profile = new Profile(profile);
       return this;
     }
 

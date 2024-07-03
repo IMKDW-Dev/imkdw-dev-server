@@ -1,7 +1,6 @@
-import { InjectionToken } from '@nestjs/common';
 import { AxiosRequestConfig } from 'axios';
 
-export const HTTP_REST_SERVICE: InjectionToken = Symbol('HTTP_REST_SERVICE');
+export const HTTP_REST_SERVICE = Symbol('HTTP_REST_SERVICE');
 
 export interface IHttpRestService {
   get<T>(url: string, options?: AxiosRequestConfig): Promise<T>;

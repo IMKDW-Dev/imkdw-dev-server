@@ -1,9 +1,8 @@
-import { InjectionToken } from '@nestjs/common';
 import { CategoryQueryFilter } from './category-query.filter';
 import Category from '../domain/models/category.model';
 import { CategoryQueryOption } from './category-query.option';
 
-export const CATEGORY_REPOSITORY: InjectionToken = Symbol('CATEGORY_REPOSITORY');
+export const CATEGORY_REPOSITORY = Symbol('CATEGORY_REPOSITORY');
 
 export interface ICategoryRepository {
   findOne(filter: CategoryQueryFilter): Promise<Category | null>;

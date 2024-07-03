@@ -25,14 +25,12 @@ import { userRoles } from '../../../user/domain/models/user-role.model';
 import { ArticleQueryFilter } from '../../repository/article/article-query.filter';
 import Article from '../../domain/models/article.model';
 import { ArticleQueryOption } from '../../repository/article/article-query.option';
-import PrismaService from '../../../../infra/database/prisma.service';
 
 @Injectable()
 export default class ArticleService {
   constructor(
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
     @Inject(ARTICLE_COMMENT_REPOSITORY) private readonly articleCommentRepository: IArticleCommentRepository,
-    private readonly prisma: PrismaService,
     private readonly articleImageService: ArticleImageService,
     private readonly articleTagService: ArticleTagService,
     private readonly categoryService: CategoryService,
@@ -49,6 +47,7 @@ export default class ArticleService {
 
     const articleId = new ArticleId(dto.id);
     articleId.addHash();
+
     const thumbnail = await this.articleImageService.getThumbnail(articleId.toString(), file);
 
     const articleContent = new ArticleContent(dto.content);
