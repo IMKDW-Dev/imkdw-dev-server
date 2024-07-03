@@ -88,7 +88,7 @@ jobs:
       - name: Test Project
         run: pnpm test
 
-  e2e:
+  E2E:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
@@ -123,13 +123,14 @@ jobs:
 
   alert:
     needs: [build, lint, test, e2e]
-    - name: Push CI Result on Slack
-      uses: 8398a7/action-slack@v3
-      with:
-        author_name: '[SERVER] IMKDW DEV CI Result'
-        status: ${{ job.status }}
-        fields: repo,message,author,took
-        text: ${{ steps.set_text.outputs.text }}
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      if: always()
+    steps:
+      - name: Push CI Result on Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          author_name: '[SERVER] IMKDW DEV CI Result'
+          status: ${{ job.status }}
+          fields: repo,message,author,took
+          text: ${{ steps.set_text.outputs.text }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
