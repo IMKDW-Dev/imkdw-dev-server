@@ -65,7 +65,6 @@ export default class ArticleComment {
   }
 
   checkReplyAvailable() {
-    console.log(this.parent);
     if (this.parent) {
       throw new CannotReplyOnReplyCommentException(
         `답글에는 답글을 작성할 수 없습니다. parentId: ${this.parent.getId()}`,

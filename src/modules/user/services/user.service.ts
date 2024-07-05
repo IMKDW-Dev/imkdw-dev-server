@@ -24,7 +24,7 @@ export default class UserService {
   }
 
   async getUserInfo(userId: string): Promise<ResponseGetUserInfoDto> {
-    const user = await this.userRepository.findOne({ id: userId });
+    const user = await this.findOneOrThrow({ id: userId });
     return new ResponseGetUserInfoDto(UserMapper.toDto(user));
   }
 
@@ -37,6 +37,10 @@ export default class UserService {
     }
 
     if (dto?.nickname) {
+      if (user.getNickname() === dto.nickname) {
+        return UserMapper.toDto(user);
+      }
+
       const userByNickname = await this.userRepository.findOne({ nickname: dto.nickname });
       if (userByNickname) {
         throw new DuplicateNicknameException(`${dto.nickname}은 이미 사용중인 닉네임입니다.`);

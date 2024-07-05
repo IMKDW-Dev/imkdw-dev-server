@@ -6,6 +6,9 @@ import User from '../../domain/models/user.model';
 interface Params {
   id?: string;
   email?: string;
+  profile?: string;
+  nickname?: string;
+  userRole?: UserRole;
   provider?: UserOAuthProvider;
 }
 
@@ -14,7 +17,9 @@ export const createUser = (params?: Params) => {
   return new User.builder()
     .setId(params?.id ?? generateUUID())
     .setEmail(params?.email ?? 'dummy_email')
-    .setRole(UserRole.NORMAL)
+    .setProfile(params?.profile ?? 'dummy_profile')
+    .setNickname(params?.nickname ?? 'dummy_nickname')
+    .setRole(params?.userRole ?? UserRole.NORMAL)
     .setOAuthProvider(params?.provider ?? UserOAuthProvider.GOOGLE)
     .build();
 };
