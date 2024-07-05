@@ -70,8 +70,13 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 8
+
       - name: Install Development Dependencies
         run: pnpm i
+
+      - name: Seeding Database
+        run: npx prisma db seed
+
       - name: Test Project
         run: pnpm test
 
