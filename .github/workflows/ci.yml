@@ -48,6 +48,8 @@ jobs:
   test:
     needs: [build]
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: mysql://root:1234@localhost:3306/test
     steps:
       - uses: mirromutth/mysql-action@v1.1
         with:
