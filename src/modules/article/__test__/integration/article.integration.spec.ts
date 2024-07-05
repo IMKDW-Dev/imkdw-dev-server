@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import { cleanupDatabase } from '../../../../../prisma/__test__/utils/cleanup';
 import IntegrationTestModule from '../../../../__test__/modules/integration-test.module';
 import { generateUUID } from '../../../../common/utils/uuid';
@@ -75,6 +76,8 @@ describe('ArticleIntegration', () => {
     });
 
     it('댓글이 있는 경우 게시글 상세정보에 댓글이 포함된다', async () => {
+      // eslint-disable-next-line no-console
+      console.log(await new PrismaClient().userOAuthProviders.findMany());
       // Given
       const user = createUser({ id: generateUUID() });
       await userRepository.save(user);

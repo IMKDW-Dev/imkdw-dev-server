@@ -24,15 +24,15 @@ async function createSeed<T>(data: T[], inserter: (input: T[]) => Promise<unknow
 }
 
 async function main() {
-  // 사용자 역할 시딩
-  await createSeed(addCommonFields(userRoleSeed), (data) =>
-    prisma.userRoles.createMany({ data, skipDuplicates: true }),
-  );
+  await Promise.all([
+    // 사용자 역할 시딩
+    createSeed(addCommonFields(userRoleSeed), (data) => prisma.userRoles.createMany({ data, skipDuplicates: true })),
 
-  // OAuth 인증 제공자 시딩
-  await createSeed(addCommonFields(oAuthProviderSeed), (data) =>
-    prisma.userOAuthProviders.createMany({ data, skipDuplicates: true }),
-  );
+    // OAuth 인증 제공자 시딩
+    createSeed(addCommonFields(oAuthProviderSeed), (data) =>
+      prisma.userOAuthProviders.createMany({ data, skipDuplicates: true }),
+    ),
+  ]);
 }
 
 main()
