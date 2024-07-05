@@ -25,8 +25,7 @@
     "prisma:studio": "npx prisma studio",
     "prisma:seed": "npx prisma db seed",
     "db:clean": "bash ./scripts/database/clean-db.sh && npx prisma db seed",
-    "db:copy": "bash ./scripts/database/copy-db.sh && npm start",
-    "prepare": "husky"
+    "db:copy": "bash ./scripts/database/copy-db.sh && npm start"
   },
   "dependencies": {
     "@aws-sdk/client-cloudwatch-logs": "^3.606.0",
