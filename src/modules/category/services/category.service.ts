@@ -92,7 +92,7 @@ export default class CategoryService {
     return category;
   }
 
-  async findNames(filter: CategoryQueryFilter): Promise<string[]> {
+  async findNames(filter?: CategoryQueryFilter): Promise<string[]> {
     return this.categoryRepository.findNames(filter);
   }
 }
