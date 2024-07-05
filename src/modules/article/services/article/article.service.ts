@@ -3,7 +3,6 @@ import { Transactional } from '@nestjs-cls/transactional';
 
 import { ARTICLE_REPOSITORY, IArticleRepository } from '../../repository/article/article-repo.interface';
 import { CreateArticleDto } from '../../dto/internal/article/create-article.dto';
-import { DuplicateArticleIdException } from '../../../../common/exceptions/409';
 import ArticleTagService from '../../../articleTag/services/article-tag.service';
 import ArticleImageService from './article-image.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../../common/exceptions/404';
@@ -39,11 +38,6 @@ export default class ArticleService {
   @Transactional()
   async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<ArticleDto> {
     const category = await this.categoryService.findOneOrThrow({ id: dto.categoryId });
-
-    const article = await this.articleRepository.findOne({ articleId: dto.id });
-    if (article) {
-      throw new DuplicateArticleIdException(dto.id.toString());
-    }
 
     const articleId = new ArticleId(dto.id);
     articleId.addHash();

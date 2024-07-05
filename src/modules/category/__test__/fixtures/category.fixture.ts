@@ -1,4 +1,4 @@
-import CategoryDto from '../../../dto/category.dto';
+import CategoryDto from '../../dto/category.dto';
 
 // eslint-disable-next-line import/prefer-default-export
 export const createCategoryDto = (params: Partial<CategoryDto>): CategoryDto => {

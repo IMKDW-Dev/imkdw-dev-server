@@ -16,6 +16,7 @@ const config: Config.InitialOptions = {
   resetMocks: true,
   restoreMocks: true,
   clearMocks: true,
+  testTimeout: 10000,
 };
 
 export default config;

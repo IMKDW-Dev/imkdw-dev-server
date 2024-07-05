@@ -1,4 +1,4 @@
-import { createCategory, createCreateCategoryDto } from '../fixtures/create-category.fixture';
+import { createCategory, createCreateCategoryDto } from '../../fixtures/create-category.fixture';
 import CategoryService from '../../../services/category.service';
 import { CATEGORY_REPOSITORY, ICategoryRepository } from '../../../repository/category-repo.interface';
 import { DuplicateCategoryNameException } from '../../../../../common/exceptions/409';
@@ -6,7 +6,7 @@ import IntegrationTestModule from '../../../../../__test__/modules/integration-t
 import { cleanupDatabase } from '../../../../../../prisma/__test__/utils/cleanup';
 import PrismaService from '../../../../../infra/database/prisma.service';
 import { IStorageService, STORAGE_SERVICE } from '../../../../../infra/storage/interfaces/storage.interface';
-import { createCategoryDto } from '../fixtures/category.fixture';
+import { createCategoryDto } from '../../fixtures/category.fixture';
 import { CategoryNotFoundException } from '../../../../../common/exceptions/404';
 import { generateMulterFile } from '../../../../../__test__/fixtures/create-multer-file.fixture';
 import { CategoryHaveArticlesException } from '../../../../../common/exceptions/403';

@@ -18,7 +18,7 @@ export const createUser = (params?: Params) => {
     .setId(params?.id ?? generateUUID())
     .setEmail(params?.email ?? 'dummy_email')
     .setProfile(params?.profile ?? 'dummy_profile')
-    .setNickname(params?.nickname ?? 'dummy_nickname')
+    .setNickname(params?.nickname ?? 'nickname')
     .setRole(params?.userRole ?? UserRole.NORMAL)
     .setOAuthProvider(params?.provider ?? UserOAuthProvider.GOOGLE)
     .build();

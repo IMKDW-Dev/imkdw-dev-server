@@ -1,6 +1,6 @@
-import { generateMulterFile } from '../../../../../__test__/fixtures/create-multer-file.fixture';
-import Category from '../../../domain/models/category.model';
-import { CreateCategoryDto } from '../../../dto/internal/create-category.dto';
+import { generateMulterFile } from '../../../../__test__/fixtures/create-multer-file.fixture';
+import Category from '../../domain/models/category.model';
+import { CreateCategoryDto } from '../../dto/internal/create-category.dto';
 
 export const createCreateCategoryDto = (params: Partial<CreateCategoryDto>): CreateCategoryDto => {
   return {
