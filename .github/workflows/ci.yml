@@ -1,152 +1,155 @@
 name: IMKDW-Dev CI
 on:
   push:
-    branches: [develop]
+    branches:
+      - develop
+      - chore/ci
   pull_request:
-    branches: [develop]
+    branches:
+      - develop
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js v20
+        uses: actions/setup-node@v3
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v2
+
+      - name: Setup pnpm v8
+        uses: pnpm/action-setup@v2
         with:
           version: 8
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+
       - name: Install Production Dependencies
         run: pnpm i -P
+
       - name: Generate Prisma Types
         run: npx prisma generate
+
       - name: Build Project
         run: pnpm build
-      - uses: actions/upload-artifact@v3
-        with:
-          name: dist
-          path: dist
 
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js v20
+        uses: actions/setup-node@v3
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v2
+
+      - name: Setup pnpm v8
+        uses: pnpm/action-setup@v2
         with:
           version: 8
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - name: Install Development Dependencies
+
+      - name: Install Dependencies
         run: pnpm i
+
       - name: Lint Project
         run: pnpm lint
 
   test:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: mysql://root:${{ secrets.DB_PASSWORD }}@localhost:3306/test
+      DATABASE_URL: mysql://root:1234@localhost:3306/test
     steps:
       - uses: mirromutth/mysql-action@v1.1
         with:
-          mysql-version: '8.0'
-          mysql-database: 'test'
-          mysql-root-password: ${{ secrets.DB_PASSWORD }}
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+          host port: 3306
+          character set server: 'utf8'
+          collation server: 'utf8_general_ci'
+          mysql version: '8.0'
+          mysql database: 'test'
+          mysql root password: 1234
+          mysql user: 'root'
+          mysql password: 1234
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js v20
+        uses: actions/setup-node@v3
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v2
+
+      - name: Setup pnpm v8
+        uses: pnpm/action-setup@v2
         with:
           version: 8
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - name: Install Development Dependencies
+
+      - name: Install Dependencies
         run: pnpm i
+
       - name: Generate Prisma Types
         run: npx prisma db push
+
       - name: Seeding Database
         run: npx prisma db seed
-      - name: Test Project
-        run: pnpm test
 
-  E2E:
+      - name: Test Project
+        run: pnpm test:ci
+
+  e2e:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: mysql://root:${{ secrets.DB_PASSWORD }}@localhost:3307/test
+      DATABASE_URL: mysql://root:1234@localhost:3307/test
     steps:
       - uses: mirromutth/mysql-action@v1.1
         with:
-          host-port: 3307
-          mysql-version: '8.0'
-          mysql-database: 'test'
-          mysql-root-password: ${{ secrets.DB_PASSWORD }}
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+          host port: 3307
+          character set server: 'utf8'
+          collation server: 'utf8_general_ci'
+          mysql version: '8.0'
+          mysql database: 'test'
+          mysql root password: 1234
+          mysql user: 'root'
+          mysql password: 1234
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js v20
+        uses: actions/setup-node@v3
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v2
+
+      - name: Setup pnpm v8
+        uses: pnpm/action-setup@v2
         with:
           version: 8
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-      - name: Install Development Dependencies
+
+      - name: Install Dependencies
         run: pnpm i
+
       - name: Generate Prisma Types
         run: npx prisma db push
-      - name: Start Application
-        run: pnpm start &
-      - name: Run E2E Tests
-        run: pnpm test:e2e
+
+      - name: Seeding Database
+        run: npx prisma db seed
+
+      - name: Test Project
+        run: pnpm test:ci
 
   alert:
-    needs: [build, lint, test, E2E]
+    needs: [build, lint, test, e2e]
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - name: Push CI Result on Slack
         uses: 8398a7/action-slack@v3
         with:
-          status: ${{ job.status }}
           author_name: '[SERVER] IMKDW DEV CI Result'
-          fields: repo,message,author,took
+          status: ${{ job.status }}
+          fields: repo,message,author
           text: ${{ steps.set_text.outputs.text }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
