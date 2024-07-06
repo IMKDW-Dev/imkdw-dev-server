@@ -50,12 +50,15 @@
   - Tailwindcss
   - Zustand
 
-- AWS
+- Infra
 
-  - S3
-  - CloudWatch
-  - EC2
-  - RDS
+  - Github Actions
+  - AWS
+    - S3
+    - CloudWatch
+    - EC2
+    - RDS
+  - Docker
 
 <br/>
 
