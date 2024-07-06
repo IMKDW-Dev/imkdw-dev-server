@@ -23,7 +23,7 @@ export default class LoggingInterceptor implements NestInterceptor {
           requester: request.user?.userId ?? `anonymous-${generateUUID()}`,
           method: request.method,
           url: request.url,
-          ip: request.ip,
+          ip: request.headers['x-forwarded-for'][0] || request.ip,
           userAgent: request.headers['user-agent'],
           status: response.statusCode,
           processingTime: `${endTime - startTime}ms`,
