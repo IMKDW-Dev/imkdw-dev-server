@@ -5,7 +5,7 @@ interface ILoggerCommonParams {
   requester: string;
   method: string;
   url: string;
-  ip: string;
+  ip: string | string[];
   userAgent: string;
   status: number;
   processingTime: string;
