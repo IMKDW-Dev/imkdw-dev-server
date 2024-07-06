@@ -14,6 +14,8 @@ export default class LoggingInterceptor implements NestInterceptor {
     const response = context.switchToHttp().getResponse<Response>();
     const startTime = Date.now();
 
+    this.logger.debug(JSON.stringify(request.headers));
+
     return next.handle().pipe(
       tap(() => {
         const endTime = Date.now();
