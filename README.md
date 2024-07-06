@@ -16,8 +16,12 @@
     <br/>
     블로그는 데스크탑 크롬 웹 브라우저에 최적화 되어있습니다.
     <br/>
-    ![Nest](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)
-    ![Next](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
+    <br/>
+    클라이언트 깃허브 : <a href="https://github.com/imkdw/imkdw-dev-client">imkdw/imkdw-dev-client</a>
+    <br/>
+    <br/>
+    <img src="https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white" alt="Nest" style="margin-right: 10px;">
+    <img src="https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next">
   </p>
 </div>
 
