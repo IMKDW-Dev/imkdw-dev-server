@@ -9,7 +9,7 @@ export const cleanupDatabase = async (prisma: PrismaService) => {
 
   const filteredTables = tables.filter(({ TABLE_NAME }) => {
     const seedTables = ['oauthproviders', 'userroles'];
-    return !seedTables.includes(TABLE_NAME);
+    return !seedTables.includes(TABLE_NAME.toLowerCase());
   });
 
   await prisma.$transaction(async (tx) => {
