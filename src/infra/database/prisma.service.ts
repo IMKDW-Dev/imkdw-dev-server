@@ -44,7 +44,10 @@ export default class PrismaService extends PrismaClient {
         }
 
         if (action === 'findFirst' || action === 'findUnique' || action === 'findMany') {
-          newParams.args.where = { ...newParams.args.where, deleteAt: null };
+          if (newParams.args?.where) {
+            newParams.args.where = { ...newParams.args.where, deleteAt: null };
+          }
+
           return next(newParams);
         }
       }

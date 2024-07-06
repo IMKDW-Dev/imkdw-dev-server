@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { categories } from '@prisma/client';
+import { categories as PrismaCategories } from '@prisma/client';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
@@ -44,10 +44,22 @@ export default class CategoryRepository implements ICategoryRepository {
         sort: category.getSort(),
         desc: category.getDesc(),
         image: category.getImage(),
+        articleCount: category.getArticleCount(),
       },
     });
 
     return this.toEntity(row);
+  }
+
+  async saveMany(categories: Category[]): Promise<void> {
+    await this.prisma.tx.categories.createMany({
+      data: categories.map((category) => ({
+        name: category.getName(),
+        sort: category.getSort(),
+        desc: category.getDesc(),
+        image: category.getImage(),
+      })),
+    });
   }
 
   async findNames(filter: CategoryQueryFilter): Promise<string[]> {
@@ -111,7 +123,7 @@ export default class CategoryRepository implements ICategoryRepository {
     await this.prisma.tx.categories.delete({ where: { id: category.getId() } });
   }
 
-  private toEntity(category: categories) {
+  private toEntity(category: PrismaCategories) {
     return new Category.builder()
       .setId(category.id)
       .setName(category.name)

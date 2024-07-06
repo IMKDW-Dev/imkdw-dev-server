@@ -13,6 +13,7 @@ export interface ICategoryRepository {
   findNames(filter: CategoryQueryFilter): Promise<string[]>;
 
   save(category: Category): Promise<Category>;
+  saveMany(categories: Category[]): Promise<void>;
 
   update(category: Category): Promise<Category>;
   updateSort(category: Category, newSort: number): Promise<Category>;
