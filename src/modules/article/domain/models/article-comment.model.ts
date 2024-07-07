@@ -2,7 +2,7 @@ import { CannotReplyOnReplyCommentException } from '../../../../common/exception
 import User from '../../../user/domain/models/user.model';
 
 export default class ArticleComment {
-  constructor(
+  private constructor(
     id: number,
     author: User,
     articleId: string,
