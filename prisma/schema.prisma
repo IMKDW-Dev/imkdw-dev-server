@@ -61,7 +61,7 @@ model userOAuthProviders {
   users users[]
 
   @@index([name])
-  @@map("oAuthProviders")
+  @@map("OAuthProviders")
 }
 
 model articles {

@@ -12,8 +12,8 @@ export default function IsCommentContent(validationOptions?: ValidationOptions) 
       validator: {
         validate(content: string) {
           /**
-           * * 게시글 댓글 유효성 규칙
-           * * 2자 이상 255자 이하
+           * 게시글 댓글 유효성 규칙
+           * 1.2자 이상 255자 이하
            */
           return content.length >= 2 && content.length <= 255;
         },

@@ -8,7 +8,7 @@ import ArticleImageService from './article-image.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../../common/exceptions/404';
 import { GetArticlesDto } from '../../dto/internal/article/get-article.dto';
 import { GetArticleSort } from '../../enums/article.enum';
-import ArticleId from '../../domain/vo/article-id.vo';
+import ArticleId from '../../domain/vo/article/article-id.vo';
 import ArticleDto from '../../dto/article.dto';
 import * as ArticleMapper from '../../mappers/article.mapper';
 import ResponseGetArticlesDto from '../../dto/response/article/get-article.dto';
@@ -18,7 +18,7 @@ import {
   IArticleCommentRepository,
 } from '../../repository/article-comment/article-comment-repo.interface';
 import { UpdateArticleDto } from '../../dto/internal/article/update-article.dto';
-import ArticleContent from '../../domain/vo/article-content.vo';
+import ArticleContent from '../../domain/vo/article/article-content.vo';
 import CategoryService from '../../../category/services/category.service';
 import { userRoles } from '../../../user/domain/models/user-role.model';
 import { ArticleQueryFilter } from '../../repository/article/article-query.filter';
@@ -51,7 +51,7 @@ export default class ArticleService {
     }
 
     const newArticle = new Article.builder()
-      .setId(articleId)
+      .setId(articleId.toString())
       .setTitle(dto.title)
       .setContent(articleContent)
       .setThumbnail(thumbnail)

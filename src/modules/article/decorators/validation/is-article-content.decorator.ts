@@ -12,7 +12,7 @@ export default function IsArticleContent(validationOptions?: ValidationOptions) 
       validator: {
         validate(content: string) {
           /**
-           * * 게시글 내용 유효성 규칙
+           * 게시글 내용 유효성 규칙
            * 1. 2~65000자 까지 작성이 가능하다
            */
           if (!content) return false;

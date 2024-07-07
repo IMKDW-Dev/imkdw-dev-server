@@ -1,5 +1,6 @@
 import { CannotReplyOnReplyCommentException } from '../../../../common/exceptions/403';
 import User from '../../../user/domain/models/user.model';
+import ArticleCommentContent from '../vo/article-comment/article-comment-content.vo';
 
 export default class ArticleComment {
   private constructor(
@@ -7,7 +8,7 @@ export default class ArticleComment {
     author: User,
     articleId: string,
     parent: ArticleComment,
-    content: string,
+    content: ArticleCommentContent,
     createdAt: Date,
     replies: ArticleComment[],
   ) {
@@ -24,7 +25,7 @@ export default class ArticleComment {
   private author: User;
   private articleId: string;
   private parent: ArticleComment | null;
-  private content: string;
+  private content: ArticleCommentContent;
   private createdAt: Date;
   private replies: ArticleComment[];
 
@@ -49,7 +50,7 @@ export default class ArticleComment {
   }
 
   getContent(): string {
-    return this.content;
+    return this.content.toString();
   }
 
   getCreatedAt(): Date {
@@ -122,7 +123,7 @@ export default class ArticleComment {
         this.author,
         this.articleId,
         this.parent,
-        this.content,
+        new ArticleCommentContent(this.content),
         this.createdAt,
         this.replies,
       );

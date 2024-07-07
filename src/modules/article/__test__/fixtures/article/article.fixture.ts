@@ -1,8 +1,8 @@
 import Category from '../../../../category/domain/models/category.model';
 import Tag from '../../../../tag/domain/models/tag.model';
 import Article from '../../../domain/models/article.model';
-import ArticleContent from '../../../domain/vo/article-content.vo';
-import ArticleId from '../../../domain/vo/article-id.vo';
+import ArticleContent from '../../../domain/vo/article/article-content.vo';
+import ArticleId from '../../../domain/vo/article/article-id.vo';
 import ArticleDto from '../../../dto/article.dto';
 
 interface CreateArticleParams {

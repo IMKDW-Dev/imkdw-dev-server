@@ -12,7 +12,7 @@ export default function IsArticleTitle(validationOptions?: ValidationOptions) {
       validator: {
         validate(title: string) {
           /**
-           * * 게시글 제목 유효성 규칙
+           * 게시글 제목 유효성 규칙
            * 1. 10~255자까지 허용된다
            */
           if (!title) return false;

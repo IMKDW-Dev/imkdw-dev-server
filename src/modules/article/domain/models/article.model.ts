@@ -1,13 +1,14 @@
 import Category from '../../../category/domain/models/category.model';
 import Tag from '../../../tag/domain/models/tag.model';
-import ArticleContent from '../vo/article-content.vo';
-import ArticleId from '../vo/article-id.vo';
+import ArticleContent from '../vo/article/article-content.vo';
+import ArticleId from '../vo/article/article-id.vo';
+import ArticleTitle from '../vo/article/article-title.vo';
 import ArticleComment from './article-comment.model';
 
 export default class Article {
   constructor(
     id: ArticleId,
-    title: string,
+    title: ArticleTitle,
     category: Category,
     content: ArticleContent,
     visible: boolean,
@@ -29,7 +30,7 @@ export default class Article {
   }
 
   private id: ArticleId;
-  private title: string;
+  private title: ArticleTitle;
   private category: Category;
   private content: ArticleContent;
   private visible: boolean;
@@ -39,15 +40,12 @@ export default class Article {
   private tags: Tag[];
   private comments: ArticleComment[];
 
-  /**
-   * GETTER
-   */
   getId() {
     return this.id.toString();
   }
 
   getTitle() {
-    return this.title;
+    return this.title.toString();
   }
 
   getContent() {
@@ -86,11 +84,8 @@ export default class Article {
     return this.category;
   }
 
-  /**
-   * OTHERS
-   */
   changeTitle(title: string) {
-    this.title = title;
+    this.title = new ArticleTitle(title);
   }
 
   changeContent(content: ArticleContent) {
@@ -114,7 +109,7 @@ export default class Article {
   }
 
   updateImageUrls(paths: { fromPath: string; toPath: string }[]) {
-    this.content.updateImageUrls(paths);
+    this.content = this.content.updateImageUrls(paths);
   }
 
   setComments(comments: ArticleComment[]) {
@@ -122,7 +117,7 @@ export default class Article {
   }
 
   static builder = class {
-    id: ArticleId;
+    id: string;
     title: string;
     category: Category;
     content: ArticleContent;
@@ -132,7 +127,7 @@ export default class Article {
     createdAt: Date;
     tags: Tag[];
 
-    setId(id: ArticleId): this {
+    setId(id: string): this {
       this.id = id;
       return this;
     }
@@ -179,8 +174,8 @@ export default class Article {
 
     build(): Article {
       return new Article(
-        this.id,
-        this.title,
+        new ArticleId(this.id),
+        new ArticleTitle(this.title),
         this.category,
         this.content,
         this.visible,

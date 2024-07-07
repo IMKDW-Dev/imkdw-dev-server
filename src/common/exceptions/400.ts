@@ -12,6 +12,7 @@ export const BAD_REQUEST_EXCEPTIONS = {
   INVALID_NICKNAME: '400008',
   INVALID_USER_ID: '400009',
   INVALID_USER_OAUTH_PROVIDER_ID: '400010',
+  INVALID_ARTICLE_COMMENT_CONTENT: '400011',
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -48,5 +49,29 @@ export class InvalidUserIdException extends BadRequestException {
 export class InvalidTagNameException extends BadRequestException {
   constructor(error: string) {
     super(BAD_REQUEST_EXCEPTIONS.INVALID_TAG_NAME, error);
+  }
+}
+
+export class InvalidArticleTitleException extends BadRequestException {
+  constructor(error: string) {
+    super(BAD_REQUEST_EXCEPTIONS.INVALID_ARTICLE_TITLE, error);
+  }
+}
+
+export class InvalidArticleContentException extends BadRequestException {
+  constructor(error: string) {
+    super(BAD_REQUEST_EXCEPTIONS.INVALID_ARTICLE_CONTENT, error);
+  }
+}
+
+export class InvalidArticleIdException extends BadRequestException {
+  constructor(error: string) {
+    super(BAD_REQUEST_EXCEPTIONS.INVALID_ARTICLE_ID, error);
+  }
+}
+
+export class InvalidArticleCommentContentException extends BadRequestException {
+  constructor(error: string) {
+    super(BAD_REQUEST_EXCEPTIONS.INVALID_ARTICLE_COMMENT_CONTENT, error);
   }
 }

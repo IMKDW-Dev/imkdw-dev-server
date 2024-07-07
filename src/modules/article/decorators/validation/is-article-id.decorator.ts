@@ -12,7 +12,7 @@ export default function IsArticleId(validationOptions?: ValidationOptions) {
       validator: {
         validate(articleId: string) {
           /**
-           * * 게시글 아이디 유효성 규칙
+           * 게시글 아이디 유효성 규칙
            * 1. 공백이 있으면 안된다.
            * 2. 10~245자까지 허용된다.
            * 3. 영문, 숫자, 특수문자만 포함한다.
