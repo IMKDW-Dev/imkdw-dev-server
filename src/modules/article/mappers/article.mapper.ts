@@ -29,7 +29,7 @@ export const toModel = (article: articles, category: Category, tags: Tag[]) => {
     .setId(article.id)
     .setTitle(article.title)
     .setCategory(category)
-    .setContent(new ArticleContent(article.content))
+    .setContent(article.content)
     .setVisible(article.visible)
     .setThumbnail(article.thumbnail)
     .setViewCount(article.viewCount)

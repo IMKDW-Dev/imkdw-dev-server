@@ -7,20 +7,20 @@ import ArticleComment from './article-comment.model';
 
 export default class Article {
   constructor(
-    id: ArticleId,
-    title: ArticleTitle,
+    id: string,
+    title: string,
     category: Category,
-    content: ArticleContent,
+    content: string,
     visible: boolean,
     thumbnail: string,
     viewCount: number,
     createdAt: Date,
     tags: Tag[],
   ) {
-    this.id = id;
-    this.title = title;
+    this.id = new ArticleId(id);
+    this.title = new ArticleTitle(title);
     this.category = category;
-    this.content = content;
+    this.content = new ArticleContent(content);
     this.visible = visible;
     this.thumbnail = thumbnail;
     this.viewCount = viewCount;
@@ -120,7 +120,7 @@ export default class Article {
     id: string;
     title: string;
     category: Category;
-    content: ArticleContent;
+    content: string;
     visible: boolean;
     thumbnail: string;
     viewCount: number;
@@ -142,7 +142,7 @@ export default class Article {
       return this;
     }
 
-    setContent(content: ArticleContent): this {
+    setContent(content: string): this {
       this.content = content;
       return this;
     }
@@ -174,8 +174,8 @@ export default class Article {
 
     build(): Article {
       return new Article(
-        new ArticleId(this.id),
-        new ArticleTitle(this.title),
+        this.id,
+        this.title,
         this.category,
         this.content,
         this.visible,

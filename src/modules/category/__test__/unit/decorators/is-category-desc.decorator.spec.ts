@@ -11,21 +11,27 @@ describe('@IsCategoryDesc', () => {
     desc: string;
   }
 
-  it('카테고리 내용이 9자인 경우 INVALID_CATEGORY_DESC 에러가 발생한다', async () => {
-    const test = new TestClass('v'.repeat(9));
-    const errors = await validate(test);
-    expect(errors[0].constraints.IsCategoryDesc).toBe(BAD_REQUEST_EXCEPTIONS.INVALID_CATEGORY_DESC);
+  describe('카테고리 내용이 9자인 경우', () => {
+    it('예외가 발생한다', async () => {
+      const test = new TestClass('v'.repeat(9));
+      const errors = await validate(test);
+      expect(errors[0].constraints.IsCategoryDesc).toBe(BAD_REQUEST_EXCEPTIONS.INVALID_CATEGORY_DESC);
+    });
   });
 
-  it('카테고리 내용이 10자인 경우 유효성 검사를 통과한다', async () => {
-    const test = new TestClass('v'.repeat(10));
-    const errors = await validate(test);
-    expect(errors.length).toBe(0);
+  describe('카테고리 내용이 10자인 경우', () => {
+    it('유효성 검사를 통과한다', async () => {
+      const test = new TestClass('v'.repeat(10));
+      const errors = await validate(test);
+      expect(errors.length).toBe(0);
+    });
   });
 
-  it('카테고리 내용이 201자인 경우 INVALID_CATEGORY_DESC 에러가 발생한다', async () => {
-    const test = new TestClass('v'.repeat(201));
-    const errors = await validate(test);
-    expect(errors[0].constraints.IsCategoryDesc).toBe(BAD_REQUEST_EXCEPTIONS.INVALID_CATEGORY_DESC);
+  describe('카테고리 내용이 201자인 경우', () => {
+    it('예외가 발생한다', async () => {
+      const test = new TestClass('v'.repeat(201));
+      const errors = await validate(test);
+      expect(errors[0].constraints.IsCategoryDesc).toBe(BAD_REQUEST_EXCEPTIONS.INVALID_CATEGORY_DESC);
+    });
   });
 });

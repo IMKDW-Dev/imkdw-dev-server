@@ -1,14 +1,8 @@
 import { InvalidCategoryNameException } from '../../../../common/exceptions/400';
 
-/**
- * 카테고리 이름 유효성 규칙
- * - 2자 이상 20자 이하여야 한다
- * - 공백을 포함할 수 없다
- */
 export default class CategoryName {
   private static readonly MIN_LENGTH = 2;
   private static readonly MAX_LENGTH = 20;
-
   private readonly value: string;
 
   constructor(name?: string) {

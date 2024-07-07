@@ -1,9 +1,5 @@
 import { InvalidCategoryDescException } from '../../../../common/exceptions/400';
 
-/**
- * 카테고리 설명 유효성 규칙
- * - 10자 이상 200자 이하여야 한다
- */
 export default class CategoryDesc {
   private static readonly MIN_LENGTH = 10;
   private static readonly MAX_LENGTH = 200;

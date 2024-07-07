@@ -53,7 +53,7 @@ export default class ArticleService {
     const newArticle = new Article.builder()
       .setId(articleId.toString())
       .setTitle(dto.title)
-      .setContent(articleContent)
+      .setContent(articleContent.toString())
       .setThumbnail(thumbnail)
       .setCategory(category)
       .setVisible(dto.visible)
