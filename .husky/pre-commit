@@ -1,1 +1,2 @@
-npm test
+pnpm test:unit
+pnpm test:integration

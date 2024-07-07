@@ -7,7 +7,6 @@ import PrismaService from '../../../../infra/database/prisma.service';
 import { IStorageService, STORAGE_SERVICE } from '../../../../infra/storage/interfaces/storage.interface';
 import UserOAuthProvider from '../../domain/models/user-oauth-provider.model';
 import UserRole from '../../domain/models/user-role.model';
-import { IUserRepository, USER_REPOSITORY } from '../../repository/user/user-repo.interface';
 import UserService from '../../services/user.service';
 import { createUser } from '../fixtures/create-user.fixture';
 

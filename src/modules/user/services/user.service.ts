@@ -1,26 +1,25 @@
 import { Inject, Injectable } from '@nestjs/common';
-import UserOAuthProvider from '../domain/models/user-oauth-provider.model';
-import { IUserRepository, USER_REPOSITORY } from '../repository/user/user-repo.interface';
 import User from '../domain/models/user.model';
 import { UpdateUserDto } from '../dto/internal/update-user-info.dto';
 import UserImageService from './user-image.service';
 import { DuplicateNicknameException } from '../../../common/exceptions/409';
-import UserRole from '../domain/models/user-role.model';
 import ResponseGetUserInfoDto from '../dto/response/user-info.dto';
 import * as UserMapper from '../mappers/user.mapper';
 import { UserNotFoundException } from '../../../common/exceptions/404';
-import { UserQueryFilter } from '../repository/user/user-query.filter';
+import CreateUserUseCase from '../use-cases/create-user.use-case';
+import { CreateUserDto } from '../dto/internal/create-user.dto';
+import { IUserRepository, USER_REPOSITORY, UserQueryFilter } from '../interfaces/user-repo.interface';
 
 @Injectable()
 export default class UserService {
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: IUserRepository,
     private readonly userImageService: UserImageService,
+    private readonly createUserUseCase: CreateUserUseCase,
   ) {}
 
-  async createUser(email: string, oAuthProvider: UserOAuthProvider): Promise<User> {
-    const user = new User.builder().setEmail(email).setOAuthProvider(oAuthProvider).setRole(UserRole.NORMAL).build();
-    return this.userRepository.save(user);
+  async createUser(dto: CreateUserDto): Promise<User> {
+    return this.createUserUseCase.execute(dto);
   }
 
   async getUserInfo(userId: string): Promise<ResponseGetUserInfoDto> {

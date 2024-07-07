@@ -1,158 +1,105 @@
-import { Test } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
+import { TestBed } from '@automock/jest';
 
 import TokenService from '../../services/token.service';
 import { IMyJwtService, MY_JWT_SERVICE } from '../../../../infra/jwt/interfaces/my-jwt.interface';
 import { InvalidJwtTokenException, RefreshTokenExpiredException } from '../../../../common/exceptions/401';
 
 describe('TokenService', () => {
-  let tokenService: TokenService;
+  let sut: TokenService;
   let jwtService: IMyJwtService;
 
-  beforeEach(async () => {
-    const module = await Test.createTestingModule({
-      providers: [
-        TokenService,
-        {
-          provide: MY_JWT_SERVICE,
-          useValue: {
-            sign: jest.fn(),
-            verify: jest.fn(),
-          },
-        },
-        {
-          provide: ConfigService,
-          useValue: {
-            get: jest.fn(),
-          },
-        },
-      ],
-    }).compile();
-
-    tokenService = module.get<TokenService>(TokenService);
-    jwtService = module.get<IMyJwtService>(MY_JWT_SERVICE);
+  beforeAll(() => {
+    const { unit, unitRef } = TestBed.create(TokenService).compile();
+    sut = unit;
+    jwtService = unitRef.get<IMyJwtService>(MY_JWT_SERVICE);
   });
 
-  describe('엑세스 토큰 발급', () => {
-    it('토큰 발급에 성공한다', () => {
-      // Given
-      const userId = 'userId';
-
-      // When
-      const sut = tokenService.generateAccessToken(userId);
-
-      // Then
-      expect(sut).not.toBeNull();
-    });
-  });
-
-  describe('리프레시 토큰 발급', () => {
-    it('토큰 발급에 성공한다', () => {
-      // Given
-      const userId = 'userId';
-
-      // When
-      const sut = tokenService.generateRefreshToken(userId);
-
-      // Then
-      expect(sut).not.toBeNull();
-    });
-  });
-
-  describe('토큰 검증', () => {
-    it('토큰 검증에 실패시 InvalidJwtTokenException 에러가 발생한다', () => {
-      // Given
-      const token = 'token';
-      jest.spyOn(jwtService, 'verify').mockImplementation(() => {
-        throw new Error();
+  describe('사용자 아이디가 주어지고', () => {
+    const userId = 'userId';
+    describe('엑세스 토큰을 발급하면', () => {
+      it('토큰 발급에 성공한다', () => {
+        expect(sut.generateAccessToken(userId)).not.toBeNull();
       });
-
-      // When, Then
-      expect(() => tokenService.verify(token)).toThrow(InvalidJwtTokenException);
-    });
-
-    it('토큰 검증에 성공시 유저의 아이디를 반환한다', () => {
-      // Given
-      const token = 'token';
-      const userId = 'userId';
-      jest.spyOn(jwtService, 'verify').mockReturnValue({ userId });
-
-      // When
-      const sut = tokenService.verify(token);
-
-      // Then
-      expect(sut).toBe(userId);
     });
   });
 
-  describe('토큰 갱신', () => {
-    it('쿠키 내부에 리프레시 토큰이 없을 경우 InvalidJwtTokenException 에러가 발생한다', () => {
-      // Given
-      const cookie = 'cookie';
-
-      // When, Then
-      expect(() => tokenService.refresh(cookie)).toThrow(InvalidJwtTokenException);
-    });
-
-    it('리프레쉬 토큰이 만료된 경우 RefreshTokenExpiredException 에러가 발생한다', () => {
-      // Given
-      const cookie = 'refreshToken=refreshToken';
-      jest.spyOn(jwtService, 'verify').mockImplementation(() => {
-        throw new Error();
+  describe('사용자 아이디가 주어지고', () => {
+    const userId = 'userId';
+    describe('리프레시 토큰을 발급하면', () => {
+      it('토큰 발급에 성공한다', () => {
+        expect(sut.generateRefreshToken(userId)).not.toBeNull();
       });
-
-      // When, Then
-      expect(() => tokenService.refresh(cookie)).toThrow(RefreshTokenExpiredException);
-    });
-
-    it('토큰 갱신 성공시 토큰을 반환한다', () => {
-      // Given
-      const cookie = 'refreshToken=refreshToken';
-      const userId = 'userId';
-      jest.spyOn(jwtService, 'verify').mockReturnValue({ userId });
-      jest.spyOn(tokenService, 'generateAccessToken').mockReturnValue('token');
-
-      // When
-      const sut = tokenService.refresh(cookie);
-
-      // Then
-      expect(sut).toBe('token');
     });
   });
 
-  describe('쿠키 내부의 토큰 파싱', () => {
-    it('쿠키 내부에 accessToken이 없을경우 빈값을 반환한다', () => {
-      // Given
-      const cookie = 'refreshToken=refreshToken';
-
-      // When
-      const sut = tokenService.parseJwtTokenByCookie(cookie);
-
-      // Then
-      expect(sut.accessToken).toBe('');
+  describe('유효하지 않은 토큰이 주어지고', () => {
+    const token = 'token';
+    describe('토큰 검증을 시도하면', () => {
+      it('예외가 발생한다', () => {
+        expect(() => sut.verify(token)).toThrow(InvalidJwtTokenException);
+      });
     });
+  });
 
-    it('쿠키 내부에 refreshToken이 없을경우 빈값을 반환한다', () => {
-      // Given
-      const cookie = 'accessToken=accessToken';
-
-      // When
-      const sut = tokenService.parseJwtTokenByCookie(cookie);
-
-      // Then
-      expect(sut.refreshToken).toBe('');
+  describe('유효한 토큰이 주어지고', () => {
+    const token = 'token';
+    describe('토큰 검증을 시도하면', () => {
+      it('유저의 아이디를 반환한다', () => {
+        const userId = 'userId';
+        jest.spyOn(jwtService, 'verify').mockReturnValue({ userId });
+        expect(sut.verify(token)).toBe(userId);
+      });
     });
+  });
 
-    it('쿠키 내부에 accessToken과 refreshToken이 있을경우 값을 반환한다', () => {
-      // Given
-      const cookie = 'accessToken=accessToken; refreshToken=refreshToken';
+  describe('리프레쉬 토큰이 없는 쿠키가 주어지고', () => {
+    const cookie = 'cookie';
+    describe('토큰 갱신을 시도하면', () => {
+      it('예외가 발생한다', () => {
+        expect(() => sut.refresh(cookie)).toThrow(InvalidJwtTokenException);
+      });
+    });
+  });
 
-      // When
-      const sut = tokenService.parseJwtTokenByCookie(cookie);
+  describe('유효하지 않은 리프레쉬 토큰이 있는 쿠키가 주어지고', () => {
+    const cookie = 'refreshToken=refreshToken';
+    describe('토큰 갱신을 시도하면', () => {
+      it('예외가 발생한다', () => {
+        expect(() => sut.refresh(cookie)).toThrow(RefreshTokenExpiredException);
+      });
+    });
+  });
 
-      // Then
-      expect(sut.accessToken).toBe('accessToken');
-      expect(sut.refreshToken).toBe('refreshToken');
+  describe('유효한 리프레쉬 토큰이 있는 쿠키가 주어지고', () => {
+    const cookie = 'refreshToken=refreshToken';
+    describe('토큰 갱신을 시도하면', () => {
+      it('엑세스 토큰을 반환한다', () => {
+        jest.spyOn(jwtService, 'verify').mockReturnValue({ userId: 'userId' });
+
+        const result = sut.refresh(cookie);
+        expect(result).not.toBeNull();
+      });
+    });
+  });
+
+  describe('쿠키 내부에 accessToken과 refreshToken이 없는 쿠키가 주어지고', () => {
+    const cookie = 'cookie';
+    describe('쿠키에서 토큰 파싱을 시도하면', () => {
+      it('빈값을 반환한다', () => {
+        const result = sut.parseJwtTokenByCookie(cookie);
+        expect(result).toEqual({ accessToken: '', refreshToken: '' });
+      });
+    });
+  });
+
+  describe('쿠키 내부에 accessToken과 refreshToken이 있는 쿠키가 주어지고', () => {
+    const [accessToken, refreshToken] = ['accessToken', 'refreshToken'];
+    const cookie = `accessToken=${accessToken}; refreshToken=${refreshToken}`;
+    describe('쿠키에서 토큰 파싱을 시도하면', () => {
+      it('accessToken과 refreshToken의 값을 반환한다', () => {
+        const result = sut.parseJwtTokenByCookie(cookie);
+        expect(result).toEqual({ accessToken, refreshToken });
+      });
     });
   });
 });

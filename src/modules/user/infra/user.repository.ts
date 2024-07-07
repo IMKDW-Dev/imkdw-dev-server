@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import * as UserMapper from '../mappers/user.mapper';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
+import * as UserMapper from '../mappers/user.mapper';
 import User from '../domain/models/user.model';
-import { UserQueryFilter } from '../repository/user/user-query.filter';
-import { IUserRepository } from '../repository/user/user-repo.interface';
-import PrismaService from '../../../infra/database/prisma.service';
+import { IUserRepository, UserQueryFilter } from '../interfaces/user-repo.interface';
 
 export type IUser = Prisma.usersGetPayload<{
   include: {
@@ -21,10 +21,17 @@ export const userInclude = {
 
 @Injectable()
 export default class UserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async findOne(where: UserQueryFilter): Promise<User | null> {
-    const row: IUser = await this.prisma.users.findFirst({ where, include: userInclude });
+    const row: IUser = await this.prisma.tx.users.findFirst({
+      where: {
+        ...(where.id && { id: where.id }),
+        ...(where.email && { email: where.email }),
+        ...(where.nickname && { nickname: where.nickname }),
+      },
+      include: userInclude,
+    });
     if (!row) {
       return null;
     }
@@ -33,7 +40,7 @@ export default class UserRepository implements IUserRepository {
   }
 
   async save(user: User): Promise<User> {
-    const row: IUser = await this.prisma.users.create({
+    const row: IUser = await this.prisma.tx.users.create({
       data: {
         id: user.getId(),
         email: user.getEmail(),
@@ -49,7 +56,7 @@ export default class UserRepository implements IUserRepository {
   }
 
   async update(user: User): Promise<User> {
-    const updatedRow: IUser = await this.prisma.users.update({
+    const updatedRow: IUser = await this.prisma.tx.users.update({
       where: { id: user.getId() },
       data: {
         nickname: user.getNickname(),
@@ -62,7 +69,7 @@ export default class UserRepository implements IUserRepository {
   }
 
   async count(): Promise<number> {
-    return this.prisma.users.count();
+    return this.prisma.tx.users.count();
   }
 
   private toEntity(user: IUser): User {
