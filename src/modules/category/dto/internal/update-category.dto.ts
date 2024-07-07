@@ -1,4 +1,5 @@
 export interface UpdateCategoryDto {
+  categoryId: number;
   name: string;
   sort: number;
   desc: string;
