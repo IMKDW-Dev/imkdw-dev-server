@@ -3,12 +3,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 
 import UserService from '../services/user.service';
-import ResponseGetUserInfoDto from '../dto/response/user-info.dto';
-import RequestUpdateUserInfoDto from '../dto/request/update-user-info.dto';
+import RequestUpdateUserDto from '../dto/request/update-user-info.dto';
 import UserGuard from '../../auth/guards/user.guard';
 import * as Swagger from '../docs/user.swagger';
 import { Public } from '../../auth/decorators/public.decorator';
 import ResponseGetUserCountDto from '../dto/response/user-count.dto';
+import UserDto from '../dto/user.dto';
 
 @ApiTags('[유저] 공통')
 @Controller({ path: 'users', version: '1' })
@@ -18,20 +18,20 @@ export default class UserController {
   @Swagger.getUserInfo('유저 정보 조회')
   @Get(':userId')
   @UseGuards(UserGuard)
-  async getUserInfo(@Param('userId') userId: string): Promise<ResponseGetUserInfoDto> {
+  async getUserInfo(@Param('userId') userId: string): Promise<UserDto> {
     return this.userService.getUserInfo(userId);
   }
 
-  @Swagger.updateUserInfo('유저 정보 수정')
+  @Swagger.updateUser('유저 정보 수정')
   @Patch(':userId')
   @UseGuards(UserGuard)
   @UseInterceptors(FileInterceptor('profileImage'))
-  async updateUserInfo(
+  async updateUser(
     @Param('userId') userId: string,
-    @Body() dto: RequestUpdateUserInfoDto,
+    @Body() dto: RequestUpdateUserDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.userService.updateUser(userId, { ...dto, profileImage: file });
+    return this.userService.updateUser({ ...dto, userId, profileImage: file });
   }
 
   @Swagger.getUserCount('유저 수 조회')

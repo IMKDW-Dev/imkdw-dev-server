@@ -21,11 +21,13 @@ import DatabaseModule from './infra/database/database.module';
 import LoggingInterceptor from './common/interceptors/logging.interceptor';
 import AlertModule from './infra/alert/alert.module';
 import createClsModule from './common/modules/cls.module';
+import createConfigModule from './common/modules/config.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ cache: true, isGlobal: true }),
     createClsModule(),
+    createConfigModule(),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,

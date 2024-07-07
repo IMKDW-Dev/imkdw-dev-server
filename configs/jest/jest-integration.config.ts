@@ -20,6 +20,7 @@ const config: Config.InitialOptions = {
   clearMocks: true,
   maxWorkers: 1,
   roots: [rootDir],
+  verbose: true,
 };
 
 export default config;
