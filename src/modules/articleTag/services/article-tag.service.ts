@@ -13,8 +13,8 @@ export default class ArticleTagService {
   ) {}
 
   async createTags(article: Article, tagNames: string[]): Promise<void> {
-    const existTags = await this.tagService.findManyByNames(tagNames);
-    const createdTags = await this.tagService.createMany(getNewTags(existTags, tagNames));
+    const existTags = await this.tagService.findByNames(tagNames);
+    const createdTags = await this.tagService.createTags({ tagNames: getNewTags(existTags, tagNames) });
 
     const tags = [...existTags, ...createdTags].map((tag) =>
       new ArticleTag.builder().setArticle(article).setTag(tag).build(),
