@@ -8,7 +8,6 @@ import ArticleImageService from './article-image.service';
 import { ArticleNotFoundException, CategoryNotFoundException } from '../../../../common/exceptions/404';
 import { GetArticlesDto } from '../../dto/internal/article/get-article.dto';
 import { GetArticleSort } from '../../enums/article.enum';
-import ArticleId from '../../domain/vo/article/article-id.vo';
 import ArticleDto from '../../dto/article.dto';
 import * as ArticleMapper from '../../mappers/article.mapper';
 import ResponseGetArticlesDto from '../../dto/response/article/get-article.dto';
@@ -24,6 +23,7 @@ import { userRoles } from '../../../user/domain/models/user-role.model';
 import { ArticleQueryFilter } from '../../repository/article/article-query.filter';
 import Article from '../../domain/models/article.model';
 import { ArticleQueryOption } from '../../repository/article/article-query.option';
+import CreateArticleUseCase from '../../use-cases/create-article.use-case';
 
 @Injectable()
 export default class ArticleService {
@@ -33,35 +33,12 @@ export default class ArticleService {
     private readonly articleImageService: ArticleImageService,
     private readonly articleTagService: ArticleTagService,
     private readonly categoryService: CategoryService,
+    private readonly createArticleUseCase: CreateArticleUseCase,
   ) {}
 
   @Transactional()
-  async createArticle(dto: CreateArticleDto, file: Express.Multer.File): Promise<ArticleDto> {
-    const category = await this.categoryService.findOneOrThrow({ id: dto.categoryId });
-
-    const articleId = new ArticleId(dto.id);
-    articleId.addHash();
-
-    const thumbnail = await this.articleImageService.getThumbnail(articleId.toString(), file);
-
-    const articleContent = new ArticleContent(dto.content);
-    if (dto?.images && dto.images.length) {
-      const copiedImageUrls = await this.articleImageService.copyContentImages(articleId.toString(), dto.images);
-      articleContent.updateImageUrls(copiedImageUrls);
-    }
-
-    const newArticle = new Article.builder()
-      .setId(articleId.toString())
-      .setTitle(dto.title)
-      .setContent(articleContent.toString())
-      .setThumbnail(thumbnail)
-      .setCategory(category)
-      .setVisible(dto.visible)
-      .build();
-
-    const createdArticle = await this.articleRepository.save(newArticle);
-    await this.articleTagService.createTags(createdArticle, dto.tags);
-    await this.categoryService.addArticleCount(category);
+  async createArticle(dto: CreateArticleDto): Promise<ArticleDto> {
+    const createdArticle = await this.createArticleUseCase.execute(dto);
     return ArticleMapper.toDto(createdArticle);
   }
 

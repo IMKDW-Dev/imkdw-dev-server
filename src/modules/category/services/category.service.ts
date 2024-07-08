@@ -34,12 +34,12 @@ export default class CategoryService {
   }
 
   async getCategory(name: string): Promise<CategoryDto> {
-    const categoryDetail = await this.categoryRepository.findOne({ name });
-    if (!categoryDetail) {
+    const category = await this.findOneOrThrow({ name });
+    if (!category) {
       throw new CategoryNotFoundException(`카테고리 이름 ${name}을 찾을 수 없습니다.`);
     }
 
-    return CategoryMapper.toDto(categoryDetail);
+    return CategoryMapper.toDto(category);
   }
 
   @Transactional()
@@ -59,5 +59,14 @@ export default class CategoryService {
 
   async findNames(filter?: CategoryQueryFilter): Promise<string[]> {
     return this.categoryRepository.findNames(filter);
+  }
+
+  async findOneOrThrow(filter: CategoryQueryFilter): Promise<Category> {
+    const category = await this.categoryRepository.findOne(filter);
+    if (!category) {
+      throw new CategoryNotFoundException(`${JSON.stringify(filter)}을 찾을 수 없습니다.`);
+    }
+
+    return category;
   }
 }

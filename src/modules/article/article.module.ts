@@ -15,18 +15,24 @@ import UserModule from '../user/user.module';
 import ArticleCommentService from './services/article-comment/article-comment.service';
 import ArticleStatsController from './controllers/article-stats.controller';
 import ArticleStatsService from './services/article/article-stats.service';
+import CreateArticleUseCase from './use-cases/create-article.use-case';
 
+const usecases = [CreateArticleUseCase];
+const services = [ArticleService, ArticleImageService, ArticleCommentService, ArticleStatsService];
+const repositories = [
+  {
+    provide: ARTICLE_REPOSITORY,
+    useClass: ArticleRepository,
+  },
+  {
+    provide: ARTICLE_COMMENT_REPOSITORY,
+    useClass: ArticleCommentRepository,
+  },
+];
 @Module({
   imports: [ArticleTagModule, ImageModule, StorageModule, CategoryModule, UserModule],
   controllers: [ArticleController, ArticleCommentController, ArticleStatsController],
-  providers: [
-    ArticleService,
-    ArticleImageService,
-    ArticleCommentService,
-    ArticleStatsService,
-    { provide: ARTICLE_REPOSITORY, useClass: ArticleRepository },
-    { provide: ARTICLE_COMMENT_REPOSITORY, useClass: ArticleCommentRepository },
-  ],
+  providers: [...usecases, ...services, ...repositories],
   exports: [ArticleService],
 })
 export default class ArticleModule {}
