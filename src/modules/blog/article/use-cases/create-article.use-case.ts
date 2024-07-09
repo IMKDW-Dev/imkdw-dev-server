@@ -6,46 +6,62 @@ import ArticleImageService from '../services/article-image.service';
 import ArticleId from '../domain/vo/article-id.vo';
 import ArticleContent from '../domain/vo/article-content.vo';
 import { UseCase } from '../../../../common/interfaces/use-case.interface';
-import CategoryValidatorService from '../../category/services/category-validator.service';
-import CategoryCounterService from '../../category/services/category-counter.service';
-import ArticleTagService from '../services/article-tag.service';
+import { CATEGORY_REPOSITORY, ICategoryRepository } from '../../category/repository/category-repo.interface';
+import { CategoryNotFoundException } from '../../../../common/exceptions/404';
+import Category from '../../category/domain/models/category.model';
+import TagService from '../../tag/services/tag.service';
 
 @Injectable()
 export default class CreateArticleUseCase implements UseCase<CreateArticleDto, Article> {
   constructor(
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
-    private readonly categoryValidatorService: CategoryValidatorService,
-    private readonly categoryCounterService: CategoryCounterService,
+    @Inject(CATEGORY_REPOSITORY) private readonly cateRepository: ICategoryRepository,
     private readonly articleImageService: ArticleImageService,
-    private readonly articleTagService: ArticleTagService,
+    private readonly tagService: TagService,
   ) {}
 
   async execute(dto: CreateArticleDto): Promise<Article> {
-    const category = await this.categoryValidatorService.findOneOrThrow({ id: dto.categoryId });
-
-    const articleId = new ArticleId(dto.id);
-    articleId.addHash();
-    const thumbnail = await this.articleImageService.getThumbnail(articleId, dto.thumbnail);
-
-    const articleContent = new ArticleContent(dto.content);
-    if (dto?.images && dto.images.length) {
-      const copiedImageUrls = await this.articleImageService.copyContentImages(articleId, dto.images);
-      articleContent.updateImageUrls(copiedImageUrls);
-    }
+    const category = await this.getCategory(dto.categoryId);
+    const id = this.generateId(dto.id);
+    const thumbnail = await this.articleImageService.getThumbnail(id, dto.thumbnail);
+    const content = await this.generateContent(id, dto.content, dto.images);
+    const tags = await this.tagService.generatArticleTags(dto.tags);
 
     const newArticle = new Article.builder()
-      .setId(articleId.toString())
+      .setId(id.toString())
       .setTitle(dto.title)
-      .setContent(articleContent.toString())
+      .setContent(content.toString())
       .setThumbnail(thumbnail)
       .setCategory(category)
       .setVisible(dto.visible)
+      .setTags(tags)
       .build();
 
-    const createdArticle = await this.articleRepository.save(newArticle);
-    await this.articleTagService.createTags(createdArticle, dto.tags);
-    await this.categoryCounterService.addArticleCount(category);
+    return this.articleRepository.save(newArticle);
+  }
 
-    return createdArticle;
+  private async getCategory(categoryId: number): Promise<Category> {
+    const category = await this.cateRepository.findOne({ id: categoryId });
+    if (!category) {
+      throw new CategoryNotFoundException(`${categoryId}을 찾을 수 없습니다.`);
+    }
+
+    return category;
+  }
+
+  private generateId(id: string): ArticleId {
+    const articleId = new ArticleId(id).addHash();
+    return articleId;
+  }
+
+  private async generateContent(id: ArticleId, content: string, images: string[]): Promise<ArticleContent> {
+    const articleContent = new ArticleContent(content);
+
+    if (Array.isArray(images) && images.length) {
+      const copiedImageUrls = await this.articleImageService.copyContentImages(id, images);
+      articleContent.updateImageUrls(copiedImageUrls);
+    }
+
+    return articleContent;
   }
 }

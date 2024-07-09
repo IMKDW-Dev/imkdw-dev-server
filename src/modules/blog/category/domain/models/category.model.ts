@@ -43,10 +43,6 @@ export default class Category {
     return this.articleCount;
   }
 
-  addArticleCount() {
-    this.articleCount += 1;
-  }
-
   changeImage(image: string) {
     this.image = image;
   }

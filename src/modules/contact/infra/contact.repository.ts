@@ -11,10 +11,10 @@ export default class ContactRepository implements IContactRepository {
 
   async save(contact: Contact): Promise<Contact> {
     const row = await this.prisma.contacts.create({ data: contact });
-    return this.toEntity(row);
+    return this.toModel(row);
   }
 
-  private toEntity(row: contacts) {
+  private toModel(row: contacts) {
     return Contact.create({
       id: row.id,
       name: row.name,

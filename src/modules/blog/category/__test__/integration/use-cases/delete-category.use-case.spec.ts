@@ -9,10 +9,14 @@ import createConfigModule from '../../../../../../common/modules/config.module';
 import { cleanupDatabase } from '../../../../../../../prisma/__test__/utils/cleanup';
 import { CategoryNotFoundException } from '../../../../../../common/exceptions/404';
 import { CategoryHaveArticlesException } from '../../../../../../common/exceptions/403';
+import { ARTICLE_REPOSITORY, IArticleRepository } from '../../../../article/repository/article-repo.interface';
+import ArticleRepository from '../../../../article/infra/article.repository';
+import { createArticle } from '../../../../article/__test__/fixtures/article.fixture';
 
 describe('DeleteCategoryUseCase', () => {
   let sut: DeleteCategoryUseCase;
   let categoryRepository: ICategoryRepository;
+  let articleRepository: IArticleRepository;
   let prisma: PrismaService;
 
   beforeAll(async () => {
@@ -24,11 +28,16 @@ describe('DeleteCategoryUseCase', () => {
           provide: CATEGORY_REPOSITORY,
           useClass: CategoryRepository,
         },
+        {
+          provide: ARTICLE_REPOSITORY,
+          useClass: ArticleRepository,
+        },
       ],
     }).compile();
 
     sut = module.get<DeleteCategoryUseCase>(DeleteCategoryUseCase);
     categoryRepository = module.get<ICategoryRepository>(CATEGORY_REPOSITORY);
+    articleRepository = module.get<IArticleRepository>(ARTICLE_REPOSITORY);
     prisma = module.get<PrismaService>(PrismaService);
   });
 
@@ -43,9 +52,10 @@ describe('DeleteCategoryUseCase', () => {
   });
 
   describe('카테고리에 게시글이 존재하는 경우', () => {
-    const category = createCategory({ articleCount: 1 });
+    const category = createCategory();
     it('예외가 발생한다', async () => {
       await categoryRepository.save(category);
+      await articleRepository.save(createArticle({ category }));
 
       await expect(sut.execute(category.getId())).rejects.toThrow(CategoryHaveArticlesException);
     });

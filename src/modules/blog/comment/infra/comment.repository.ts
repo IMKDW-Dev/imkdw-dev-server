@@ -59,7 +59,7 @@ export default class CommentRepository implements ICommentRepository {
       include: articleCommentInclude,
     });
 
-    return this.toEntity(row);
+    return this.toModel(row);
   }
 
   async findMany(filter: ArticleCommentQueryFilter): Promise<Comment[]> {
@@ -68,7 +68,7 @@ export default class CommentRepository implements ICommentRepository {
       include: articleCommentInclude,
     });
 
-    return rows.map((row) => this.toEntity(row));
+    return rows.map((row) => this.toModel(row));
   }
 
   async save(comment: Comment): Promise<Comment> {
@@ -82,7 +82,7 @@ export default class CommentRepository implements ICommentRepository {
       include: articleCommentInclude,
     });
 
-    return this.toEntity(row);
+    return this.toModel(row);
   }
 
   async deleteByArticleId(articleId: string): Promise<void> {
@@ -91,7 +91,7 @@ export default class CommentRepository implements ICommentRepository {
     });
   }
 
-  private toEntity(row: IArticleComment): Comment {
+  private toModel(row: IArticleComment): Comment {
     const replies = row.replies.map((reply) => {
       const author = UserMapper.toModel(reply.user, reply.user.role, reply.user.oAuthProvider);
       return CommentMapper.toModel(reply, author, []);

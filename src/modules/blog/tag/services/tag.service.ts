@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ITagRepository, TAG_REPOSITORY } from '../repository/tag-repo.interface';
-import Tag from '../domain/models/tag.model';
 import CreateTagUseCase from '../use-cases/create-tag.use-case';
-import { CreateTagDto } from '../dto/internal/create-tag.dto';
+import { getNewTags } from '../../article/functions/tag.function';
+import Tag from '../domain/models/tag.model';
 
 @Injectable()
 export default class TagService {
@@ -11,8 +11,10 @@ export default class TagService {
     private readonly createTagUseCase: CreateTagUseCase,
   ) {}
 
-  async createTags(dto: CreateTagDto): Promise<Tag[]> {
-    return this.createTagUseCase.execute(dto);
+  async generatArticleTags(tagNames: string[]): Promise<Tag[]> {
+    const existTags = await this.tagRepository.findManyByNames(tagNames);
+    const createdTags = await this.createTagUseCase.execute({ tagNames: getNewTags(existTags, tagNames) });
+    return [...existTags, ...createdTags];
   }
 
   async findByNames(names: string[]) {

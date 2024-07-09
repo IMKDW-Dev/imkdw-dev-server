@@ -12,12 +12,12 @@ export const toDto = (category: Category): CategoryDto =>
     category.getArticleCount(),
   );
 
-export const toModel = (category: categories) =>
+export const toModel = (category: categories, count: number) =>
   new Category.builder()
     .setId(category.id)
     .setName(category.name)
     .setImage(category.image)
     .setDesc(category.desc)
     .setSort(category.sort)
-    .setArticleCount(category.articleCount)
+    .setArticleCount(count)
     .build();

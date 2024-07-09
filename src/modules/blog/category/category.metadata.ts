@@ -1,7 +1,5 @@
 import { ClassProvider, Provider } from '@nestjs/common';
 import CategoryService from './services/category.service';
-import CategoryValidatorService from './services/category-validator.service';
-import CategoryCounterService from './services/category-counter.service';
 import CategoryImageService from './services/category-image.service';
 import CreateCategoryUseCase from './use-cases/create-category.use-case';
 import DeleteCategoryUseCase from './use-cases/delete-category.use-case';
@@ -10,7 +8,7 @@ import CategoryRepository from './infra/category.repository';
 import CategoryController from './controllers/category.controller';
 import { CATEGORY_REPOSITORY } from './repository/category-repo.interface';
 
-const services: Provider[] = [CategoryService, CategoryValidatorService, CategoryCounterService, CategoryImageService];
+const services: Provider[] = [CategoryService, CategoryImageService];
 const usecases: Provider[] = [CreateCategoryUseCase, DeleteCategoryUseCase, UpdateCategoryUseCase];
 const repositories: ClassProvider[] = [
   {

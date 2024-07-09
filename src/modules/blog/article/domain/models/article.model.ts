@@ -25,7 +25,7 @@ export default class Article {
     this.thumbnail = thumbnail;
     this.viewCount = viewCount;
     this.createdAt = createdAt;
-    this.tags = tags;
+    this.tags = tags ?? [];
     this.comments = [];
   }
 

@@ -3,7 +3,6 @@ import { Transactional } from '@nestjs-cls/transactional';
 
 import { ARTICLE_REPOSITORY, IArticleRepository } from '../repository/article-repo.interface';
 import { CreateArticleDto } from '../dto/internal/create-article.dto';
-import ArticleTagService from './article-tag.service';
 import ArticleImageService from './article-image.service';
 import { ArticleNotFoundException } from '../../../../common/exceptions/404';
 import { GetArticlesDto } from '../dto/internal/get-article.dto';
@@ -14,7 +13,6 @@ import ResponseGetArticlesDto from '../dto/response/get-article.dto';
 import { getOffsetPagingResult } from '../../../../common/functions/offset-paging.function';
 import { UpdateArticleDto } from '../dto/internal/update-article.dto';
 import ArticleContent from '../domain/vo/article-content.vo';
-import CategoryService from '../../category/services/category.service';
 import { userRoles } from '../../../user/domain/models/user-role.model';
 import { ArticleQueryFilter } from '../repository/article-query.filter';
 import Article from '../domain/models/article.model';
@@ -28,8 +26,6 @@ export default class ArticleService {
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
     @Inject(COMMENT_REPOSITORY) private readonly articleCommentRepository: ICommentRepository,
     private readonly articleImageService: ArticleImageService,
-    private readonly articleTagService: ArticleTagService,
-    private readonly categoryService: CategoryService,
     private readonly createArticleUseCase: CreateArticleUseCase,
   ) {}
 
@@ -88,7 +84,7 @@ export default class ArticleService {
     const article = await this.findOneOrThrow({ articleId });
 
     await this.articleCommentRepository.deleteByArticleId(articleId);
-    await this.articleTagService.deleteByArticleId(articleId);
+    // await this.articleTagService.deleteByArticleId(articleId);
     await this.articleRepository.delete(article);
   }
 

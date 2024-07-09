@@ -14,7 +14,15 @@ import * as ArticleMapper from '../mappers/article.mapper';
 
 export type IArticle = Prisma.articlesGetPayload<{
   include: {
-    category: true;
+    category: {
+      include: {
+        _count: {
+          select: {
+            articles: true;
+          };
+        };
+      };
+    };
     articleTag: {
       include: {
         tags: true;
@@ -24,7 +32,15 @@ export type IArticle = Prisma.articlesGetPayload<{
 }>;
 
 export const articleInclude = {
-  category: true,
+  category: {
+    include: {
+      _count: {
+        select: {
+          articles: true,
+        },
+      },
+    },
+  },
   articleTag: {
     include: {
       tags: true,
@@ -45,7 +61,7 @@ export default class ArticleRepository implements IArticleRepository {
       },
       include: articleInclude,
     });
-    return row ? this.toEntity(row) : null;
+    return row ? this.toModel(row) : null;
   }
 
   async findMany(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<Article[]> {
@@ -75,7 +91,7 @@ export default class ArticleRepository implements IArticleRepository {
       ...(option?.page && { skip: (option.page - 1) * option.limit }),
     });
 
-    return rows.map((row) => this.toEntity(row));
+    return rows.map((row) => this.toModel(row));
   }
 
   async save(article: Article): Promise<Article> {
@@ -88,10 +104,17 @@ export default class ArticleRepository implements IArticleRepository {
         thumbnail: article.getThumbnail(),
         categoryId: article.getCategoryId(),
         visible: article.getVisible(),
+        articleTag: {
+          createMany: {
+            data: article.getTags().map((tag) => ({
+              tagId: tag.getId(),
+            })),
+          },
+        },
       },
     });
 
-    return this.toEntity(row);
+    return this.toModel(row);
   }
 
   async update(article: Article): Promise<Article> {
@@ -108,7 +131,7 @@ export default class ArticleRepository implements IArticleRepository {
       include: articleInclude,
     });
 
-    return this.toEntity(row);
+    return this.toModel(row);
   }
 
   async findCounts(query: ArticleQueryFilter, option?: ArticleQueryOption): Promise<number> {
@@ -143,8 +166,8 @@ export default class ArticleRepository implements IArticleRepository {
     await this.prisma.tx.articles.delete({ where: { id: article.getId().toString() } });
   }
 
-  private toEntity(row: IArticle): Article {
-    const category = CategoryMapper.toModel(row.category);
+  private toModel(row: IArticle): Article {
+    const category = CategoryMapper.toModel(row.category, row.category._count.articles);
     const tags = row.articleTag.map((articleTag) => TagMapper.toModel(articleTag.tags));
     return ArticleMapper.toModel(row, category, tags);
   }

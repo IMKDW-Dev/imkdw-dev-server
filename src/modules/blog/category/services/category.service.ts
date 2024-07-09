@@ -7,18 +7,15 @@ import { CategoryNotFoundException } from '../../../../common/exceptions/404';
 import { UpdateCategoryDto } from '../dto/internal/update-category.dto';
 import CategoryDto from '../dto/category.dto';
 import * as CategoryMapper from '../mappers/category.mapper';
-import Category from '../domain/models/category.model';
 import { CategoryQueryFilter } from '../repository/category-query.filter';
 import CreateCategoryUseCase from '../use-cases/create-category.use-case';
 import UpdateCategoryUseCase from '../use-cases/update-category.use-case';
 import DeleteCategoryUseCase from '../use-cases/delete-category.use-case';
-import CategoryValidatorService from './category-validator.service';
 
 @Injectable()
 export default class CategoryService {
   constructor(
     @Inject(CATEGORY_REPOSITORY) private readonly categoryRepository: ICategoryRepository,
-    private readonly categoryValidatorService: CategoryValidatorService,
     private readonly createCategoryUseCase: CreateCategoryUseCase,
     private readonly updateCategoryUseCase: UpdateCategoryUseCase,
     private readonly deleteCategoryUseCase: DeleteCategoryUseCase,
@@ -36,7 +33,7 @@ export default class CategoryService {
   }
 
   async getCategory(name: string): Promise<CategoryDto> {
-    const category = await this.categoryValidatorService.findOneOrThrow({ name });
+    const category = await this.categoryRepository.findOne({ name });
     if (!category) {
       throw new CategoryNotFoundException(`카테고리 이름 ${name}을 찾을 수 없습니다.`);
     }
@@ -52,11 +49,6 @@ export default class CategoryService {
 
   async deleteCategory(categoryId: number) {
     return this.deleteCategoryUseCase.execute(categoryId);
-  }
-
-  async addArticleCount(category: Category) {
-    category.addArticleCount();
-    await this.categoryRepository.update(category);
   }
 
   async findNames(filter?: CategoryQueryFilter): Promise<string[]> {

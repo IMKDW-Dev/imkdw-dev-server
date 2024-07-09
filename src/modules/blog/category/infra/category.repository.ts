@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { categories as PrismaCategories } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
@@ -9,13 +9,31 @@ import { QueryOption } from '../../../../common/interfaces/common-query.filter';
 import { CategoryQueryOption } from '../repository/category-query.option';
 import Category from '../domain/models/category.model';
 
+export type ICategory = Prisma.categoriesGetPayload<{
+  include: {
+    _count: {
+      select: {
+        articles: true;
+      };
+    };
+  };
+}>;
+
+export const include = {
+  _count: {
+    select: {
+      articles: true,
+    },
+  },
+} as const;
+
 @Injectable()
 export default class CategoryRepository implements ICategoryRepository {
   constructor(private readonly prisma: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async findOne(where: CategoryQueryFilter): Promise<Category | null> {
-    const row = await this.prisma.tx.categories.findFirst({ where });
-    return row ? this.toEntity(row) : null;
+    const row = await this.prisma.tx.categories.findFirst({ where, include });
+    return row ? this.toModel(row) : null;
   }
 
   async findNextSort(): Promise<number> {
@@ -32,9 +50,10 @@ export default class CategoryRepository implements ICategoryRepository {
     const rows = await this.prisma.tx.categories.findMany({
       ...(option?.limit && { take: option.limit }),
       orderBy: { sort: 'asc' },
+      include,
     });
 
-    return rows.map((row) => this.toEntity(row));
+    return rows.map((row) => this.toModel(row));
   }
 
   async save(category: Category): Promise<Category> {
@@ -44,11 +63,11 @@ export default class CategoryRepository implements ICategoryRepository {
         sort: category.getSort(),
         desc: category.getDesc(),
         image: category.getImage(),
-        articleCount: category.getArticleCount(),
       },
+      include,
     });
 
-    return this.toEntity(row);
+    return this.toModel(row);
   }
 
   async saveMany(categories: Category[]): Promise<void> {
@@ -76,9 +95,10 @@ export default class CategoryRepository implements ICategoryRepository {
       where: filter,
       ...(option?.limit && { take: option.limit }),
       orderBy: { sort: 'asc' },
+      include,
     });
 
-    return rows.map((row) => this.toEntity(row));
+    return rows.map((row) => this.toModel(row));
   }
 
   async update(category: Category): Promise<Category> {
@@ -89,11 +109,11 @@ export default class CategoryRepository implements ICategoryRepository {
         desc: category.getDesc(),
         image: category.getImage(),
         sort: category.getSort(),
-        articleCount: category.getArticleCount(),
       },
+      include,
     });
 
-    return this.toEntity(updatedCategory);
+    return this.toModel(updatedCategory);
   }
 
   async updateSort(category: Category, newSort: number): Promise<Category> {
@@ -114,23 +134,24 @@ export default class CategoryRepository implements ICategoryRepository {
     const updaedCategory = await this.prisma.tx.categories.update({
       where: { id: category.getId() },
       data: { sort: newSort },
+      include,
     });
 
-    return this.toEntity(updaedCategory);
+    return this.toModel(updaedCategory);
   }
 
   async delete(category: Category): Promise<void> {
     await this.prisma.tx.categories.delete({ where: { id: category.getId() } });
   }
 
-  private toEntity(category: PrismaCategories) {
+  private toModel(category: ICategory) {
     return new Category.builder()
       .setId(category.id)
       .setName(category.name)
       .setDesc(category.desc)
       .setImage(category.image)
       .setSort(category.sort)
-      .setArticleCount(category.articleCount)
+      .setArticleCount(category._count.articles)
       .build();
   }
 }

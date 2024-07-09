@@ -36,7 +36,7 @@ export default class UserRepository implements IUserRepository {
       return null;
     }
 
-    return this.toEntity(row);
+    return this.toModel(row);
   }
 
   async save(user: User): Promise<User> {
@@ -52,7 +52,7 @@ export default class UserRepository implements IUserRepository {
       include: userInclude,
     });
 
-    return this.toEntity(row);
+    return this.toModel(row);
   }
 
   async update(user: User): Promise<User> {
@@ -65,14 +65,14 @@ export default class UserRepository implements IUserRepository {
       include: userInclude,
     });
 
-    return this.toEntity(updatedRow);
+    return this.toModel(updatedRow);
   }
 
   async count(): Promise<number> {
     return this.prisma.tx.users.count();
   }
 
-  private toEntity(user: IUser): User {
+  private toModel(user: IUser): User {
     return UserMapper.toModel(user, user.role, user.oAuthProvider);
   }
 }

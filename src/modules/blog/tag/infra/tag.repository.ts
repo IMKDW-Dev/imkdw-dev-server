@@ -15,7 +15,7 @@ export default class TagRepository implements ITagRepository {
       where: { name: { in: names } },
     });
 
-    return rows.map(this.toEntity);
+    return rows.map(this.toModel);
   }
 
   async createMany(tags: Tag[]): Promise<Tag[]> {
@@ -25,10 +25,10 @@ export default class TagRepository implements ITagRepository {
     const createdRows = await this.prisma.tx.tags.findMany({
       where: { name: { in: tags.map((tag) => tag.toString()) } },
     });
-    return createdRows.map(this.toEntity);
+    return createdRows.map(this.toModel);
   }
 
-  private toEntity(row: prismaTags): Tag {
+  private toModel(row: prismaTags): Tag {
     return new Tag.builder().setId(row.id).setName(row.name).build();
   }
 }

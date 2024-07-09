@@ -1,8 +1,6 @@
 import Category from '../../../category/domain/models/category.model';
 import Tag from '../../../tag/domain/models/tag.model';
 import Article from '../../domain/models/article.model';
-import ArticleContent from '../../domain/vo/article-content.vo';
-import ArticleId from '../../domain/vo/article-id.vo';
 import ArticleDto from '../../dto/article.dto';
 
 interface CreateArticleParams {
@@ -19,10 +17,10 @@ interface CreateArticleParams {
 // eslint-disable-next-line import/prefer-default-export
 export const createArticle = (params?: CreateArticleParams) => {
   return new Article.builder()
-    .setId(new ArticleId(params?.id ?? 'articleId'))
-    .setTitle(params?.title ?? 'title')
+    .setId(params?.id ?? 'a'.repeat(24))
+    .setTitle(params?.title ?? 'a'.repeat(10))
     .setCategory(params?.category ?? new Category.builder().build())
-    .setContent(new ArticleContent(params?.content ?? 'a'.repeat(100)))
+    .setContent(params?.content ?? 'a'.repeat(100))
     .setVisible(params?.visible ?? true)
     .setThumbnail(params?.thumbnail ?? 'thumbnail')
     .setViewCount(params?.viewCount ?? 1)
