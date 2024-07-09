@@ -16,7 +16,7 @@ const config: Config.InitialOptions = {
   resetMocks: true,
   restoreMocks: true,
   clearMocks: true,
-  coveragePathIgnorePatterns: ['/node_modules/', '/__test__/', '/__docs__/'],
+  coveragePathIgnorePatterns: ['/node_modules/', '/__test__/', '/docs/'],
 };
 
 export default config;
