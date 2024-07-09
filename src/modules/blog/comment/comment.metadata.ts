@@ -3,9 +3,10 @@ import CommentService from './services/comment.service';
 import { COMMENT_REPOSITORY } from './repository/comment-repo.interface';
 import CommentRepository from './infra/comment.repository';
 import CommentController from './controllers/comment.controller';
+import CreateCommentUseCase from './use-cases/create-comment.use-case';
 
 const services: Provider[] = [CommentService];
-const usecases: Provider[] = [];
+const usecases: Provider[] = [CreateCommentUseCase];
 const repositories: ClassProvider[] = [
   {
     provide: COMMENT_REPOSITORY,

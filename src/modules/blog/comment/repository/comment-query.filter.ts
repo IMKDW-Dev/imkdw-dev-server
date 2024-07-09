@@ -1,4 +1,4 @@
-export interface ArticleCommentQueryFilter {
+export interface CommentQueryFilter {
   id?: number;
   articleId?: string;
 }

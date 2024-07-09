@@ -7,7 +7,7 @@ export default class Comment {
     id: number,
     author: User,
     articleId: string,
-    parent: Comment,
+    parentId: number | null,
     content: string,
     createdAt: Date,
     replies: Comment[],
@@ -15,7 +15,7 @@ export default class Comment {
     this.id = id;
     this.author = author;
     this.articleId = articleId;
-    this.parent = parent;
+    this.parentId = parentId;
     this.content = new CommentContent(content);
     this.createdAt = createdAt;
     this.replies = replies;
@@ -24,7 +24,7 @@ export default class Comment {
   private id: number;
   private author: User;
   private articleId: string;
-  private parent: Comment | null;
+  private parentId: number | null;
   private content: CommentContent;
   private createdAt: Date;
   private replies: Comment[];
@@ -45,10 +45,6 @@ export default class Comment {
     return this.articleId;
   }
 
-  getParent(): Comment {
-    return this.parent;
-  }
-
   getContent(): string {
     return this.content.toString();
   }
@@ -57,19 +53,21 @@ export default class Comment {
     return this.createdAt;
   }
 
+  getParentId(): number | null {
+    return this.parentId;
+  }
+
   getReplies(): Comment[] {
     return this.replies;
   }
 
-  setParent(parent: Comment): void {
-    this.parent = parent;
+  setParentId(parentId: number | null): void {
+    this.parentId = parentId;
   }
 
   checkReplyAvailable() {
-    if (this.parent) {
-      throw new CannotReplyOnReplyCommentException(
-        `답글에는 답글을 작성할 수 없습니다. parentId: ${this.parent.getId()}`,
-      );
+    if (this.parentId) {
+      throw new CannotReplyOnReplyCommentException(`답글에는 답글을 작성할 수 없습니다. parentId: ${this.parentId}`);
     }
   }
 
@@ -77,7 +75,7 @@ export default class Comment {
     id: number;
     author: User;
     articleId: string;
-    parent: Comment;
+    parentId: number | null;
     content: string;
     createdAt: Date;
     replies: Comment[];
@@ -97,8 +95,8 @@ export default class Comment {
       return this;
     }
 
-    setParent(parent: Comment): this {
-      this.parent = parent;
+    setParentId(parentId: number | null): this {
+      this.parentId = parentId;
       return this;
     }
 
@@ -118,7 +116,15 @@ export default class Comment {
     }
 
     build(): Comment {
-      return new Comment(this.id, this.author, this.articleId, this.parent, this.content, this.createdAt, this.replies);
+      return new Comment(
+        this.id,
+        this.author,
+        this.articleId,
+        this.parentId,
+        this.content,
+        this.createdAt,
+        this.replies,
+      );
     }
   };
 }

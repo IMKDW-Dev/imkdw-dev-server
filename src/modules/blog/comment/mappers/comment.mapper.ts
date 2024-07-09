@@ -19,6 +19,7 @@ export const toDto = (comment: Comment): CommentDto => {
 export const toModel = (comment: articleComments, author: User, replies?: Comment[]) => {
   return new Comment.builder()
     .setId(comment.id)
+    .setParentId(comment.parentId)
     .setArticleId(comment.articleId)
     .setContent(comment.content)
     .setCreatedAt(comment.createdAt)
