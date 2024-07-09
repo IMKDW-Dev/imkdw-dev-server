@@ -19,7 +19,7 @@ export const createArticle = (params?: CreateArticleParams) => {
   return new Article.builder()
     .setId(params?.id ?? 'a'.repeat(24))
     .setTitle(params?.title ?? 'a'.repeat(10))
-    .setCategory(params?.category ?? new Category.builder().build())
+    .setCategory(params.category)
     .setContent(params?.content ?? 'a'.repeat(100))
     .setVisible(params?.visible ?? true)
     .setThumbnail(params?.thumbnail ?? 'thumbnail')

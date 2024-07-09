@@ -12,13 +12,13 @@ import * as ArticleMapper from '../mappers/article.mapper';
 import ResponseGetArticlesDto from '../dto/response/get-article.dto';
 import { getOffsetPagingResult } from '../../../../common/functions/offset-paging.function';
 import { UpdateArticleDto } from '../dto/internal/update-article.dto';
-import ArticleContent from '../domain/vo/article-content.vo';
 import { userRoles } from '../../../user/domain/models/user-role.model';
 import { ArticleQueryFilter } from '../repository/article-query.filter';
 import Article from '../domain/models/article.model';
 import { ArticleQueryOption } from '../repository/article-query.option';
 import CreateArticleUseCase from '../use-cases/create-article.use-case';
 import { COMMENT_REPOSITORY, ICommentRepository } from '../../comment/repository/comment-repo.interface';
+import UpdateArticleUseCase from '../use-cases/update-article.use-case';
 
 @Injectable()
 export default class ArticleService {
@@ -27,6 +27,7 @@ export default class ArticleService {
     @Inject(COMMENT_REPOSITORY) private readonly articleCommentRepository: ICommentRepository,
     private readonly articleImageService: ArticleImageService,
     private readonly createArticleUseCase: CreateArticleUseCase,
+    private readonly updateArticleUseCase: UpdateArticleUseCase,
   ) {}
 
   @Transactional()
@@ -88,31 +89,8 @@ export default class ArticleService {
     await this.articleRepository.delete(article);
   }
 
-  async updateArticle(articleId: string, dto: UpdateArticleDto) {
-    const article = await this.findOneOrThrow({ articleId });
-    article.changeTitle(dto.title);
-    article.changeContent(new ArticleContent(dto.content));
-    article.changeVisible(dto.visible);
-
-    if (dto?.thumbnail) {
-      const thumbnail = await this.articleImageService.getThumbnail(article.getId(), dto.thumbnail);
-      article.changeThumbnail(thumbnail);
-    }
-
-    // if (dto?.categoryId) {
-    //   const category = await this.categoryService.findOneOrThrow({ id: dto.categoryId });
-    //   if (!category) {
-    //     throw new CategoryNotFoundException(dto.categoryId);
-    //   }
-    //   article.changeCategory(category);
-    // }
-
-    if (dto?.images && dto.images.length) {
-      const copiedImageUrls = await this.articleImageService.copyContentImages(article.getId(), dto.images);
-      article.updateImageUrls(copiedImageUrls);
-    }
-
-    const updatedArticle = await this.articleRepository.update(article);
+  async updateArticle(dto: UpdateArticleDto) {
+    const updatedArticle = await this.updateArticleUseCase.execute(dto);
     return ArticleMapper.toDto(updatedArticle);
   }
 

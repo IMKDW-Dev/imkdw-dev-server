@@ -88,8 +88,8 @@ export default class Article {
     this.title = new ArticleTitle(title);
   }
 
-  changeContent(content: ArticleContent) {
-    this.content = content;
+  changeContent(content: string) {
+    this.content = new ArticleContent(content);
   }
 
   changeVisible(visible: boolean) {

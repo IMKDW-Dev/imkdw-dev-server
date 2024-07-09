@@ -90,6 +90,6 @@ export default class ArticleController {
     @Body() dto: RequestUpdateArticleDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ArticleDto> {
-    return this.articleService.updateArticle(articleId, { ...dto, thumbnail: file });
+    return this.articleService.updateArticle({ ...dto, articleId, thumbnail: file });
   }
 }

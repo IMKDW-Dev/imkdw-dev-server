@@ -1,10 +1,9 @@
 export interface UpdateArticleDto {
-  title?: string;
-  visible?: boolean;
-  viewCount?: number;
-  commentCount?: number;
+  articleId: string;
+  title: string;
+  visible: boolean;
+  content: string;
   thumbnail?: Express.Multer.File;
-  categoryId?: number;
-  content?: string;
   images?: string[];
+  categoryId: number;
 }

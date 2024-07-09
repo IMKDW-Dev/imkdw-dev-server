@@ -9,9 +9,10 @@ import ArticleTagRepository from './infra/article-tag.repository';
 import CreateArticleUseCase from './use-cases/create-article.use-case';
 import ArticleController from './controllers/article.controller';
 import ArticleStatsController from './controllers/article-stats.controller';
+import UpdateArticleUseCase from './use-cases/update-article.use-case';
 
 const services: Provider[] = [ArticleService, ArticleImageService, ArticleStatsService];
-const usecases: Provider[] = [CreateArticleUseCase];
+const usecases: Provider[] = [CreateArticleUseCase, UpdateArticleUseCase];
 const repositories: ClassProvider[] = [
   {
     provide: ARTICLE_REPOSITORY,
