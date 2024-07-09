@@ -96,7 +96,7 @@ export default class Article {
     this.visible = visible;
   }
 
-  addViewCount() {
+  increaseViewCount() {
     this.viewCount += 1;
   }
 

@@ -19,6 +19,7 @@ import { ArticleQueryOption } from '../repository/article-query.option';
 import CreateArticleUseCase from '../use-cases/create-article.use-case';
 import { COMMENT_REPOSITORY, ICommentRepository } from '../../comment/repository/comment-repo.interface';
 import UpdateArticleUseCase from '../use-cases/update-article.use-case';
+import IncreaseViewCountUseCase from '../use-cases/increate-view-count.use-case';
 
 @Injectable()
 export default class ArticleService {
@@ -28,6 +29,7 @@ export default class ArticleService {
     private readonly articleImageService: ArticleImageService,
     private readonly createArticleUseCase: CreateArticleUseCase,
     private readonly updateArticleUseCase: UpdateArticleUseCase,
+    private readonly increaseViewCountUseCase: IncreaseViewCountUseCase,
   ) {}
 
   @Transactional()
@@ -68,17 +70,8 @@ export default class ArticleService {
     });
   }
 
-  async addViewCount(articleId: string, userRole: string): Promise<void> {
-    const article = await this.articleRepository.findOne({
-      includePrivate: userRole === userRoles.admin.name,
-    });
-
-    if (!article) {
-      throw new ArticleNotFoundException(articleId);
-    }
-
-    article.addViewCount();
-    await this.articleRepository.update(article);
+  async increaseViewCount(articleId: string, userRole: string): Promise<void> {
+    await this.increaseViewCountUseCase.execute({ articleId, userRole });
   }
 
   async deleteArticle(articleId: string): Promise<void> {

@@ -23,7 +23,7 @@ export const createArticle = (params?: CreateArticleParams) => {
     .setContent(params?.content ?? 'a'.repeat(100))
     .setVisible(params?.visible ?? true)
     .setThumbnail(params?.thumbnail ?? 'thumbnail')
-    .setViewCount(params?.viewCount ?? 1)
+    .setViewCount(params?.viewCount ?? 0)
     .setCreatedAt(params?.createdAt ?? new Date())
     .setTags(params?.tags ?? [])
     .build();

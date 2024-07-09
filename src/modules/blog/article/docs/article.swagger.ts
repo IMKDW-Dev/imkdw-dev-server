@@ -38,7 +38,7 @@ export const getArticles = (summary: string) => {
   );
 };
 
-export const addViewCount = (summary: string) => {
+export const increaseViewCount = (summary: string) => {
   return applyDecorators(ApiOperation({ summary }), ApiParam({ name: 'articleId', description: '게시글 아이디' }));
 };
 
