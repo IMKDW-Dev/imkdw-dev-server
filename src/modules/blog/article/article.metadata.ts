@@ -12,6 +12,7 @@ import ArticleStatsController from './controllers/article-stats.controller';
 import UpdateArticleUseCase from './use-cases/update-article.use-case';
 import IncreaseViewCountUseCase from './use-cases/increate-view-count.use-case';
 import DeleteArticleUseCase from './use-cases/delete-article.use-case';
+import GetArticleDetailUseCase from './use-cases/get-article-detail.use-case';
 
 const services: Provider[] = [ArticleService, ArticleImageService, ArticleStatsService];
 const usecases: Provider[] = [
@@ -19,6 +20,7 @@ const usecases: Provider[] = [
   UpdateArticleUseCase,
   IncreaseViewCountUseCase,
   DeleteArticleUseCase,
+  GetArticleDetailUseCase,
 ];
 const repositories: ClassProvider[] = [
   {

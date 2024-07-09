@@ -20,6 +20,7 @@ import { COMMENT_REPOSITORY, ICommentRepository } from '../../comment/repository
 import UpdateArticleUseCase from '../use-cases/update-article.use-case';
 import IncreaseViewCountUseCase from '../use-cases/increate-view-count.use-case';
 import DeleteArticleUseCase from '../use-cases/delete-article.use-case';
+import GetArticleDetailUseCase from '../use-cases/get-article-detail.use-case';
 
 @Injectable()
 export default class ArticleService {
@@ -30,6 +31,7 @@ export default class ArticleService {
     private readonly updateArticleUseCase: UpdateArticleUseCase,
     private readonly increaseViewCountUseCase: IncreaseViewCountUseCase,
     private readonly deleteArticleUseCase: DeleteArticleUseCase,
+    private readonly getArticleDetailUseCase: GetArticleDetailUseCase,
   ) {}
 
   @Transactional()
@@ -39,10 +41,7 @@ export default class ArticleService {
   }
 
   async getArticleDetail(articleId: string, userRole: string): Promise<ArticleDto> {
-    const articleDetail = await this.findOneOrThrow({ articleId, includePrivate: userRole === userRoles.admin.name });
-    const comments = await this.commentRepository.findMany({ articleId: articleDetail.getId().toString() });
-    articleDetail.setComments(comments);
-
+    const articleDetail = await this.getArticleDetailUseCase.execute({ articleId, userRole });
     return ArticleMapper.toDto(articleDetail);
   }
 

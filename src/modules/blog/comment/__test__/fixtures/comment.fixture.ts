@@ -1,5 +1,5 @@
-import User from '../../../../../user/domain/models/user.model';
-import Comment from '../../../domain/models/article-comment.model';
+import User from '../../../../user/domain/models/user.model';
+import Comment from '../../domain/models/comment.model';
 
 interface Params {
   id?: number;

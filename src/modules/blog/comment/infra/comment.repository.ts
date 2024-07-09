@@ -30,7 +30,7 @@ type IArticleComment = Prisma.articleCommentsGetPayload<{
   };
 }>;
 
-const articleCommentInclude = {
+const include = {
   user: {
     include: {
       role: true,
@@ -56,7 +56,7 @@ export default class CommentRepository implements ICommentRepository {
   async findOne(filter: ArticleCommentQueryFilter): Promise<Comment> {
     const row: IArticleComment = await this.prisma.tx.articleComments.findFirst({
       where: filter,
-      include: articleCommentInclude,
+      include,
     });
 
     return this.toModel(row);
@@ -65,7 +65,7 @@ export default class CommentRepository implements ICommentRepository {
   async findMany(filter: ArticleCommentQueryFilter): Promise<Comment[]> {
     const rows: IArticleComment[] = await this.prisma.tx.articleComments.findMany({
       where: { ...filter, parentId: null },
-      include: articleCommentInclude,
+      include,
     });
 
     return rows.map((row) => this.toModel(row));
@@ -79,10 +79,21 @@ export default class CommentRepository implements ICommentRepository {
         content: comment.getContent(),
         userId: comment.getAuthorId(),
       },
-      include: articleCommentInclude,
+      include,
     });
 
     return this.toModel(row);
+  }
+
+  async saveMany(comments: Comment[]): Promise<void> {
+    await this.prisma.tx.articleComments.createMany({
+      data: comments.map((comment) => ({
+        articleId: comment.getArticleId(),
+        ...(comment.getParent() && { parentId: comment.getParent().getId() }),
+        content: comment.getContent(),
+        userId: comment.getAuthorId(),
+      })),
+    });
   }
 
   async deleteByArticleId(articleId: string): Promise<void> {
