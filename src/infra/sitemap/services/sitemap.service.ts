@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import ArticleService from '../../../modules/article/services/article/article.service';
-import CategoryService from '../../../modules/category/services/category.service';
+import CategoryService from '../../../modules/blog/category/services/category.service';
+import ArticleService from '../../../modules/blog/article/services/article.service';
 
 @Injectable()
 export default class SitemapService {

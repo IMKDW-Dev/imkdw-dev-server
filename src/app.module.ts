@@ -10,8 +10,6 @@ import UserModule from './modules/user/user.module';
 import JwtCookieMiddleware from './modules/auth/middlewares/jwt-cookie.middleware';
 import JwtGuard from './modules/auth/guards/jwt.guard';
 import TransformInterceptor from './common/interceptors/transform.interceptor';
-import CategoryModule from './modules/category/category.module';
-import ArticleModule from './modules/article/article.module';
 import AllExceptionsFilter from './common/exceptions/all-exception.filter';
 import ContactModule from './modules/contact/contact.module';
 import SitemapModule from './infra/sitemap/sitemap.module';
@@ -22,6 +20,7 @@ import LoggingInterceptor from './common/interceptors/logging.interceptor';
 import AlertModule from './infra/alert/alert.module';
 import createClsModule from './common/modules/cls.module';
 import createConfigModule from './common/modules/config.module';
+import BlogModule from './modules/blog/blog.module';
 
 @Module({
   imports: [
@@ -36,14 +35,13 @@ import createConfigModule from './common/modules/config.module';
     ]),
     AuthModule,
     UserModule,
-    CategoryModule,
-    ArticleModule,
     ContactModule,
     SitemapModule,
     LoggerModule,
     TokenModule,
     DatabaseModule,
     AlertModule,
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [

@@ -80,11 +80,11 @@ model articles {
   deleteAt   DateTime? @map("delete_at")
   deleteUser String?   @map("delete_user")
 
-  articleTag     articleTags[]
-  articleComment articleComments[]
-  category       categories        @relation(fields: [categoryId], references: [id])
-  users          users?            @relation(fields: [usersId], references: [id])
-  usersId        String?
+  articleTag articleTags[]
+  comment    articleComments[]
+  category   categories        @relation(fields: [categoryId], references: [id])
+  users      users?            @relation(fields: [usersId], references: [id])
+  usersId    String?
 
   @@index([categoryId])
   @@map("Articles")

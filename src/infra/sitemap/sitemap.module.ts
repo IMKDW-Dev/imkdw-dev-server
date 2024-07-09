@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import SitemapController from './controllers/sitemap.controller';
 import SitemapService from './services/sitemap.service';
-import ArticleModule from '../../modules/article/article.module';
-import CategoryModule from '../../modules/category/category.module';
+import BlogModule from '../../modules/blog/blog.module';
 
 @Module({
-  imports: [ArticleModule, CategoryModule],
+  imports: [BlogModule],
   controllers: [SitemapController],
   providers: [SitemapService],
 })
