@@ -3,7 +3,6 @@ import { Transactional } from '@nestjs-cls/transactional';
 
 import { ARTICLE_REPOSITORY, IArticleRepository } from '../repository/article-repo.interface';
 import { CreateArticleDto } from '../dto/internal/create-article.dto';
-import ArticleImageService from './article-image.service';
 import { ArticleNotFoundException } from '../../../../common/exceptions/404';
 import { GetArticlesDto } from '../dto/internal/get-article.dto';
 import { GetArticleSort } from '../enums/article.enum';
@@ -20,16 +19,17 @@ import CreateArticleUseCase from '../use-cases/create-article.use-case';
 import { COMMENT_REPOSITORY, ICommentRepository } from '../../comment/repository/comment-repo.interface';
 import UpdateArticleUseCase from '../use-cases/update-article.use-case';
 import IncreaseViewCountUseCase from '../use-cases/increate-view-count.use-case';
+import DeleteArticleUseCase from '../use-cases/delete-article.use-case';
 
 @Injectable()
 export default class ArticleService {
   constructor(
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
-    @Inject(COMMENT_REPOSITORY) private readonly articleCommentRepository: ICommentRepository,
-    private readonly articleImageService: ArticleImageService,
+    @Inject(COMMENT_REPOSITORY) private readonly commentRepository: ICommentRepository,
     private readonly createArticleUseCase: CreateArticleUseCase,
     private readonly updateArticleUseCase: UpdateArticleUseCase,
     private readonly increaseViewCountUseCase: IncreaseViewCountUseCase,
+    private readonly deleteArticleUseCase: DeleteArticleUseCase,
   ) {}
 
   @Transactional()
@@ -40,7 +40,7 @@ export default class ArticleService {
 
   async getArticleDetail(articleId: string, userRole: string): Promise<ArticleDto> {
     const articleDetail = await this.findOneOrThrow({ articleId, includePrivate: userRole === userRoles.admin.name });
-    const comments = await this.articleCommentRepository.findMany({ articleId: articleDetail.getId().toString() });
+    const comments = await this.commentRepository.findMany({ articleId: articleDetail.getId().toString() });
     articleDetail.setComments(comments);
 
     return ArticleMapper.toDto(articleDetail);
@@ -75,11 +75,7 @@ export default class ArticleService {
   }
 
   async deleteArticle(articleId: string): Promise<void> {
-    const article = await this.findOneOrThrow({ articleId });
-
-    await this.articleCommentRepository.deleteByArticleId(articleId);
-    // await this.articleTagService.deleteByArticleId(articleId);
-    await this.articleRepository.delete(article);
+    await this.deleteArticleUseCase.execute(articleId);
   }
 
   async updateArticle(dto: UpdateArticleDto) {

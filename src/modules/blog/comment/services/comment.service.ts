@@ -13,7 +13,7 @@ import { CreateCommentDto } from '../dto/internal/create-comment.dto';
 @Injectable()
 export default class CommentService {
   constructor(
-    @Inject(COMMENT_REPOSITORY) private readonly articleCommentRepository: ICommentRepository,
+    @Inject(COMMENT_REPOSITORY) private readonly commentRepository: ICommentRepository,
     private readonly articleService: ArticleService,
     private readonly userQueryService: UserService,
   ) {}
@@ -30,12 +30,12 @@ export default class CommentService {
       comment.setParent(parentComment);
     }
 
-    const createdComment = await this.articleCommentRepository.save(comment);
+    const createdComment = await this.commentRepository.save(comment);
     return ArticleCommentMapper.toDto(createdComment);
   }
 
   async findOneOrThrow(filter: ArticleCommentQueryFilter): Promise<Comment> {
-    const comment = await this.articleCommentRepository.findOne(filter);
+    const comment = await this.commentRepository.findOne(filter);
     if (!comment) {
       throw new ArticleCommentNotFoundException(`댓글을 찾을 수 없습니다. filter: ${filter}`);
     }

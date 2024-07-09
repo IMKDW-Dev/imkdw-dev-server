@@ -6,12 +6,12 @@ import { COMMENT_REPOSITORY, ICommentRepository } from '../../comment/repository
 export default class ArticleStatsService {
   constructor(
     @Inject(ARTICLE_REPOSITORY) private readonly articleRepository: IArticleRepository,
-    @Inject(COMMENT_REPOSITORY) private readonly articleCommentRepository: ICommentRepository,
+    @Inject(COMMENT_REPOSITORY) private readonly commentRepository: ICommentRepository,
   ) {}
 
   async getArticleStats(): Promise<ArticleStatsDto> {
     const articles = await this.articleRepository.findMany({ includePrivate: false });
-    const comments = await this.articleCommentRepository.findMany({});
+    const comments = await this.commentRepository.findMany({});
     const articleViews = articles.reduce((acc, article) => acc + article.getViewCount(), 0);
     return new ArticleStatsDto(articles.length, comments.length, articleViews);
   }
