@@ -1,3 +1,4 @@
+import { generateCUID } from '../../../../../common/utils/cuid';
 import Category from '../../../category/domain/models/category.model';
 import Tag from '../../../tag/domain/models/tag.model';
 import Article from '../../domain/models/article.model';
@@ -17,7 +18,7 @@ interface CreateArticleParams {
 // eslint-disable-next-line import/prefer-default-export
 export const createArticle = (params?: CreateArticleParams) => {
   return new Article.builder()
-    .setId(params?.id ?? 'a'.repeat(24))
+    .setId(params?.id ?? generateCUID())
     .setTitle(params?.title ?? 'a'.repeat(10))
     .setCategory(params.category)
     .setContent(params?.content ?? 'a'.repeat(100))

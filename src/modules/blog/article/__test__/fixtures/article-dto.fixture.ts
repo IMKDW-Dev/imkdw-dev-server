@@ -1,8 +1,10 @@
 import { generateMulterFile } from '../../../../../__test__/fixtures/create-multer-file.fixture';
+import { userRoles } from '../../../../user/domain/models/user-role.model';
 import { CreateArticleDto } from '../../dto/internal/create-article.dto';
+import { GetArticlesDto } from '../../dto/internal/get-article.dto';
 import { UpdateArticleDto } from '../../dto/internal/update-article.dto';
+import { GetArticleSort } from '../../enums/article.enum';
 
-// eslint-disable-next-line import/prefer-default-export
 export const createCreateArticleDto = (params?: Partial<CreateArticleDto>): CreateArticleDto => {
   return {
     title: params?.title ?? 'a'.repeat(10),
@@ -25,5 +27,17 @@ export const createUpdateArticleDto = (params?: Partial<UpdateArticleDto>): Upda
     visible: params?.visible ?? true,
     thumbnail: params?.thumbnail ?? generateMulterFile(),
     images: params?.images ?? [],
+  };
+};
+
+export const createGetArticlesDto = (params?: Partial<GetArticlesDto>): GetArticlesDto => {
+  return {
+    userRole: params?.userRole ?? userRoles.normal.name,
+    limit: params?.limit ?? 10,
+    page: params?.page ?? 1,
+    categoryId: params?.categoryId ?? null,
+    excludeId: params?.excludeId ?? '',
+    search: params?.search ?? '',
+    sort: params?.sort ?? GetArticleSort.LATEST,
   };
 };

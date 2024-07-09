@@ -13,15 +13,19 @@ import UpdateArticleUseCase from './use-cases/update-article.use-case';
 import IncreaseViewCountUseCase from './use-cases/increate-view-count.use-case';
 import DeleteArticleUseCase from './use-cases/delete-article.use-case';
 import GetArticleDetailUseCase from './use-cases/get-article-detail.use-case';
+import GetArticlesUseCase from './use-cases/get-articles.use-case';
 
 const services: Provider[] = [ArticleService, ArticleImageService, ArticleStatsService];
+
 const usecases: Provider[] = [
   CreateArticleUseCase,
   UpdateArticleUseCase,
   IncreaseViewCountUseCase,
   DeleteArticleUseCase,
   GetArticleDetailUseCase,
+  GetArticlesUseCase,
 ];
+
 const repositories: ClassProvider[] = [
   {
     provide: ARTICLE_REPOSITORY,

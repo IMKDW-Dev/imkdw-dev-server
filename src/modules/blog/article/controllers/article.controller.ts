@@ -62,7 +62,7 @@ export default class ArticleController {
     @Requester() requester: IRequester,
     @Query() query: GetArticlesQuery,
   ): Promise<ResponseGetArticlesDto> {
-    return this.articleService.getArticles(query, requester?.role);
+    return this.articleService.getArticles({ ...query, userRole: requester?.role });
   }
 
   @Swagger.increaseViewCount('게시글 조회수 증가')

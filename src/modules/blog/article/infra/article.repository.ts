@@ -105,6 +105,7 @@ export default class ArticleRepository implements IArticleRepository {
         categoryId: article.getCategoryId(),
         visible: article.getVisible(),
         viewCount: article.getViewCount(),
+        createdAt: article.getCreatedAt(),
         articleTag: {
           createMany: {
             data: article.getTags().map((tag) => ({

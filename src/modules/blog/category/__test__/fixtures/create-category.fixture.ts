@@ -1,4 +1,5 @@
 import { generateMulterFile } from '../../../../../__test__/fixtures/create-multer-file.fixture';
+import { generateCUID } from '../../../../../common/utils/cuid';
 import Category from '../../domain/models/category.model';
 import { CreateCategoryDto } from '../../dto/internal/create-category.dto';
 
@@ -21,7 +22,7 @@ interface CreateCategoryParams {
 export const createCategory = (params?: CreateCategoryParams): Category => {
   return new Category.builder()
     .setId(params?.id ?? 1)
-    .setName(params?.name ?? 'name')
+    .setName(params?.name ?? generateCUID().slice(0, 20))
     .setDesc(params?.desc ?? 'category description')
     .setArticleCount(params?.articleCount ?? 0)
     .setSort(params?.sort ?? 1)

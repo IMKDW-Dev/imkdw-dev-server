@@ -91,7 +91,7 @@ describe('UpdateArticleUseCase', () => {
         await categoryRepository.save(category);
         await articleRepository.save(article);
 
-        const dto = createUpdateArticleDto({ categoryId: 99 });
+        const dto = createUpdateArticleDto({ categoryId: 99, articleId: article.getId().toString() });
         await expect(sut.execute(dto)).rejects.toThrow(CategoryNotFoundException);
       });
     });
@@ -105,7 +105,7 @@ describe('UpdateArticleUseCase', () => {
         await categoryRepository.save(category2);
         await articleRepository.save(article);
 
-        const dto = createUpdateArticleDto({ categoryId: category2.getId() });
+        const dto = createUpdateArticleDto({ categoryId: category2.getId(), articleId: article.getId().toString() });
 
         const updatedArticle = await sut.execute(dto);
         expect(updatedArticle.getCategory().getId()).toBe(category2.getId());

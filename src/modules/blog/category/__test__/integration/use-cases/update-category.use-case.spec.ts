@@ -14,7 +14,7 @@ import { cleanupDatabase } from '../../../../../../../prisma/__test__/utils/clea
 import { CategoryNotFoundException } from '../../../../../../common/exceptions/404';
 import { generateMulterFile } from '../../../../../../__test__/fixtures/create-multer-file.fixture';
 
-describe('UpdateUserUseCase', () => {
+describe('UpdateCategoryUseCase', () => {
   let sut: UpdateCategoryUseCase;
   let categoryRepository: ICategoryRepository;
   let prisma: PrismaService;
