@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 
 import UserService from '../services/user.service';
-import RequestUpdateUserDto from '../dto/request/update-user-info.dto';
+import RequestUpdateUserDto from '../dto/request/update-user.dto';
 import UserGuard from '../../auth/guards/user.guard';
 import * as Swagger from '../docs/user.swagger';
 import { Public } from '../../auth/decorators/public.decorator';

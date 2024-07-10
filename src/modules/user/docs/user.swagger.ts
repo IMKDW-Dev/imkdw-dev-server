@@ -8,7 +8,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { FORBIDDEN_EXCEPTIONS } from '../../../common/exceptions/403';
-import RequestUpdateUserDto from '../dto/request/update-user-info.dto';
+import RequestUpdateUserDto from '../dto/request/update-user.dto';
 import UserDto from '../dto/user.dto';
 import ResponseGetUserCountDto from '../dto/response/user-count.dto';
 
