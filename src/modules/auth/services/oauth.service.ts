@@ -9,6 +9,7 @@ import { KakaoOAuthToken, KakaoUserInfo } from '../../../@types/auth/oauth/kakao
 import { GithubOAuthToken } from '../../../@types/auth/oauth/github.type';
 import UserOAuthProvider from '../../user/domain/models/user-oauth-provider.model';
 import UserService from '../../user/services/user.service';
+import OAuthProvider from '../enums/oauth-provider.enum';
 
 @Injectable()
 export default class OAuthService {
@@ -94,4 +95,6 @@ export default class OAuthService {
 
     return this.authService.register(email, provider);
   }
+
+  async getOAuthUrl(provider: OAuthProvider): Promise<string> {}
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
@@ -12,6 +12,7 @@ import ResponseAuthResultDto from '../dto/response/auth-result.dto';
 import { Public } from '../decorators/public.decorator';
 import ReqeustKakaoOAuthDto from '../dto/request/kakao-oauth.dto';
 import ReqeustGithubOAuthDto from '../dto/request/github-oauth.dto';
+import RequestGetOAuthUrlQuery from '../dto/request/get-oauth-url.dto';
 
 @ApiTags('[인증] 소셜로그인')
 @Controller({ path: 'oauth', version: '1' })
@@ -57,6 +58,9 @@ export default class OAuthController {
     this.setCookie(res, authResult);
     return { userId: authResult.userId };
   }
+
+  @Public()
+  async getOAuthUrl(@Query() query: RequestGetOAuthUrlQuery) {}
 
   private setCookie(res: Response, { accessToken, refreshToken }: { accessToken: string; refreshToken: string }) {
     this.cookieService.setCookie(ACCESS_TOKEN_KEY, accessToken, CookieMaxage.HOUR_1, res);
