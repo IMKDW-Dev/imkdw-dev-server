@@ -9,7 +9,6 @@ import * as ArticleMapper from '../mappers/article.mapper';
 import ResponseGetArticlesDto from '../dto/response/get-article.dto';
 import { getOffsetPagingResult } from '../../../../common/functions/offset-paging.function';
 import { UpdateArticleDto } from '../dto/internal/update-article.dto';
-import { ArticleQueryFilter } from '../repository/article-query.filter';
 import CreateArticleUseCase from '../use-cases/create-article.use-case';
 import UpdateArticleUseCase from '../use-cases/update-article.use-case';
 import IncreaseViewCountUseCase from '../use-cases/increate-view-count.use-case';
@@ -61,9 +60,5 @@ export default class ArticleService {
   async updateArticle(dto: UpdateArticleDto) {
     const updatedArticle = await this.updateArticleUseCase.execute(dto);
     return ArticleMapper.toDto(updatedArticle);
-  }
-
-  async findIds(filter: ArticleQueryFilter) {
-    return this.articleRepository.findIds(filter);
   }
 }

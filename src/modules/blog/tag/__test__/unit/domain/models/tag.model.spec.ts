@@ -2,29 +2,35 @@ import { InvalidTagNameException } from '../../../../../../../common/exceptions/
 import Tag from '../../../../domain/models/tag.model';
 
 describe('Tag', () => {
-  describe('유효성검사', () => {
-    it('태그 이름이 없는 경우 InvalidTagNameException 에러가 발생한다', () => {
-      // Given
-      const tagName = '';
-
-      // When, Then
-      expect(() => new Tag.builder().setName(tagName).build()).toThrow(InvalidTagNameException);
+  describe('공백으로', () => {
+    describe('태그를 생성하면', () => {
+      it('예외가 발생한다', () => {
+        expect(() => new Tag.builder().setName(' ').build()).toThrow(InvalidTagNameException);
+      });
     });
+  });
 
-    it('태그 이름이 2자 미만인 경우 InvalidTagNameException 에러가 발생한다', () => {
-      // Given
-      const tagName = 'a';
-
-      // When, Then
-      expect(() => new Tag.builder().setName(tagName).build()).toThrow(InvalidTagNameException);
+  describe('2글자 미만인 이름으로', () => {
+    describe('태그를 생성하면', () => {
+      it('예외가 발생한다', () => {
+        expect(() => new Tag.builder().setName('a').build()).toThrow(InvalidTagNameException);
+      });
     });
+  });
 
-    it('태그 이름이 20자 초과인 경우 InvalidTagNameException 에러가 발생한다', () => {
-      // Given
-      const tagName = 'a'.repeat(21);
+  describe('20자 초과인 이름으로', () => {
+    describe('태그를 생성하면', () => {
+      it('예외가 발생한다', () => {
+        expect(() => new Tag.builder().setName('a'.repeat(21)).build()).toThrow(InvalidTagNameException);
+      });
+    });
+  });
 
-      // When, Then
-      expect(() => new Tag.builder().setName(tagName).build()).toThrow(InvalidTagNameException);
+  describe('10자의 이름으로', () => {
+    describe('태그를 생성하면', () => {
+      it('예외가 발생하지 않는다', () => {
+        expect(() => new Tag.builder().setName('a'.repeat(10)).build()).not.toThrow();
+      });
     });
   });
 });

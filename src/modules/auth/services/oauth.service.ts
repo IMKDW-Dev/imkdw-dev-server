@@ -84,7 +84,6 @@ export default class OAuthService {
 
   private async handleOAuth(provider: UserOAuthProvider, email: string) {
     const userByEmail = await this.userService.findOne({ email });
-
     if (userByEmail && userByEmail.isSignupWithOAuth(provider)) {
       return this.authService.login(userByEmail.getId());
     }
