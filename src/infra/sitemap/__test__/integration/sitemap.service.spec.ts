@@ -51,7 +51,6 @@ describe('SitemapService', () => {
         desc: category.getDesc(),
         image: category.getImage(),
         sort: category.getSort(),
-        articleCount: category.getArticleCount(),
       })),
     });
 

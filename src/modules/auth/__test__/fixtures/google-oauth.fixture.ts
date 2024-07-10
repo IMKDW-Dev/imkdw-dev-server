@@ -14,7 +14,5 @@ export const createGoogleOAuthUserInfo = (params: CreateGoogleOAuthUserInfoParam
     given_name: '',
     family_name: '',
     picture: '',
-    locale: '',
-    hd: '',
   };
 };

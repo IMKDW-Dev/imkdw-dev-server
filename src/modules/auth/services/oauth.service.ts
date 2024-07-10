@@ -9,30 +9,27 @@ import { KakaoOAuthToken, KakaoUserInfo } from '../../../@types/auth/oauth/kakao
 import { GithubOAuthToken } from '../../../@types/auth/oauth/github.type';
 import UserOAuthProvider from '../../user/domain/models/user-oauth-provider.model';
 import UserService from '../../user/services/user.service';
-import OAuthProvider from '../enums/oauth-provider.enum';
 
 @Injectable()
 export default class OAuthService {
   constructor(
+    @Inject(HTTP_REST_SERVICE) private readonly httpRestService: IHttpRestService,
     private readonly authService: AuthService,
     private readonly userService: UserService,
-    @Inject(HTTP_REST_SERVICE) private readonly httpRestService: IHttpRestService,
     private readonly configService: ConfigService,
   ) {}
 
   async googleOAuth(accessToken: string) {
-    const GET_USER_INFO_API = 'https://www.googleapis.com/oauth2/v2/userinfo';
-
+    const GET_USER_INFO_API = this.configService.get<string>('GOOGLE_GET_USER_INFO_API');
     const userInfo = await this.httpRestService.get<GoogleOAuthUserInfo>(GET_USER_INFO_API, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-
     return this.handleOAuth(UserOAuthProvider.GOOGLE, userInfo.email);
   }
 
   async kakaoOAuth(code: string, redirectUri: string) {
-    const GET_ACCESS_TOKEN_API = 'https://kauth.kakao.com/oauth/token';
-    const GET_USER_API = 'https://kapi.kakao.com/v2/user/me';
+    const GET_ACCESS_TOKEN_API = this.configService.get<string>('KAKAO_GET_ACCESS_TOKEN_API');
+    const GET_USER_INFO_API = this.configService.get<string>('KAKAO_GET_USER_INFO_API');
 
     const kakaoTokenResponse = await this.httpRestService.post<KakaoOAuthToken>(
       GET_ACCESS_TOKEN_API,
@@ -47,7 +44,7 @@ export default class OAuthService {
       },
     );
 
-    const userInfo = await this.httpRestService.get<KakaoUserInfo>(GET_USER_API, {
+    const userInfo = await this.httpRestService.get<KakaoUserInfo>(GET_USER_INFO_API, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
         Authorization: `Bearer ${kakaoTokenResponse.access_token}`,
@@ -58,8 +55,8 @@ export default class OAuthService {
   }
 
   async githubOAuth(code: string, redirectUri: string) {
-    const GET_ACCESS_TOKEN_API = 'https://github.com/login/oauth/access_token';
-    const GET_USER_API = 'https://api.github.com/user';
+    const GET_ACCESS_TOKEN_API = this.configService.get<string>('GITHUB_GET_ACCESS_TOKEN_API');
+    const GET_USER_INFO_API = this.configService.get<string>('GITHUB_GET_USER_INFO_API');
 
     const getTokenResponse = await this.httpRestService.post<GithubOAuthToken>(
       GET_ACCESS_TOKEN_API,
@@ -76,7 +73,7 @@ export default class OAuthService {
       },
     );
 
-    const userInfo = await this.httpRestService.get<GithubUserInfo>(GET_USER_API, {
+    const userInfo = await this.httpRestService.get<GithubUserInfo>(GET_USER_INFO_API, {
       headers: { Authorization: `token ${getTokenResponse.access_token}` },
     });
 
@@ -95,6 +92,4 @@ export default class OAuthService {
 
     return this.authService.register(email, provider);
   }
-
-  async getOAuthUrl(provider: OAuthProvider): Promise<string> {}
 }
