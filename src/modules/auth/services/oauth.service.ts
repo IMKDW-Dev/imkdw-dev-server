@@ -55,14 +55,14 @@ export default class OAuthService {
   }
 
   async githubOAuth(code: string, redirectUri: string) {
-    const GET_ACCESS_TOKEN_API = this.configService.get<string>('GITHUB_GET_ACCESS_TOKEN_API');
-    const GET_USER_INFO_API = this.configService.get<string>('GITHUB_GET_USER_INFO_API');
+    const GET_ACCESS_TOKEN_API = this.configService.get<string>('OAUTH_GITHUB_GET_ACCESS_TOKEN_API');
+    const GET_USER_INFO_API = this.configService.get<string>('OAUTH_GITHUB_GET_USER_INFO_API');
 
     const getTokenResponse = await this.httpRestService.post<GithubOAuthToken>(
       GET_ACCESS_TOKEN_API,
       {
-        client_id: this.configService.get<string>('GITHUB_CLIENT_ID'),
-        client_secret: this.configService.get<string>('GITHUB_CLIENT_SECRET'),
+        client_id: this.configService.get<string>('OAUTH_GITHUB_CLIENT_ID'),
+        client_secret: this.configService.get<string>('OAUTH_GITHUB_CLIENT_SECRET'),
         code,
         redirect_uri: redirectUri,
       },
