@@ -8,6 +8,7 @@ import User from '../../../user/domain/models/user.model';
 export const toDto = (comment: Comment): CommentDto => {
   return new CommentDto(
     comment.getId(),
+    comment.getParentId(),
     comment.getArticleId(),
     comment.getContent(),
     comment.getCreatedAt(),

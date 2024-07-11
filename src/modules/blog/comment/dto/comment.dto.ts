@@ -2,8 +2,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import UserDto from '../../../user/dto/user.dto';
 
 export default class CommentDto {
-  constructor(id: number, articleId: string, content: string, createdAt: Date, author: UserDto, replies: CommentDto[]) {
+  constructor(
+    id: number,
+    parentId: number,
+    articleId: string,
+    content: string,
+    createdAt: Date,
+    author: UserDto,
+    replies: CommentDto[],
+  ) {
     this.id = id;
+    this.parentId = parentId;
     this.articleId = articleId;
     this.content = content;
     this.createdAt = createdAt;
@@ -13,6 +22,9 @@ export default class CommentDto {
 
   @ApiProperty({ description: '댓글 아이디', example: 1, type: Number })
   id: number;
+
+  @ApiProperty({ description: '부모 댓글 아이디', example: 1, type: Number })
+  parentId: number;
 
   @ApiProperty({ description: '게시글 아이디', example: 'UUID' })
   articleId: string;
