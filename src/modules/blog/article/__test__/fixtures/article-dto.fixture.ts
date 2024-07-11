@@ -1,8 +1,10 @@
 import { generateMulterFile } from '../../../../../__test__/fixtures/create-multer-file.fixture';
+import { generateCUID } from '../../../../../common/utils/cuid';
 import { userRoles } from '../../../../user/domain/models/user-role.model';
 import { CreateArticleDto } from '../../dto/internal/create-article.dto';
 import { GetArticlesDto } from '../../dto/internal/get-article.dto';
 import { UpdateArticleDto } from '../../dto/internal/update-article.dto';
+import RequestCreateArticleDto from '../../dto/request/create-article.dto';
 import { GetArticleSort } from '../../enums/article.enum';
 
 export const createCreateArticleDto = (params?: Partial<CreateArticleDto>): CreateArticleDto => {
@@ -39,5 +41,18 @@ export const createGetArticlesDto = (params?: Partial<GetArticlesDto>): GetArtic
     excludeId: params?.excludeId ?? '',
     search: params?.search ?? '',
     sort: params?.sort ?? GetArticleSort.LATEST,
+  };
+};
+
+export const createRequestCreateArticleDto = (params?: Partial<RequestCreateArticleDto>): RequestCreateArticleDto => {
+  return {
+    id: params?.id ?? generateCUID(),
+    title: params?.title ?? generateCUID(),
+    visible: params?.visible ?? true,
+    categoryId: params?.categoryId ?? 1,
+    content: params?.content ?? 'a'.repeat(100),
+    thumbnail: params?.thumbnail ?? generateMulterFile(),
+    tags: params?.tags ?? ['tag1'],
+    images: params?.images ?? [],
   };
 };
