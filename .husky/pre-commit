@@ -1,1 +1,8 @@
-npx lint-staged
+#!/bin/bash
+
+export NODE_ENV=test
+
+pnpm lint
+pnpm test:unit
+pnpm test:integration
+pnpm test:e2e

@@ -15,7 +15,7 @@ export default class AxiosHttpRestService implements IHttpRestService {
       const response = await this.instance.get<T>(url, options);
       return response.data;
     } catch (error) {
-      Logger.error(error.response.data, error.stack, 'AxiosHttpRestService.get');
+      Logger.error(JSON.stringify(error));
       return null;
     }
   }
@@ -25,7 +25,7 @@ export default class AxiosHttpRestService implements IHttpRestService {
       const response = await this.instance.post<T>(url, body, options);
       return response.data;
     } catch (error) {
-      Logger.error(error.response.data, error.stack, 'AxiosHttpRestService.get');
+      Logger.error(JSON.stringify(error));
       return null;
     }
   }

@@ -17,7 +17,7 @@ export default class AuthService {
   }
 
   async register(email: string, oAuthProvider: UserOAuthProvider) {
-    const registerdUser = await this.userService.createUser(email, oAuthProvider);
+    const registerdUser = await this.userService.createUser({ email, oAuthProvider });
     return this.login(registerdUser.getId());
   }
 

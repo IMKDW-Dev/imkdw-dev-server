@@ -1,3 +1,4 @@
+import { generateCUID } from '../../../../common/utils/cuid';
 import { generateUUID } from '../../../../common/utils/uuid';
 import UserOAuthProvider from '../../domain/models/user-oauth-provider.model';
 import UserRole from '../../domain/models/user-role.model';
@@ -16,7 +17,7 @@ interface Params {
 export const createUser = (params?: Params) => {
   return new User.builder()
     .setId(params?.id ?? generateUUID())
-    .setEmail(params?.email ?? 'dummy_email')
+    .setEmail(params?.email ?? `${generateCUID()}@imkdw.dev`)
     .setProfile(params?.profile ?? 'dummy_profile')
     .setNickname(params?.nickname ?? 'nickname')
     .setRole(params?.userRole ?? UserRole.NORMAL)

@@ -5,7 +5,7 @@ import Transport from 'winston-transport';
 
 import { ILogger } from '../interfaces/logger.interface';
 import CloudwatchTransport from '../transports/cloudwatch.transport';
-import { isLocal, isProduction } from '../../../common/functions/enviroment.function';
+import { isProduction } from '../../../common/functions/enviroment.function';
 
 const { combine, timestamp, prettyPrint, printf, errors } = winston.format;
 
@@ -15,9 +15,7 @@ export default class WinstonLogger implements ILogger {
   private transports: Transport[] = [];
 
   constructor(private readonly configService: ConfigService) {
-    if (isLocal()) {
-      this.transports = [new winston.transports.Console({ level: 'debug' })];
-    }
+    this.transports = [new winston.transports.Console({ level: 'debug' })];
 
     if (isProduction()) {
       this.transports.push(
