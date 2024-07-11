@@ -3,7 +3,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 export const NOT_FOUND_EXCEPTIONS = {
   CATEGORY_NOT_FOUND: '404001',
   ARTICLE_NOT_FOUND: '404002',
-  ARTICLE_COMMENT_NOT_FOUND: '404003',
+  COMMENT_NOT_FOUND: '404003',
   USER_NOT_FOUND: '404004',
 } as const;
 
@@ -25,9 +25,9 @@ export class ArticleNotFoundException extends NotFoundException {
   }
 }
 
-export class ArticleCommentNotFoundException extends NotFoundException {
+export class CommentNotFoundException extends NotFoundException {
   constructor(error: unknown) {
-    super(NOT_FOUND_EXCEPTIONS.ARTICLE_COMMENT_NOT_FOUND, error);
+    super(NOT_FOUND_EXCEPTIONS.COMMENT_NOT_FOUND, error);
   }
 }
 

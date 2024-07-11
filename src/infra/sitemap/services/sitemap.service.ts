@@ -1,19 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import ArticleService from '../../../modules/article/services/article/article.service';
-import CategoryService from '../../../modules/category/services/category.service';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
 @Injectable()
 export default class SitemapService {
-  constructor(
-    private readonly articleService: ArticleService,
-    private readonly categoryService: CategoryService,
-  ) {}
+  constructor(private readonly prisma: TransactionHost<TransactionalAdapterPrisma>) {}
 
   async getArticleIds(): Promise<string[]> {
-    return this.articleService.findIds({ includePrivate: false });
+    const articleIds = await this.prisma.tx.articles.findMany({ select: { id: true }, where: { visible: true } });
+    return articleIds.map((article) => article.id);
   }
 
   async getCategoryNames(): Promise<string[]> {
-    return this.categoryService.findNames({});
+    const categoryNames = await this.prisma.tx.categories.findMany({ select: { name: true } });
+    return categoryNames.map((category) => category.name);
   }
 }

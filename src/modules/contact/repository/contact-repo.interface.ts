@@ -1,4 +1,4 @@
-import Contact from '../domain/entities/contact.entity';
+import Contact from '../domain/models/contact.model';
 
 export const CONTACT_REPOTIROY = Symbol('CONTACT_REPOTIROY');
 export interface IContactRepository {

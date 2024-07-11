@@ -113,7 +113,7 @@ export default class User {
         this.nickname || new Nickname(),
         this.profile || new Profile(),
         this.oAuthProvider,
-        this.role,
+        this.role || UserRole.NORMAL,
       );
     }
   };

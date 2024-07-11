@@ -16,7 +16,7 @@ const config: Config.InitialOptions = {
   resetMocks: true,
   restoreMocks: true,
   clearMocks: true,
-  testTimeout: 10000,
+  coveragePathIgnorePatterns: ['/node_modules/', '/__test__/', '/docs/', '\\.interface\\.ts$'],
 };
 
 export default config;

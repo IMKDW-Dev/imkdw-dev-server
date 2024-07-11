@@ -16,7 +16,7 @@ export default class UserImageService {
     const BASIC_PATH = `users/${user.getId()}`;
 
     const originalPath = `${BASIC_PATH}/original.${image.originalname.split('.').pop()}`;
-    this.storageService.upload(originalPath, image.buffer, ContentType.IMAGE);
+    await this.storageService.upload(originalPath, image.buffer, ContentType.IMAGE);
 
     const thumbnailPath = `${BASIC_PATH}/${generateUUID()}.webp`;
     const thumbnailImage: Buffer = await this.imageService.generateThumbnail({ image, width: 60 });
