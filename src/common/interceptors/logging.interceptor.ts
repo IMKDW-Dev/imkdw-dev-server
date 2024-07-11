@@ -15,7 +15,7 @@ export default class LoggingInterceptor implements NestInterceptor {
     const startTime = Date.now();
 
     return next.handle().pipe(
-      tap(() => {
+      tap((responseBody) => {
         const endTime = Date.now();
 
         this.logger.info({
@@ -33,8 +33,7 @@ export default class LoggingInterceptor implements NestInterceptor {
             params: request.params,
           },
           response: {
-            // TODO: 응답값 로깅 데이터 가져오기 작업
-            body: response.locals.body,
+            body: responseBody,
           },
         });
       }),
