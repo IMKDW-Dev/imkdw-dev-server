@@ -76,12 +76,6 @@ jobs:
       - name: Install Dependencies
         run: pnpm i
 
-      - name: Generate Prisma Types
-        run: npx prisma db push
-
-      - name: Seeding Database
-        run: npx prisma db seed
-
       - name: Test Project
         run: pnpm test:unit
 
