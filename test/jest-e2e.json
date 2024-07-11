@@ -6,5 +6,8 @@
   "transform": {
     "^.+\\.(t|j)s$": "@swc/jest"
   },
-  "verbose": true
+  "verbose": true,
+  "resetMocks": true,
+  "restoreMocks": true,
+  "clearMocks": true
 }

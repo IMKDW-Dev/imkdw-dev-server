@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import nock from 'nock';
 
-import createTestApp from '../../../../__test__/fixtures/create-e2e-nest-app.fixture';
+import createTestApp from '../../../../__test__/fixtures/create-e2e-app.fixture';
 import { mockKakaoGetAccessTokenApi, mockKakaoOAuthGetUserInfoApi } from '../helpers/kakao-oauth.helper';
 import PrismaService from '../../../../infra/database/prisma.service';
 import { cleanupDatabase } from '../../../../../prisma/__test__/utils/cleanup';
@@ -11,7 +11,7 @@ import { testGoogleOAuth } from './features/test_google_oauth';
 import { testKakaoOAuth } from './features/test_kakao_oauth';
 import { testGithubOAuth } from './features/test_github_oauth';
 
-describe('OAuth', () => {
+describe('OAuth (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
 
@@ -22,7 +22,9 @@ describe('OAuth', () => {
     app.init();
   });
 
-  beforeEach(async () => cleanupDatabase(prisma));
+  beforeEach(async () => {
+    await cleanupDatabase(prisma);
+  });
 
   afterEach(() => nock.cleanAll());
 

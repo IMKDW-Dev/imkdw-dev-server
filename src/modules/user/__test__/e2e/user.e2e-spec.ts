@@ -1,10 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import nock from 'nock';
 
-import createTestApp from '../../../../__test__/fixtures/create-e2e-nest-app.fixture';
+import createTestApp from '../../../../__test__/fixtures/create-e2e-app.fixture';
 import PrismaService from '../../../../infra/database/prisma.service';
 import { cleanupDatabase } from '../../../../../prisma/__test__/utils/cleanup';
-import { testGoogleOAuth } from '../../../auth/__test__/e2e/features/test_google_oauth';
 import { testGetUserInfo } from './features/test_get_user_info';
 import { DEFAULT_PROFILE } from '../../constants/user.constant';
 import { userRoles } from '../../domain/models/user-role.model';
@@ -13,8 +13,9 @@ import { testUpdateUserProfile } from './features/test_update_user_profile';
 import { IStorageService } from '../../../../infra/storage/interfaces/storage.interface';
 import { generateMulterFile } from '../../../../__test__/fixtures/create-multer-file.fixture';
 import ContentType from '../../../../infra/storage/enums/s3-content-type.enum';
+import { registerNewUser } from '../../../auth/__test__/fixtures/auth.fixture';
 
-describe('OAuth', () => {
+describe('User (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let storageService: IStorageService;
@@ -27,7 +28,11 @@ describe('OAuth', () => {
     app.init();
   });
 
-  beforeEach(async () => cleanupDatabase(prisma));
+  beforeEach(async () => {
+    await cleanupDatabase(prisma);
+  });
+
+  afterEach(() => nock.cleanAll());
 
   afterAll(async () => {
     await app.close();
@@ -38,9 +43,7 @@ describe('OAuth', () => {
 
     describe('유저 정보를 조회하면', () => {
       it('유저 정보가 반환된다', async () => {
-        const registerResponse = await testGoogleOAuth(app);
-        const cookies = registerResponse.headers['set-cookie'];
-        const { userId } = registerResponse.body.data;
+        const { cookies, userId } = await registerNewUser(app, userRoles.normal.name);
 
         response = await testGetUserInfo(app, userId, cookies);
         expect(response.body.data.id).toBe(userId);
@@ -57,9 +60,7 @@ describe('OAuth', () => {
     describe('닉네임을 수정하면', () => {
       const newNickname = 'newName';
       it('닉네임을 저장하고 유저 정보를 반환한다', async () => {
-        const registerResponse = await testGoogleOAuth(app);
-        const cookies = registerResponse.headers['set-cookie'];
-        const { userId } = registerResponse.body.data;
+        const { cookies, userId } = await registerNewUser(app, userRoles.normal.name);
 
         response = await testUpdateUserNickname(app, userId, cookies, newNickname);
         expect(response.body.data.nickname).toBe(newNickname);
@@ -72,9 +73,7 @@ describe('OAuth', () => {
       const imageExt = image.originalname.split('.').pop();
 
       it('프로필 이미지를 저장하고 유저 정보를 반환한다', async () => {
-        const registerResponse = await testGoogleOAuth(app);
-        const cookies = registerResponse.headers['set-cookie'];
-        const { userId } = registerResponse.body.data;
+        const { cookies, userId } = await registerNewUser(app, userRoles.normal.name);
 
         const uploadSpy = jest.spyOn(storageService, 'upload').mockResolvedValue(uploadedUrl);
 

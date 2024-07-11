@@ -15,7 +15,7 @@ const createTestApp = async () => {
     .useValue({
       info: () => {},
       debug: () => {},
-      error: () => {},
+      error: (data: unknown) => console.log(data),
     })
     .overrideProvider(STORAGE_SERVICE)
     .useValue({
