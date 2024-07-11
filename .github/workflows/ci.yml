@@ -57,7 +57,35 @@ jobs:
       - name: Lint Project
         run: pnpm lint
 
-  test:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js v20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Setup pnpm v8
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install Dependencies
+        run: pnpm i
+
+      - name: Generate Prisma Types
+        run: npx prisma db push
+
+      - name: Seeding Database
+        run: npx prisma db seed
+
+      - name: Test Project
+        run: pnpm test:unit
+
+  integration-test:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: mysql://root:1234@localhost:3306/test
@@ -96,9 +124,9 @@ jobs:
         run: npx prisma db seed
 
       - name: Test Project
-        run: pnpm test:ci
+        run: pnpm test:integration
 
-  e2e:
+  e2e-test:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: mysql://root:1234@localhost:3307/test
@@ -137,10 +165,10 @@ jobs:
         run: npx prisma db seed
 
       - name: Test Project
-        run: pnpm test:ci
+        run: pnpm test:e2e
 
   alert:
-    needs: [build, lint, test, e2e]
+    needs: [build, lint, unit-test, integration-test, e2e-test]
     runs-on: ubuntu-latest
     steps:
       - name: Push CI Result on Slack
