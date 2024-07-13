@@ -176,6 +176,7 @@ model articleComments {
   article articles @relation(fields: [articleId], references: [id])
   user    users    @relation(fields: [userId], references: [id])
 
+  @@index([articleId])
   @@map("ArticleComments")
 }
 
