@@ -9,9 +9,7 @@ export default class ImageService implements IImageService {
   async generateThumbnail(dto: GenerateThumbnailDto): Promise<Buffer> {
     const thumbnail = await sharp(dto.image.buffer)
       .webp({ quality: dto?.quality ?? 40 })
-      .resize({
-        width: dto.width,
-      })
+      .resize({ width: dto.width })
       .toBuffer();
 
     return thumbnail;

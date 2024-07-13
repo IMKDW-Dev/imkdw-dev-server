@@ -13,10 +13,6 @@ export interface ResponseType<T = unknown> {
 @Injectable()
 export default class TransformInterceptor<T> implements NestInterceptor<T, ResponseType<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<ResponseType<T>> {
-    return next.handle().pipe(
-      map((data) => ({
-        data,
-      })),
-    );
+    return next.handle().pipe(map((data) => ({ data })));
   }
 }
