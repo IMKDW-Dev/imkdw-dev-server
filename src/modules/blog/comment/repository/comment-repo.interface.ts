@@ -9,5 +9,7 @@ export interface ICommentRepository {
   save(comment: Comment): Promise<Comment>;
   saveMany(comments: Comment[]): Promise<void>;
 
+  count(): Promise<number>;
+
   deleteByArticleId(articleId: string): Promise<void>;
 }

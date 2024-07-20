@@ -104,6 +104,10 @@ export default class CommentRepository implements ICommentRepository {
     });
   }
 
+  async count(): Promise<number> {
+    return this.prisma.tx.articleComments.count();
+  }
+
   private toModel(row: IArticleComment): Comment {
     const replies =
       row?.replies.map((reply) => {
