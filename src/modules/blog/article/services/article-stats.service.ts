@@ -11,8 +11,8 @@ export default class ArticleStatsService {
 
   async getArticleStats(): Promise<ArticleStatsDto> {
     const articles = await this.articleRepository.findMany({ includePrivate: false });
-    const comments = await this.commentRepository.findMany({});
+    const comments = await this.commentRepository.count();
     const articleViews = articles.reduce((acc, article) => acc + article.getViewCount(), 0);
-    return new ArticleStatsDto(articles.length, comments.length, articleViews);
+    return new ArticleStatsDto(articles.length, comments, articleViews);
   }
 }
