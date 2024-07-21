@@ -28,13 +28,6 @@
 <br/>
 <br/>
 
-# Links
-
-1. 블로그 소개 : [블로그 소개글로 이동하기](https://imkdw.dev/articles/introduce-of-my-tech-blog-imkdw-dev-e0ex0rqh)
-2. CI/CD 구성 : [CI/CD 구성 소개글로 이동하기](https://imkdw.dev/articles/introduce-of-imkdw-dev-cicd-pipeline-fo9igia5)
-3. 인프라 구성 : [인프라 구성 소개글로 이동하기](https://imkdw.dev/articles/introduce-of-imkdw-dev-aws-infra-avsgg00u)
-   <br/>
-   <br/>
 
 # Tech Stacks
 
