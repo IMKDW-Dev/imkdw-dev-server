@@ -46,8 +46,9 @@ jobs:
       - run: pnpm build
       - uses: actions/upload-artifact@v3
         with:
-          name: build
-          path: build
+          name: dist
+          path: dist
+          if-no-files-found: error
 
   lint:
     runs-on: ubuntu-latest
