@@ -31,7 +31,7 @@ env:
   SLACK_CHANNEL_ERROR: ${{ secrets.SLACK_CHANNEL_ERROR }}
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -47,58 +47,48 @@ jobs:
         with:
           version: 8
 
-      - name: Install Production Dependencies
-        run: pnpm i -P
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - name: Generate Prisma Types
-        run: npx prisma generate
+      - name: Install Dependencies
+        run: pnpm i
 
-      - name: Build Project
-        run: pnpm build
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - run: pnpm install
+      - uses: actions/cache@v3
+        with:
+          path: ./*
+          key: ${{ github.sha }}
 
   lint:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js v20
-        uses: actions/setup-node@v3
+      - uses: actions/cache@v3
         with:
-          node-version: 20
-
-      - name: Setup pnpm v8
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - name: Install Dependencies
-        run: pnpm i
-
-      - name: Lint Project
-        run: pnpm lint
+          path: ./*
+          key: ${{ github.sha }}
+      - run: pnpm lint
 
   unit-test:
+    needs: setup
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js v20
-        uses: actions/setup-node@v3
+      - uses: actions/cache@v3
         with:
-          node-version: 20
-
-      - name: Setup pnpm v8
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - name: Install Dependencies
-        run: pnpm i
-
-      - name: Test Project
-        run: pnpm test:unit
+          path: ./*
+          key: ${{ github.sha }}
+      - run: pnpm test:unit
 
   integration-test:
     runs-on: ubuntu-latest
