@@ -17,7 +17,7 @@ env:
   OAUTH_GITHUB_GET_ACCESS_TOKEN_API: ${{ secrets.OAUTH_GITHUB_GET_ACCESS_TOKEN_API }}
   OAUTH_GITHUB_GET_USER_INFO_API: ${{ secrets.OAUTH_GITHUB_GET_USER_INFO_API }}
   OAUTH_GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
-  OAUTH_GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
+  OAUTH_GITHUB_CLIENT_SEC RET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
   JWT_SECRET: test
   JWT_ACCESS_TOKEN_EXPIRES_IN: ${{ secrets.JWT_ACCESS_TOKEN_EXPIRES_IN }}
   JWT_REFRESH_TOKEN_EXPIRES_IN: ${{ secrets.JWT_REFRESH_TOKEN_EXPIRES_IN }}
@@ -34,27 +34,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js v20
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 20
-
-      - name: Setup pnpm v8
-        uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v2
         with:
           version: 8
-
-      - name: Install Production Dependencies
-        run: pnpm i -P
-
-      - name: Generate Prisma Types
-        run: npx prisma generate
-
-      - name: Build Project
-        run: pnpm build
+      - run: pnpm i -P
+      - run: npx prisma generate
+      - run: pnpm build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build
 
   lint:
     runs-on: ubuntu-latest
