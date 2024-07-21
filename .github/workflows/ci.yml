@@ -173,7 +173,7 @@ jobs:
         run: pnpm test:e2e
 
   alert:
-    needs: [build, lint, unit-test, integration-test, e2e-test]
+    needs: [setup, lint, unit-test, integration-test, e2e-test]
     runs-on: ubuntu-latest
     steps:
       - name: Push CI Result on Slack
