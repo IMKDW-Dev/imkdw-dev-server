@@ -132,7 +132,6 @@ export default class ArticleRepository implements IArticleRepository {
       },
       include: articleInclude,
     });
-
     return this.toModel(row);
   }
 

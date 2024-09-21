@@ -11,6 +11,7 @@ export default class IncreaseViewCountUseCase implements UseCase<IncreaseViewCou
 
   async execute(dto: IncreaseViewCountDto): Promise<void> {
     const article = await this.articleRepository.findOne({
+      articleId: dto.articleId,
       includePrivate: dto.userRole === userRoles.admin.name,
     });
 
